@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Ranine\Tests\Helper;
 
-use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\TestCase;
 use Ranine\Helper\IterationHelpers;
 
 /**
@@ -13,7 +13,7 @@ use Ranine\Helper\IterationHelpers;
  * @coversDefaultClass \Ranine\Helper\IterationHelpers
  * @group ranine
  */
-class RoleHelpersTest extends UnitTestCase {
+class RoleHelpersTest extends TestCase {
 
   /**
    * Tests the walkRecursiveIterator() method.
