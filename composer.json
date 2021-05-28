@@ -1,6 +1,6 @@
 {
   "name": "ucg/ranine",
-  "description": "Contains useful PHP helper methods, classes, interfaces, and traits. Some are Drupal-specific.",
+  "description": "Contains useful PHP helper methods, classes, and traits. Some are Drupal-specific.",
   "type": "library",
   "authors": [
     {
