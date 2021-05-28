@@ -11,41 +11,62 @@ use Traversable;
 class ExtendableIterator extends \IteratorAggregate {
 
   /**
-   * The generator which produces elements from the iterable source.
+   * The source iterable.
    */
-  private Generator $generator;
+  private iterable $source;
 
   /**
    * Creates a new extendable iterator.
    *
-   * @param iterable $generator
-   *   Generator which yields values over which we are iterating.
+   * @param iterable $source
+   *   Iterator which yields values over which we are iterating.
    */
-  protected function __construct(Generator $generator) {
-    $this->generator = $generator;
+  protected function __construct(iterable $source) {
+    $this->source = $source;
+  }
+
+  /**
+   * Appends elements from $other on the end of this iterator.
+   *
+   * @param iterable $other
+   *   Iterator to append.
+   *
+   * @return ExtendableIterator
+   *   Appended output.
+   */
+  public function append(iterable $other) : ExtendableIterator {
+    return new static((function () use ($other) {
+      yield from $this->source;
+      yield from $other;
+    })());
   }
 
   /**
    * Counts the elements in this iterable.
    *
-   * If the iterable represents an array or implements \Countable, it is better
-   * to use the native count() function.
-   *
    * @return int
    *   Count.
    */
   public function count() : int {
-    return iterator_count($this->generator);
+    if (is_array($this->source) || ($this->source instanceof \Countable)) {
+      // Note: Intelephense gives a type error unless we do something like this.
+      /** @var array|\Countable */
+      $countableSource = $this->source;
+      return count($countableSource);
+    }
+    else {
+      return iterator_count($this->source);
+    }
   }
 
   /**
-   * Gets the iterator underlying this object.
+   * Gets an iterator for looping through values associated with this object.
    *
    * @return \Traversable
    *   Iterator.
    */
-  public function getIterator() : Traversable {
-    return $this->generator;
+  public function getIterator() : \Traversable {
+    yield from $this->source;
   }
 
   /**
@@ -61,7 +82,7 @@ class ExtendableIterator extends \IteratorAggregate {
    */
   public function filter(callable $filter = fn($k, $v) => TRUE) : ExtendableIterator {
     return new static((function () use ($filter) {
-      foreach ($this->generator as $key => $value) {
+      foreach ($this->source as $key => $value) {
         if ($filter($key, $value)) {
           yield $key => $value;
         }
@@ -86,7 +107,7 @@ class ExtendableIterator extends \IteratorAggregate {
    */
   public function map(callable $valueMap = fn($k, $v) => $v, callable $keyMap = fn($k, $v) => $k) : ExtendableIterator {
     return new static((function () use ($keyMap, $valueMap) {
-      foreach ($this->generator as $key => $value) {
+      foreach ($this->source as $key => $value) {
         yield $keyMap($key, $value) => $valueMap($key, $value);
       }
     })());
@@ -107,9 +128,9 @@ class ExtendableIterator extends \IteratorAggregate {
    * @return mixed
    *   Value of the aggregate object returned from the last call to $reduction.
    */
-  public function reduce(callable $reduction = fn($k, $v, $c) => $c, $initialValue) {
+  public function reduce(callable $reduction = fn($k, $v, $a) => $a, $initialValue) {
     $aggregate = $initialValue;
-    foreach ($this->generator as $key => $value) {
+    foreach ($this->source as $key => $value) {
       $aggregate = $reduction($key, $value, $aggregate);
     }
     return $aggregate;
@@ -125,7 +146,21 @@ class ExtendableIterator extends \IteratorAggregate {
    *   Resulting array.
    */
   public function toArray(bool $preserveKeys = TRUE) : array {
-    return iterator_to_array($this->generator, $preserveKeys);
+    if (is_array($this->source)) {
+      // This is necessary to make Intelephense work.
+      /** @var array */
+      $sourceArray = $this->source;
+      return $sourceArray;
+    }
+    elseif (($this->source instanceof \ArrayObject)) {
+      // Again, this is necessary to make Intelephense work.
+      /** @var \ArrayObject */
+      $sourceArrayObject = $this->source;
+      return $sourceArrayObject->getArrayCopy();
+    }
+    else {
+      return iterator_to_array($this->source, $preserveKeys);
+    }
   }
 
   /**
@@ -138,7 +173,7 @@ class ExtendableIterator extends \IteratorAggregate {
    *   Extendable iterator.
    */
   public static function create(iterable $source) : ExtendableIterator {
-    return new static((function () use ($source) { yield from $source; })());
+    return new static($source);
   }
 
 }

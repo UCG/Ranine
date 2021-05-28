@@ -5,38 +5,38 @@ declare(strict_types = 1);
 namespace Ranine\Collection;
 
 /**
- * Represents a stack (FILO collection) of arrays.
+ * Represents a stack (FILO collection).
  */
-class StackOfArrays implements \IteratorAggregate {
+class Stack implements \IteratorAggregate {
 
   use StackTrait;
 
   /**
    * Returns (but does not remove) the top element of the stack.
    *
-   * @return array
+   * @return mixed
    *   Top stack element.
    */
-  public function peek() : array {
+  public function peek() {
     return $this->peekInternal();
   }
 
   /**
    * Returns and removes the top element of the stack.
    *
-   * @return array
+   * @return mixed
    *   Top stack element.
    */
-  public function pop() : array {
+  public function pop() {
     return $this->popInternal();
   }
 
   /**
    * Pushes $element onto the stack.
    *
-   * @param array $element
+   * @param mixed $element
    */
-  public function push(array $element) : void {
+  public function push($element) : void {
     $this->pushInternal($element);
   }
 

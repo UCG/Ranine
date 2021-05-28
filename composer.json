@@ -13,7 +13,8 @@
   },
   "autoload": {
     "psr-4": {
-      "Ranine\\": "src/"
+      "Ranine\\": "src/",
+      "Ranine\\Tests": "tests/src"
     }
   }
 }
