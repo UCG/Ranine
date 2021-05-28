@@ -2,9 +2,6 @@
 
 namespace Ranine\Iteration;
 
-use Generator;
-use Traversable;
-
 /**
  * Iterates through an iterable object while providing useful extension methods.
  */

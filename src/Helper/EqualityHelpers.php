@@ -38,7 +38,7 @@ final class EqualityHelpers {
    * @return bool
    *   Returns 'TRUE' if arrays are equal, else 'FALSE'.
    */
-  protected static function areArraysEqualStrictOrderInvariant(array $arr1, array $arr2, bool $recursive = FALSE) : bool {
+  public static function areArraysEqualStrictOrderInvariant(array $arr1, array $arr2, bool $recursive = FALSE) : bool {
     if (count($arr1) !== count($arr2)) {
       return FALSE;
     }
@@ -82,9 +82,9 @@ final class EqualityHelpers {
   /**
    * Checks if the values in two arrays are equal.
    *
-   * Equality is reached if two things are true: 1) for each value in $arr1,
-   * there is a strictly equal value in $arr2, and 2) for each value in $arr2,
-   * there is a strictly equal value in $arr1.
+   * Equality is defined such that equality is obtained if and only if for each
+   * element in $arr1, there is exactly one matching element in $arr2 with the
+   * same value, and visa versa.
    *
    * @param array $arr1
    *   Array 1.
@@ -94,54 +94,29 @@ final class EqualityHelpers {
    * @return bool
    *   Returns 'TRUE' if array values are equal, else 'FALSE'.
    */
-  protected static function areArrayValuesEqualStrict(array $arr1, array $arr2) : bool {
+  public static function areArrayValuesEqualStrict(array $arr1, array $arr2) : bool {
     if (count($arr1) !== count($arr2)) {
       return FALSE;
     }
 
-    // Where possible, make the values of $arr1 into "hash sets" so we can
-    // check for their existence in ~O(1).  
-    $arr1StringsAndIntegers = [];
-    $arr1ObjectIds = [];
-    // Also store keys to other values.
-    $arr1OtherKeys = [];
-    foreach ($arr1 as $key => $value) {
-      // Note: don't store \WeakReference IDs as the spec is unclear if these
-      // would be unique in this context.
-      if (is_int($value) || is_string($value)) {
-        $arr1StringsAndIntegers[$value] = NULL;
-      }
-      elseif (is_object($value) && !($value instanceof \WeakReference)) {
-        $arr1ObjectIds[spl_object_id($value)] = NULL;
-      }
-      else {
-        $arr1OtherKeys[] = $key;
-      }
-    }
+    // @todo Optimize if values can be nicely represented as strings/integers,
+    // and maybe for cases where values can be sorted, and for in-between cases.
+    // Right now this runs in O(n*m).
 
-    foreach ($arr2 as $value) {
-      if (is_int($value) || is_string($value)) {
-        if (!array_key_exists($value, $arr1StringsAndIntegers)) {
-          return FALSE;
+    // Set up a table of the used keys in $arr2.
+    $usedKeys = [];
+    foreach ($arr1 as $value1) {
+      $foundValue = FALSE;
+      foreach ($arr2 as $key2 => $value2) {
+        if (!array_key_exists($key2, $usedKeys) && $value2 === $value1) {
+          $foundValue = TRUE;
         }
       }
-      elseif (is_object($value) && !($value instanceof \WeakReference)) {
-        if (!array_key_exists(spl_object_id($value), $arr1ObjectIds)) {
-          return FALSE;
-        }
+      if ($foundValue) {
+        $usedKeys[$key2] = NULL;
       }
       else {
-        // Search for $value.
-        $valueFound = FALSE;
-        foreach ($arr1OtherKeys as $key) {
-          if ($arr1[$key] === $value) {
-            $valueFound = TRUE;
-            break;
-          }
-        }
-        if (!$valueFound) {
-          return FALSE;
-        }
+        return FALSE;
       }
     }
 

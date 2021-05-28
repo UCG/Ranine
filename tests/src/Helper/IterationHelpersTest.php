@@ -13,7 +13,7 @@ use Ranine\Helper\IterationHelpers;
  * @coversDefaultClass \Ranine\Helper\IterationHelpers
  * @group ranine
  */
-class RoleHelpersTest extends TestCase {
+class IterationHelpersTest extends TestCase {
 
   /**
    * Tests the walkRecursiveIterator() method.
