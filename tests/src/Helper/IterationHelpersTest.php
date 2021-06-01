@@ -29,10 +29,11 @@ class IterationHelpersTest extends TestCase {
     $currentSum = 0;
     $this->assertTrue(IterationHelpers::walkRecursiveIterator(new \RecursiveArrayIterator($arr),
       function ($key, $value, ?int $context) use (&$currentSum) : bool {
-        $currentSum += $value;
         if (is_array($value)) {
           return TRUE;
         }
+
+        $currentSum += $value;
         switch ($value) {
           case 2:
           case 3:

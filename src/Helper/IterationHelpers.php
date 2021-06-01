@@ -101,7 +101,7 @@ final class IterationHelpers {
         // Create the information for the next level and push it onto the stack.
         $childContext = $drillDown($key, $value, $currentContext);
         $parentLevels->push($currentLevel);
-        $currentLevel = [$iterator, $childContext];
+        $currentLevel = [$currentIterator, $childContext];
         // Move to the child iterator.
         /** @var \RecursiveIterator */
         $currentIterator = $childIterator;
