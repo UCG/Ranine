@@ -36,18 +36,19 @@ final class IterationHelpers {
    * @param \RecursiveIterator $iterator
    *   Iterator to walk.
    * @param callable $operation
-   *   Operation to apply for every element. This is passed the current key,
-   *   value and a "context" object, which stores information associated with
-   *   the current level being traversed. This function returns a boolean
-   *   indicating whether iteration should be continued ('TRUE' to continue,
+   *   Operation to apply for every element, of the form
+   *   ($key, $value, $context) : bool. The "context" object stores information
+   *   associated with the current level being traversed. The return value
+   *   indicates whether iteration should be continued ('TRUE' to continue,
    *   'FALSE' to halt).
-   * @param callable $drillDown
-   *   This is called before moving down a level, and allows information to be
-   *   stored with the level to which we are moving, before we move there.
-   *   it already exists) *before* moving down a level. The key and value of the
-   *   node whose children we are about to move down to are passed to this
-   *   function, along with the current context (of the level *above* the level
-   *   whose context information we are creating).
+   * @param callable|null $drillDown
+   *   Of the form ($key, $value, $context) : mixed, this is called before
+   *   moving down a level, and allows information to be stored, as the return
+   *   value of this callable, with the level to which we are moving. The key
+   *   and value of the node whose children we are about to move down to are
+   *   passed to this function, along with the current context (of the level
+   *   *above* the level whose context information we are creating). If 'NULL'
+   *   is passed for this parameter, the function ($k, $v, $c) => NULL is used.s
    * @param mixed $initialContext
    *   The context information to be stored at the root level.
    *
@@ -55,10 +56,11 @@ final class IterationHelpers {
    *   Returns 'FALSE' if it was necessary to exit early because of a 'FALSE'
    *   return value of $operation; otherwise returns 'TRUE'.
    */
-  public static function walkRecursiveIterator(\RecursiveIterator $iterator,
-    callable $operation = fn($key, $value, $context) : bool => TRUE,
-    callable $drillDown = fn($key, $value, $context) => $context,
-    $initialContext) : bool {
+  public static function walkRecursiveIterator(\RecursiveIterator $iterator, callable $operation, ?callable $drillDown = NULL, $initialContext = NULL) : bool {
+    if ($drillDown === NULL) {
+      $drillDown = fn() => NULL;
+    }
+
     // Prepare the iterator.
     $iterator->rewind();
     if (!$iterator->valid()) {

@@ -2,6 +2,8 @@
 
 namespace Ranine\Iteration;
 
+use Ranine\Helper\ThrowHelpers;
+
 /**
  * Iterates through an iterable object while providing useful extension methods.
  */
@@ -70,14 +72,14 @@ class ExtendableIterator extends \IteratorAggregate {
    * Filters on the collection's values.
    *
    * @param callable $filter
-   *   Filter - takes each key (first argument) and value from and returns
-   *   'TRUE' (to preserve the value in the output) or 'FALSE' (to not preserve
-   *   the value in the output).
+   *   Filter - of form ($key, $value) : bool - takes each key and value and
+   *   returns 'TRUE' (to preserve the value in the output) or 'FALSE' (to not
+   *   preserve the value in the output).
    *
    * @return \Ranine\Iteration\ExtendableIterator
    *   Filtered output.
    */
-  public function filter(callable $filter = fn($k, $v) => TRUE) : ExtendableIterator {
+  public function filter(callable $filter) : ExtendableIterator {
     return new static((function () use ($filter) {
       foreach ($this->source as $key => $value) {
         if ($filter($key, $value)) {
@@ -92,17 +94,26 @@ class ExtendableIterator extends \IteratorAggregate {
    *
    * @param iterable $input
    *   Input collection.
-   * @param callable $keyMap
-   *   Key map - takes each key (first argument) and value and returns an output
-   *   key.
+   * @param callable|null $keyMap
+   *   Key map - of form ($key, $value) : mixed - takes each key and value and
+   *   returns an output key. If 'NULL' is passed for this parameter, the key
+   *   map ($k, $v) => $k is used.
    * @param callable $valueMap
-   *   Value map - takes each key (first argument) and value form and returns an
-   *   output value.
+   *   Value map - of form ($key, $value) : mixed - takes each key and value and
+   *   returns an output value. If 'NULL' is passed for this parameter, the
+   *   value map ($k, $v) => $v is used.
    *
-   * @return iterable
+   * @return \Ranine\Iteration\ExtendableIterator
    *   Output generator.
    */
-  public function map(callable $valueMap = fn($k, $v) => $v, callable $keyMap = fn($k, $v) => $k) : ExtendableIterator {
+  public function map(?callable $valueMap, ?callable $keyMap = NULL) : ExtendableIterator {
+    if ($valueMap === NULL) {
+      $valueMap = fn($k, $v) => $v;
+    }
+    if ($keyMap === NULL) {
+      $keyMap = fn($k) => $k;
+    }
+
     return new static((function () use ($keyMap, $valueMap) {
       foreach ($this->source as $key => $value) {
         yield $keyMap($key, $value) => $valueMap($key, $value);
@@ -114,10 +125,11 @@ class ExtendableIterator extends \IteratorAggregate {
    * Aggregates the iterable into a single object (the "aggregate").
    *
    * @param callable $reduction
-   *   Reduction - takes each key (first argument), value (second argument), and
-   *   the current value of the "aggregate" object, and produces the resulting
-   *   value of the aggregate object, which will be passed to the reduction for
-   *   the next key and value.
+   *   Reduction - of form ($key, $value, $aggregate) : mixed - produces
+   *   resulting value of aggregate object (in that step of aggregation) from
+   *   current value of aggregate object and key and value. The resulting value
+   *   of the aggregate object, which will be passed to the reduction for the
+   *   next key and value.
    * @param mixed $initialValue
    *   Initial value of the aggregate object (passed to $reduction on its first
    *   call).
@@ -125,12 +137,39 @@ class ExtendableIterator extends \IteratorAggregate {
    * @return mixed
    *   Value of the aggregate object returned from the last call to $reduction.
    */
-  public function reduce(callable $reduction = fn($k, $v, $a) => $a, $initialValue) {
+  public function reduce(callable $reduction, $initialValue) {
     $aggregate = $initialValue;
     foreach ($this->source as $key => $value) {
       $aggregate = $reduction($key, $value, $aggregate);
     }
     return $aggregate;
+  }
+
+  /**
+   * Iterates through $num elements.
+   *
+   * @param int $num
+   *   Number of elements to take.
+   *
+   * @return \Ranine\Iteration\ExtendableIterator
+   *   Items.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown if $num is less than zero.
+   */
+  public function take(int $num) : ExtendableIterator {
+    ThrowHelpers::throwIfLessThanZero($num, 'num');
+
+    return new static((function () use ($num) {
+      $i = 0;
+      foreach ($this->source as $key => $value) {
+        if ($i === $num) {
+          break;
+        }
+        yield $key => $value;
+        $i++;
+      }
+    })());
   }
 
   /**
@@ -171,6 +210,25 @@ class ExtendableIterator extends \IteratorAggregate {
    */
   public static function create(iterable $source) : ExtendableIterator {
     return new static($source);
+  }
+
+  /**
+   * Generates an extendable iterator from a range of integers.
+   *
+   * @param int $start
+   *   Inclusive start value for range.
+   * @param int $end
+   *   Inclusive end value for range.
+   *
+   * @return \Ranine\Iteration\ExtendableIterator
+   *   Output range.
+   */
+  public static function fromRange(int $start, int $end) : ExtendableIterator {
+    return new static((function () use ($start, $end) {
+      for ($i = $start; $i <= $end; $i++) {
+        yield $i;
+      }
+    })());
   }
 
 }

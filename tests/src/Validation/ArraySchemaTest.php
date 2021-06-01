@@ -181,11 +181,11 @@ class ArraySchemaTest extends TestCase {
     
     // Set up an array schema.
     $this->schema = new ArraySchema([
-      '1' => new ArraySchemaRule(fn($x) => NULL, TRUE, [
-        '1_1' => new ArraySchemaRule(fn($x) => NULL, FALSE, [
+      '1' => new ArraySchemaRule(fn() => NULL, TRUE, [
+        '1_1' => new ArraySchemaRule(fn() => NULL, FALSE, [
           '1_1_1' => new ArraySchemaRule(fn($x) => $x === 2 ? NULL : new InvalidArraySchemaException(static::BAD_SCHEMA_MESSAGE_1_1_1), TRUE),
         ]),
-        '1_2' => new ArraySchemaRule(fn($x) => NULL, TRUE, [
+        '1_2' => new ArraySchemaRule(fn() => NULL, TRUE, [
           '1_2_1' => new ArraySchemaRule(fn($x) => $x === 3 ? NULL : new InvalidArraySchemaException(static::BAD_SCHEMA_MESSAGE_1_2_1)),
           '1_2_2' => new ArraySchemaRule(fn($x) => $x === 'c' ? NULL : new InvalidArraySchemaException(static::BAD_SCHEMA_MESSAGE_1_2_2)),
         ]),
