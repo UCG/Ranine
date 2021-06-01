@@ -64,7 +64,7 @@ final class IterationHelpers {
     // Prepare the iterator.
     $iterator->rewind();
     if (!$iterator->valid()) {
-      return;
+      return TRUE;
     }
 
     // Stores information associated with each parent level. This is a
