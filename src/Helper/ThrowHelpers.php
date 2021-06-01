@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Drupal\single_sign_on_idp\Helper;
+namespace Ranine\Helper;
 
 /**
  * Static helper methods to deal with throwing exceptions.
