@@ -13,7 +13,7 @@ use Ranine\Helper\EqualityHelpers;
  * @coversDefaultClass \Ranine\Helper\EqualityHelpers
  * @group ranine
  */
-class RoleHelpersTest extends TestCase {
+class EqualityHelpersTest extends TestCase {
 
   /**
    * Tests the areArraysEqualStrictOrderInvariant() method.
