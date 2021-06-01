@@ -28,7 +28,7 @@ class IterationHelpersTest extends TestCase {
 
     $currentSum = 0;
     $this->assertTrue(IterationHelpers::walkRecursiveIterator(new \RecursiveArrayIterator($arr),
-      function (int $key, $value, ?int $context) use (&$currentSum) : bool {
+      function ($key, $value, ?int $context) use (&$currentSum) : bool {
         $currentSum += $value;
         if (is_array($value)) {
           return TRUE;
@@ -51,7 +51,7 @@ class IterationHelpersTest extends TestCase {
             return FALSE;
         }
       },
-      fn(int $k, int $v, ?int $c) => $c = $k, NULL));
+      fn($k) => $k, NULL));
     $this->assertTrue($currentSum === $sumOfElements);
   }
 }
