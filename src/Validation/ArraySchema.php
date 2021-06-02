@@ -63,7 +63,7 @@ class ArraySchema {
     $iterator = new class($this->rules) implements RecursiveIterator {
       private array $arr;
       private $key;
-      private ArraySchemaRule $value;
+      private $value;
 
       public function __construct(array $arr) {
         $this->arr = $arr;
@@ -71,7 +71,7 @@ class ArraySchema {
         $this->value = current($arr);
       }
 
-      public function current() : ArraySchemaRule {
+      public function current() {
         return $this->value;
       }
 
