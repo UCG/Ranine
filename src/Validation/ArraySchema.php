@@ -80,7 +80,7 @@ class ArraySchema {
       }
 
       public function hasChildren() : bool {
-        return ($this->valid() && $this->value->getChildren !== []) ? TRUE : FALSE;
+        return ($this->valid() && $this->value->getChildren() !== []) ? TRUE : FALSE;
       }
 
       public function key() {
