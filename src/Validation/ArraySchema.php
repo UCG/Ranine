@@ -60,15 +60,15 @@ class ArraySchema {
     // very deep.
 
     // Create a recursive iterator for iterating through the validation tree.
-    $iterator = new class($this->rules) implements RecursiveIterator {
-      private array $arr;
+    $iterator = new class($this->rules, $this->data) implements RecursiveIterator {
       private $key;
+      private array $rules;
       private $value;
 
-      public function __construct(array $arr) {
-        $this->arr = $arr;
-        $this->key = key($arr);
-        $this->value = current($arr);
+      public function __construct(array $rules, array $data) {
+        $this->key = key($rules);
+        $this->rules = $rules;
+        $this->value = [current($rules), $data];
       }
 
       public function current() {
@@ -76,11 +76,16 @@ class ArraySchema {
       }
 
       public function getChildren() {
-        return $this->valid() ? new self($this->value->getChildren()) : [];
+        if ($this->hasChildren()) {
+          return new self($this->value[0]->getChildren(), $this->value[1][$this->key]);
+        }
+        else {
+          return new self([], []);
+        }
       }
 
       public function hasChildren() : bool {
-        return ($this->valid() && $this->value->getChildren() !== []) ? TRUE : FALSE;
+        return ($this->valid() && array_key_exists($this->key, $this->value[1]) && is_array($this->value[1][$this->key])) ? TRUE : FALSE;
       }
 
       public function key() {
@@ -88,12 +93,12 @@ class ArraySchema {
       }
 
       public function next() : void {
-        $this->value = next($this->arr);
-        $this->key = key($this->arr);
+        $this->value[0] = next($this->rules);
+        $this->key = key($this->rules);
       }
 
       public function rewind() : void {
-        $this->value = reset($this->arr);
+        $this->value[0] = reset($this->arr);
         $this->key = key($this->arr);
       }
 
@@ -102,18 +107,17 @@ class ArraySchema {
       }
     };
 
-
     // Perform top-level validation (no sub-tree analysis) for the root level.
     static::validateTopLevel($this->rules, $data);
     // Validate the descendents.
-    IterationHelpers::walkRecursiveIterator($iterator, function ($key, ArraySchemaRule $value, array $context) : bool {
-      if ($value->shouldValidateChildren() && array_key_exists($key, $context)) {
-        static::validateTopLevel($value->getChildren(), $context[$key]);
-      }
-      return TRUE;
-    },
-    fn($k, $v, $c) => $c[$k],
-    $data);
+    IterationHelpers::walkRecursiveIterator($iterator, fn() => TRUE, function($key, array $value) : null {
+      /** @var \Ranine\Validation\ArraySchemaRule */
+      $rule = $value[0];
+      /** @var array */
+      $data = $value[1][$key];
+      static::validateTopLevel($rule->getChildren(), $data);
+      return NULL;
+    }, fn() => NULL, NULL);
   }
 
   /**
