@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace Ranine\Collection;
 
+use Ranine\Exception\InvalidOperationException;
+
 /**
  * Can be used to implement a FILO (first in last out) collection.
  *
@@ -62,8 +64,15 @@ trait StackTrait {
    *
    * @return mixed
    *   Top stack element.
+   *
+   * @throws \Ranine\Exception\InvalidOperationException
+   *   Thrown if the stack is empty.
    */
   private function popInternal() {
+    if ($this->isEmpty()) {
+      throw new InvalidOperationException('Cannot pop from an empty stack.');
+    }
+
     $lastKey = array_key_last($this->arr);
     $lastElement = $this->arr[$lastKey];
     unset($this->arr[$lastKey]);

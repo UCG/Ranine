@@ -26,6 +26,9 @@ class Stack implements \IteratorAggregate {
    *
    * @return mixed
    *   Top stack element.
+   *
+   * @throws \Ranine\Exception\InvalidOperationException
+   *   Thrown if the stack is empty.
    */
   public function pop() {
     return $this->popInternal();
