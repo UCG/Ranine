@@ -73,18 +73,20 @@ final class IterationHelpers {
     // this level ('NULL' indicates no parent), and the second is the user
     // context information.
     $parentLevels = new Stack();
-    // Store the current level information.
-    $currentLevel = [NULL, $initialContext];
 
     // Keep track of the current iterator.
     $currentIterator = $iterator;
+    // Keep track of the parent iterator and the current context. These are set
+    // *when we move up or down a level*.
+    /** @var \RecursiveIterator|null */
+    $parentIterator = NULL;
+    $currentContext = $initialContext;
     // Loop until we run out of elements.
     do {
-      $key = $iterator->key();
-      $value = $iterator->current();
-      /** @var \RecursiveIterator|null */
-      $parentIterator = $currentLevel[0];
-      $currentContext = $currentLevel[1];
+      // These are set at the beginning of the loop, not when we move up or
+      // down a level.
+      $key = $currentIterator->key();
+      $value = $currentIterator->current();
 
       if (!$operation($key, $value, $currentContext)) {
         return FALSE;
@@ -93,15 +95,16 @@ final class IterationHelpers {
       // Move. Try the following moves, in this order:
       // 1) Move down a level, to the first child element, if possible.
       // 2) Otherwise, move to the next sibling of this element.
-      // 3) Otherwise, move to the next sibling of the parent of this element.
+      // 3) Otherwise, move to the next sibling of the closest (grand)parent
+      // that has a next sibling.
+
       // Move 1:
       if (($childIterator = static::prepareChildIterator($currentIterator)) !== NULL) {
         // Push the current level onto $parentLevels, and create and store the
         // current level information.
-        // Create the information for the next level and push it onto the stack.
-        $childContext = $drillDown($key, $value, $currentContext);
-        $parentLevels->push($currentLevel);
-        $currentLevel = [$currentIterator, $childContext];
+        $parentLevels->push([$currentIterator, $currentContext]);
+        $parentIterator = $currentIterator;
+        $currentContext = $drillDown($key, $value, $currentContext);
         // Move to the child iterator.
         /** @var \RecursiveIterator */
         $currentIterator = $childIterator;
@@ -109,30 +112,18 @@ final class IterationHelpers {
       }
 
       // Move 2: Try to move the iterator forward.
-      $iterator->next();
-      if ($iterator->valid()) {
-        // We moved successfully.
-        continue;
-      }
+      $currentIterator->next();
 
-      if ($parentIterator !== NULL) {
-        // Move 3. We have reached the end of the current set of children. We
-        // need to move to the parent's next sibling, if possible. First, we
-        // must move up a level.
+      // Move 3. Work our way back up the tree, if necessary.
+      while (!$currentIterator->valid() && $parentIterator !== NULL) {
+        // Move up a level.
         /** @var \RecursiveIterator */
         $currentIterator = $parentIterator;
-        // Try to move to the next sibling of the parent.
+        list($parentIterator, $currentContext) = $parentLevels->pop();
+        // Try to move to the next sibling.
         $currentIterator->next();
-        if ($currentIterator->valid()) {
-          // Our move was successful. Pop off the top context and use it to
-          // replace the current level information.
-          $currentLevel = $parentLevels->pop();
-          continue;
-        }
       }
-
-      break;
-    } while (TRUE);
+    } while ($currentIterator->valid());
 
     return TRUE;
   }
