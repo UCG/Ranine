@@ -60,7 +60,7 @@ class ArraySchema {
     // very deep.
 
     // Create a recursive iterator for iterating through the validation tree.
-    $iterator = new class($this->rules, $this->data) implements RecursiveIterator {
+    $iterator = new class($this->rules, $data) implements RecursiveIterator {
       private $key;
       private array $rules;
       private $value;
