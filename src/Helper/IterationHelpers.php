@@ -107,7 +107,7 @@ final class IterationHelpers {
         $currentIterator = $childIterator;
         continue;
       }
-      
+
       // Move 2: Try to move the iterator forward.
       $iterator->next();
       if ($iterator->valid()) {
@@ -130,7 +130,9 @@ final class IterationHelpers {
           continue;
         }
       }
-    } while (FALSE);
+
+      break;
+    } while (TRUE);
 
     return TRUE;
   }
