@@ -102,7 +102,7 @@ final class IterationHelpers {
       if (($childIterator = static::prepareChildIterator($currentIterator)) !== NULL) {
         // Push the current level onto $parentLevels, and create and store the
         // current level information.
-        $parentLevels->push([$currentIterator, $currentContext]);
+        $parentLevels->push([$parentIterator, $currentContext]);
         $parentIterator = $currentIterator;
         $currentContext = $drillDown($key, $value, $currentContext);
         // Move to the child iterator.
