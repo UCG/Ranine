@@ -98,8 +98,8 @@ class ArraySchema {
       }
 
       public function rewind() : void {
-        $this->value[0] = reset($this->arr);
-        $this->key = key($this->arr);
+        $this->value[0] = reset($this->rules);
+        $this->key = key($this->rules);
       }
 
       public function valid() : bool {
