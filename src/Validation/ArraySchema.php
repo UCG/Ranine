@@ -107,7 +107,7 @@ class ArraySchema {
     static::validateTopLevel($this->rules, $data);
     // Validate the descendents.
     IterationHelpers::walkRecursiveIterator($iterator, function ($key, ArraySchemaRule $value, array $context) : bool {
-      if ($value->shouldValidateChildren()) {
+      if ($value->shouldValidateChildren() && array_key_exists($key, $context)) {
         static::validateTopLevel($value->getChildren(), $context[$key]);
       }
       return TRUE;
