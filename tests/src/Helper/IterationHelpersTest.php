@@ -22,9 +22,10 @@ class IterationHelpersTest extends TestCase {
    */
   public function testWalkRecursiveIteator() : void {
     $arr = [
-      1 => [2, 3, 4 => [5, 6, 7], 8 => [9, 10]]
+      1 => [2, 3, 4 => [5, 6, 7], 8 => [9, 10]],
+      11 => [12, 13, 14],
     ];
-    $sumOfValues = 42;
+    $sumOfValues = 81;
 
     $currentSum = 0;
     $this->assertTrue(IterationHelpers::walkRecursiveIterator(new \RecursiveArrayIterator($arr),
@@ -47,6 +48,11 @@ class IterationHelpersTest extends TestCase {
           case 9:
           case 10:
             return $context === 8 ? TRUE : FALSE;
+
+          case 12:
+          case 13:
+          case 14:
+            return $context === 11 ? TRUE : FALSE;
 
           default:
             return FALSE;
