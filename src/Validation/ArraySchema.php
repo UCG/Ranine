@@ -110,7 +110,7 @@ class ArraySchema {
     // Perform top-level validation (no sub-tree analysis) for the root level.
     static::validateTopLevel($this->rules, $data);
     // Validate the descendents.
-    IterationHelpers::walkRecursiveIterator($iterator, fn() => TRUE, function($key, array $value) : null {
+    IterationHelpers::walkRecursiveIterator($iterator, fn() => TRUE, function($key, array $value) {
       /** @var \Ranine\Validation\ArraySchemaRule */
       $rule = $value[0];
       /** @var array */
