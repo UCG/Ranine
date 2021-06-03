@@ -9,7 +9,7 @@ use Ranine\Helper\ThrowHelpers;
 /**
  * Iterates through an iterable object while providing useful extension methods.
  */
-class ExtendableIterable extends \IteratorAggregate {
+class ExtendableIterable implements \IteratorAggregate {
 
   /**
    * The source iterable.
