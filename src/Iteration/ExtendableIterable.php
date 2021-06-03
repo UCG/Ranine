@@ -240,7 +240,7 @@ class ExtendableIterator extends \IteratorAggregate {
   }
 
   /**
-   * Creates a new extendable iterator.
+   * Creates a new extendable iterator from $source.
    *
    * @param iterable $source
    *   Source object over which we are iterating.
@@ -248,7 +248,7 @@ class ExtendableIterator extends \IteratorAggregate {
    * @return ExtendableIterator
    *   Extendable iterator.
    */
-  public static function create(iterable $source) : ExtendableIterator {
+  public static function from(iterable $source) : ExtendableIterator {
     return new static($source);
   }
 
