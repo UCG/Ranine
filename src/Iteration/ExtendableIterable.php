@@ -25,6 +25,46 @@ class ExtendableIterator extends \IteratorAggregate {
   }
 
   /**
+   * Checks to see if $predicate applies to all items in this collection.
+   *
+   * @param callable $predicate
+   *   Predicate, of form ($key, $value) : bool
+   *
+   * @return bool
+   *   Returns 'TRUE' if $predicate evaluates to TRUE for all items; else
+   *   returns 'FALSE'.
+   */
+  public function all(callable $predicate) : bool {
+    foreach ($this->source as $key => $value) {
+      if (!$predicate($key, $value)) {
+        return FALSE;
+      }
+    }
+
+    return TRUE;
+  }
+
+  /**
+   * Checks to see if $predicate applies to any item in this collection.
+   *
+   * @param callable $predicate
+   *   Predicate, of form ($key, $value) : bool
+   *
+   * @return bool
+   *   Returns 'TRUE' if $predicate evaluates to TRUE for at least one item;
+   *   else returns 'FALSE'.
+   */
+  public function any(callable $predicate) : bool {
+    foreach ($this->source as $key => $value) {
+      if ($predicate($key, $value)) {
+        return TRUE;
+      }
+    }
+
+    return FALSE;
+  }
+
+  /**
    * Appends elements from $other on the end of this iterator.
    *
    * @param iterable $other
