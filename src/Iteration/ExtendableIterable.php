@@ -9,7 +9,7 @@ use Ranine\Helper\ThrowHelpers;
 /**
  * Iterates through an iterable object while providing useful extension methods.
  */
-class ExtendableIterator extends \IteratorAggregate {
+class ExtendableIterable extends \IteratorAggregate {
 
   /**
    * The source iterable.
@@ -33,7 +33,7 @@ class ExtendableIterator extends \IteratorAggregate {
    *   Predicate, of form ($key, $value) : bool
    *
    * @return bool
-   *   Returns 'TRUE' if $predicate evaluates to TRUE for all items; else
+   *   Returns 'TRUE' if $predicate evaluates to 'TRUE' for all items; else
    *   returns 'FALSE'.
    */
   public function all(callable $predicate) : bool {
@@ -53,7 +53,7 @@ class ExtendableIterator extends \IteratorAggregate {
    *   Predicate, of form ($key, $value) : bool
    *
    * @return bool
-   *   Returns 'TRUE' if $predicate evaluates to TRUE for at least one item;
+   *   Returns 'TRUE' if $predicate evaluates to 'TRUE' for at least one item;
    *   else returns 'FALSE'.
    */
   public function any(callable $predicate) : bool {
@@ -72,10 +72,10 @@ class ExtendableIterator extends \IteratorAggregate {
    * @param iterable $other
    *   Iterator to append.
    *
-   * @return ExtendableIterator
+   * @return \Ranine\Iteration\ExtendableIterable
    *   Appended output.
    */
-  public function append(iterable $other) : ExtendableIterator {
+  public function append(iterable $other) : ExtendableIterable {
     return new static((function () use ($other) {
       yield from $this->source;
       yield from $other;
@@ -118,10 +118,10 @@ class ExtendableIterator extends \IteratorAggregate {
    *   returns 'TRUE' (to preserve the value in the output) or 'FALSE' (to not
    *   preserve the value in the output).
    *
-   * @return \Ranine\Iteration\ExtendableIterator
+   * @return \Ranine\Iteration\ExtendableIterable
    *   Filtered output.
    */
-  public function filter(callable $filter) : ExtendableIterator {
+  public function filter(callable $filter) : ExtendableIterable {
     return new static((function () use ($filter) {
       foreach ($this->source as $key => $value) {
         if ($filter($key, $value)) {
@@ -145,10 +145,10 @@ class ExtendableIterator extends \IteratorAggregate {
    *   returns an output value. If 'NULL' is passed for this parameter, the
    *   value map ($k, $v) => $v is used.
    *
-   * @return \Ranine\Iteration\ExtendableIterator
+   * @return \Ranine\Iteration\ExtendableIterable
    *   Output generator.
    */
-  public function map(?callable $valueMap, ?callable $keyMap = NULL) : ExtendableIterator {
+  public function map(?callable $valueMap, ?callable $keyMap = NULL) : ExtendableIterable {
     if ($valueMap === NULL) {
       $valueMap = fn($k, $v) => $v;
     }
@@ -193,13 +193,13 @@ class ExtendableIterator extends \IteratorAggregate {
    * @param int $num
    *   Number of elements to take.
    *
-   * @return \Ranine\Iteration\ExtendableIterator
+   * @return \Ranine\Iteration\ExtendableIterable
    *   Items.
    *
    * @throws \InvalidArgumentException
    *   Thrown if $num is less than zero.
    */
-  public function take(int $num) : ExtendableIterator {
+  public function take(int $num) : ExtendableIterable {
     ThrowHelpers::throwIfLessThanZero($num, 'num');
 
     return new static((function () use ($num) {
@@ -247,10 +247,10 @@ class ExtendableIterator extends \IteratorAggregate {
    * @param iterable $source
    *   Source object over which we are iterating.
    *
-   * @return ExtendableIterator
+   * @return \Ranine\Iteration\ExtendableIterable
    *   Extendable iterator.
    */
-  public static function from(iterable $source) : ExtendableIterator {
+  public static function from(iterable $source) : ExtendableIterable {
     return new static($source);
   }
 
@@ -262,10 +262,10 @@ class ExtendableIterator extends \IteratorAggregate {
    * @param int $end
    *   Inclusive end value for range.
    *
-   * @return \Ranine\Iteration\ExtendableIterator
+   * @return \Ranine\Iteration\ExtendableIterable
    *   Output range.
    */
-  public static function fromRange(int $start, int $end) : ExtendableIterator {
+  public static function fromRange(int $start, int $end) : ExtendableIterable {
     return new static((function () use ($start, $end) {
       for ($i = $start; $i <= $end; $i++) {
         yield $i;
