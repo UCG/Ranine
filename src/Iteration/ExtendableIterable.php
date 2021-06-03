@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Ranine\Iteration;
 
 use Ranine\Helper\ThrowHelpers;
