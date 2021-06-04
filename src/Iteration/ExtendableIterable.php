@@ -8,6 +8,19 @@ use Ranine\Helper\ThrowHelpers;
 
 /**
  * Iterates through an iterable object while providing useful extension methods.
+ *
+ * Sample use -- calculate sum of squares of first five items from array input
+ * and where x^2 < 100:
+ * <code>
+ * <?php
+ * $input = [2, 3, 7, 77, 99, 110];
+ * $sum = ExtendableIterable::from($input)
+ *  ->take(5)
+ *  ->map(fn($k, $v) => $v * $v)
+ *  ->filter(fn($k, $v) => $v < 100)
+ *  ->reduce(fn($k, $v, $sum) => $sum + $v, 0);
+ * // $sum = 2*2 + 3*3 + 7*7 = 62
+ * </code>
  */
 class ExtendableIterable implements \IteratorAggregate {
 
@@ -212,6 +225,46 @@ class ExtendableIterable implements \IteratorAggregate {
         $i++;
       }
     })());
+  }
+
+  /**
+   * Iterates through at most $max elements while $predicate is 'TRUE'.
+   *
+   * @param callable $predicate
+   *   Predicate, of form ($key, $value) : bool.
+   * @param int|null $max
+   *   Max number of elements to take. Pass 'NULL' for "unlimited."
+   *
+   * @return ExtendableIterable
+   *   Items.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown if $num is less than zero.
+   */
+  public function takeWhile(callable $predicate, ?int $max = NULL) : ExtendableIterable {
+    if ($max === NULL) {
+      return new static((function () use ($predicate) {
+        foreach ($this->source as $key => $value) {
+          if (!$predicate($key, $value)) {
+            break;
+          }
+          yield $key => $value;
+        }
+      })());
+    }
+    else {
+      ThrowHelpers::throwIfLessThanZero((int) $max, 'max');
+      return new static((function () use ($predicate, $max) {
+        $i = 0;
+        foreach ($this->source as $key => $value) {
+          if (!$predicate($key, $value) || $i === $max) {
+            break;
+          }
+          yield $key => $value;
+          $i++;
+        }
+      })());
+    }
   }
 
   /**
