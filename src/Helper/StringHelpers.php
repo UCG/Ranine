@@ -18,27 +18,26 @@ final class StringHelpers {
   }
 
   /**
-   * Get $str or a default message if $str is NULL or empty.
+   * Get $str, or a default message if $str is NULL or empty.
    *
    * If $str is NULL or empty, returns $defaultMessage; else, returns $str.
-   *
-   * @param string|null $str
-   *   String to check / return if possible.
-   * @param string|null $defaultMessage
-   *   Default message if $str is NULL or empty.
-   *
-   * @return string|null
-   *   Return value; see method description.
    */
   public static function getValueOrDefault(?string $str, ?string $defaultMessage) : ?string {
     return static::isNullOrEmpty($str) ? $defaultMessage : $str;
   }
 
   /**
-   * Checks if $value is a non-empty string.
+   * If $str is an empty string, converts it to 'NULL'.
    *
-   * @param mixed $value
-   *   Value to check.
+   * @return string|null
+   *   Returns $str if $str !== ""; otherwise, returns 'NULL'.
+   */
+  public static function emptyToNull(?string $str) : ?string {
+    return ($str === '') ? NULL : $str;
+  }
+
+  /**
+   * Checks if $value is a non-empty string.
    *
    * @return bool
    *   Returns 'TRUE' if $value is a non-empty string, else returns 'FALSE'.
@@ -49,9 +48,6 @@ final class StringHelpers {
 
   /**
    * Checks if $str is either 'NULL' or an empty string.
-   *
-   * @param string|null $str
-   *   String to check.
    *
    * @return bool
    *   'TRUE' if $str is 'NULL' or empty string, else 'FALSE'.
