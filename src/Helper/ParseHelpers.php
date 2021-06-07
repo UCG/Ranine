@@ -11,7 +11,7 @@ use Ranine\Exception\ParseException;
  *
  * @static
  */
-final class StringHelpers {
+final class ParseHelpers {
 
   /**
    * Empty private constructor to ensure no one instantiates this class.
