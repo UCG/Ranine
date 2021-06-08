@@ -117,10 +117,10 @@ class ExtendableIterable implements \IteratorAggregate {
   /**
    * Gets an iterator for looping through values associated with this object.
    *
-   * @return \Traversable
+   * @return \Iterator
    *   Iterator.
    */
-  public function getIterator() : \Traversable {
+  public function getIterator() : \Iterator {
     yield from $this->source;
   }
 
