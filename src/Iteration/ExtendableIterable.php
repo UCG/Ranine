@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Ranine\Iteration;
 
+use Ranine\Exception\InvalidOperationException;
 use Ranine\Helper\ThrowHelpers;
 
 /**
@@ -145,14 +146,58 @@ class ExtendableIterable implements \IteratorAggregate {
   }
 
   /**
+   * Grabs the first value of this collection, if possible.
+   *
+   * @return mixed
+   *   First value.
+   *
+   * @throws \Ranine\Exception\InvalidOperationException
+   *   Thrown if the collection if empty.
+   */
+  public function first() {
+    foreach ($this->source as $value) {
+      return $value;
+    }
+
+    throw new InvalidOperationException('The collection is empty.');
+  }
+
+  /**
+   * Grabs the first key of this collection, if possible.
+   *
+   * @return string|int
+   *   First key.
+   *
+   * @throws \Ranine\Exception\InvalidOperationException
+   *   Thrown if the collection if empty.
+   */
+  public function firstKey() {
+    foreach ($this->source as $key => $value) {
+      return $key;
+    }
+
+    throw new InvalidOperationException('The collection is empty.');
+  }
+
+  /**
+   * Checks whether the collection is empty.
+   */
+  public function isEmpty() : bool {
+    foreach ($this->source as $value) {
+      return FALSE;
+    }
+    return TRUE;
+  }
+
+  /**
    * Lazily maps the given iterable collection to a generator.
    *
    * @param iterable $input
    *   Input collection.
    * @param callable|null $keyMap
-   *   Key map - of form ($key, $value) : mixed - takes each key and value and
-   *   returns an output key. If 'NULL' is passed for this parameter, the key
-   *   map ($k, $v) => $k is used.
+   *   Key map - of form ($key, $value) : string|int - takes each key and value
+   *   and returns an output key. If 'NULL' is passed for this parameter, the
+   *   key map ($k, $v) => $k is used.
    * @param callable $valueMap
    *   Value map - of form ($key, $value) : mixed - takes each key and value and
    *   returns an output value. If 'NULL' is passed for this parameter, the
@@ -292,6 +337,53 @@ class ExtendableIterable implements \IteratorAggregate {
     else {
       return iterator_to_array($this->source, $preserveKeys);
     }
+  }
+
+  /**
+   * Creates a collection by producing output values from two iterables.
+   *
+   * The two iterables are iterated through simultaneously, and output keys
+   * and values are given by $keyMap and $valueMap (respectively) while both
+   * iterables are valid. If one iterable terminates before the other, the
+   * remaining output keys and values are taken from the remaining keys/values
+   * of the longer iterable.
+   *
+   * @param iterable $other
+   *   Other iterable.
+   * @param callable $keyMap
+   *   Map to produce output keys, of form
+   *   ($keyFromThisObject, $valueFromThisObject, $keyFromOtherIterable,
+   *   $valueFromOtherIterable) : string|int
+   * @param callable $valueMap
+   *   Map to produce output values, of form
+   *   ($keyFromThisObject, $valueFromThisObject, $keyFromOtherIterable,
+   *   $valueFromOtherIterable) : mixed
+   *
+   * @return ExtendableIterable
+   *   Resulting collection.
+   */
+  public function zip(iterable $other, callable $keyMap, callable $valueMap) : ExtendableIterable {
+    // Wrap $other in a generator in order to ensure we can iterate through it
+    // manually.
+    $otherGenerator = (function () use ($other) { yield from $other; })();
+    return new static((function () use ($otherGenerator, $keyMap, $valueMap) {
+      $otherGenerator->rewind();
+      foreach ($this->source as $key1 => $value1) {
+        if ($otherGenerator->valid()) {
+          $key2 = $otherGenerator->key();
+          $value2 = $otherGenerator->current();
+          yield $keyMap($key1, $value1, $key2, $value2) => $valueMap($key1, $value1, $key2, $value2);
+          $otherGenerator->next();
+        }
+        else {
+          yield $key1 => $value1;
+        }
+      }
+      while ($otherGenerator->valid()) {
+        yield $otherGenerator->key() => $otherGenerator->current();
+        $otherGenerator->next();
+      }
+    })());
   }
 
   /**
