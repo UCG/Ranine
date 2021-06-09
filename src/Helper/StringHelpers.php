@@ -54,7 +54,7 @@ final class StringHelpers {
       if (!$isFirstIteration) {
         $output .= $separator;
       }
-      $output .= static::escape($item, '\e', $separator);
+      $output .= static::escape($item, $separator, '\e');
       $isFirstIteration = FALSE;
     }
 
@@ -69,15 +69,15 @@ final class StringHelpers {
    *
    * @param string $str
    *   String to escape.
-   * @param string $escapeCharacter
-   *   Single-length escape character.
    * @param string $otherSpecialCharacters
    *   Special characters to escape.
+   * @param string $escapeCharacter
+   *   Single-length escape character.
    *
    * @throws \InvalidArgumentException
    *   Thrown if $escapeCharacter is not of unit length.
    */
-  public static function escape(string $str, string $escapeCharacter, string $otherSpecialCharacters) {
+  public static function escape(string $str, string $otherSpecialCharacters, string $escapeCharacter = '\e') {
     if (strlen($escapeCharacter) !== 1) {
       throw new \InvalidArgumentException('$escapeCharacter is not of unit length.');
     }
