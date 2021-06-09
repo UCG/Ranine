@@ -4,14 +4,14 @@ declare(strict_types = 1);
 
 namespace Ranine\Helper;
 
-use Ranine\Iteration\ExtendableIterable;
-
 /**
  * Static helper methods to deal with strings.
  *
  * @static
  */
 final class StringHelpers {
+
+  public const ASCII_GROUP_SEPARATOR = '0x1D';
 
   /**
    * ASCII record separator character string.
