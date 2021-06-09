@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace Ranine\Helper;
 
+use Ranine\Iteration\ExtendableIterable;
+
 /**
  * Static helper methods to deal with strings.
  *
@@ -25,6 +27,69 @@ final class StringHelpers {
    * Empty private constructor to ensure no one instantiates this class.
    */
   private function __construct() {
+  }
+
+  /**
+   * Assembles $items into a single string with $separator between values.
+   *
+   * There is no terminating, and no loading separator. Separator is escaped
+   * from all items using the ASCII ESC character.
+   *
+   * @param string $separator
+   *   Separator.
+   * @param string ...$items
+   *   Strings to assemble.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown if $separator is not of unit length.
+   */
+  public static function assemble(string $separator, string ...$items) {
+    if (strlen($separator) !== 1) {
+      throw new \InvalidArgumentException('$separator is not of unit length.');
+    }
+
+    $output = '';
+    $isFirstIteration = TRUE;
+    foreach ($items as $item) {
+      if (!$isFirstIteration) {
+        $output .= $separator;
+      }
+      $output .= static::escape($item, '\e', $separator);
+      $isFirstIteration = FALSE;
+    }
+
+    return $output;
+  }
+
+  /**
+   * Escapes $str.
+   * 
+   * Escapes, with $escapeCharacter, all instances of $escapeCharacter and every
+   * character in $otherSpecialCharacters.
+   *
+   * @param string $str
+   *   String to escape.
+   * @param string $escapeCharacter
+   *   Single-length escape character.
+   * @param string $otherSpecialCharacters
+   *   Special characters to escape.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown if $escapeCharacter is not of unit length.
+   */
+  public static function escape(string $str, string $escapeCharacter, string $otherSpecialCharacters) {
+    if (strlen($escapeCharacter) !== 1) {
+      throw new \InvalidArgumentException('$escapeCharacter is not of unit length.');
+    }
+
+    $searchSequences = str_split($otherSpecialCharacters);
+    $searchSequences[] = $escapeCharacter;
+    $replaceSequences = [];
+    foreach ($searchSequences as $char) {
+      $replaceSequences[] = ($escapeCharacter . $char);
+    }
+
+    return str_replace($searchSequences, $replaceSequences, $str);
   }
 
   /**
