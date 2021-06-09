@@ -12,6 +12,16 @@ namespace Ranine\Helper;
 final class StringHelpers {
 
   /**
+   * ASCII record separator character string.
+   */
+  public const ASCII_RECORD_SEPARATOR = '0x1E';
+
+  /**
+   * ASCII unit separator character string.
+   */
+  public const ASCII_UNIT_SEPARATOR = '0x1F';
+
+  /**
    * Empty private constructor to ensure no one instantiates this class.
    */
   private function __construct() {
