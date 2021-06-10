@@ -87,7 +87,8 @@ class ExtendableIterable implements \IteratorAggregate {
    *   Iterator to append.
    *
    * @return \Ranine\Iteration\ExtendableIterable
-   *   Appended output.
+   *   Appended output -- the order of elements in this iterator and $source is
+   *   preserved.
    */
   public function append(iterable $other) : ExtendableIterable {
     return new static((function () use ($other) {
@@ -133,7 +134,7 @@ class ExtendableIterable implements \IteratorAggregate {
    *   preserve the value in the output).
    *
    * @return \Ranine\Iteration\ExtendableIterable
-   *   Filtered output.
+   *   Filtered output -- the order of elements in this iterator is preserved.
    */
   public function filter(callable $filter) : ExtendableIterable {
     return new static((function () use ($filter) {
@@ -204,7 +205,7 @@ class ExtendableIterable implements \IteratorAggregate {
    *   value map ($k, $v) => $v is used.
    *
    * @return \Ranine\Iteration\ExtendableIterable
-   *   Output generator.
+   *   Output generator. The order of elements is preserved.
    */
   public function map(?callable $valueMap, ?callable $keyMap = NULL) : ExtendableIterable {
     if ($valueMap === NULL) {
@@ -252,7 +253,7 @@ class ExtendableIterable implements \IteratorAggregate {
    *   Number of elements to take.
    *
    * @return \Ranine\Iteration\ExtendableIterable
-   *   Items.
+   *   Items. The order of elements is preserved.
    *
    * @throws \InvalidArgumentException
    *   Thrown if $num is less than zero.
@@ -281,7 +282,7 @@ class ExtendableIterable implements \IteratorAggregate {
    *   Max number of elements to take. Pass 'NULL' for "unlimited."
    *
    * @return ExtendableIterable
-   *   Items.
+   *   Items. The order of elements is preserved.
    *
    * @throws \InvalidArgumentException
    *   Thrown if $num is less than zero.
@@ -319,7 +320,7 @@ class ExtendableIterable implements \IteratorAggregate {
    *   Whether the iterable keys should be used for the new array.
    *
    * @return array
-   *   Resulting array.
+   *   Resulting array. The order of elements is preserved.
    */
   public function toArray(bool $preserveKeys = TRUE) : array {
     if (is_array($this->source)) {
@@ -360,7 +361,8 @@ class ExtendableIterable implements \IteratorAggregate {
    *   $valueFromOtherIterable) : mixed
    *
    * @return ExtendableIterable
-   *   Resulting collection.
+   *   Resulting collection. The order of elements in this iterator and $other
+   *   is preserved.
    */
   public function zip(iterable $other, callable $keyMap, callable $valueMap) : ExtendableIterable {
     // Wrap $other in a generator in order to ensure we can iterate through it
