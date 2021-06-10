@@ -54,7 +54,7 @@ final class StringHelpers {
       if (!$isFirstIteration) {
         $output .= $separator;
       }
-      $output .= static::escape($item, $separator, "\e");
+      $output .= static::escape($item, [$separator], "\e");
       $isFirstIteration = FALSE;
     }
 
@@ -69,27 +69,33 @@ final class StringHelpers {
    *
    * @param string $str
    *   String to escape.
-   * @param string $otherSpecialCharacters
-   *   Special characters to escape.
+   * @param string[] $otherSpecialCharacters
+   *   Special characters to escape; each should be a string of unit length.
    * @param string $escapeCharacter
    *   Single-length escape character.
    *
    * @throws \InvalidArgumentException
-   *   Thrown if $escapeCharacter is not of unit length.
+   *   Thrown if $escapeCharacter is not of unit length, or if an element in
+   *   $otherSpecialCharacters is not an array of length one.
    */
-  public static function escape(string $str, string $otherSpecialCharacters, string $escapeCharacter = "\e") {
+  public static function escape(string $str, array $otherSpecialCharacters, string $escapeCharacter = "\e") {
     if (strlen($escapeCharacter) !== 1) {
       throw new \InvalidArgumentException('$escapeCharacter is not of unit length.');
     }
 
-    $searchSequences = str_split($otherSpecialCharacters);
-    $searchSequences[] = $escapeCharacter;
+    // Escape the escape character.
+    $intermediateResult = str_replace($escapeCharacter, $escapeCharacter . $escapeCharacter, $str);
+
+    // Escape everything else.
+    /** @var string[] */
     $replaceSequences = [];
-    foreach ($searchSequences as $char) {
+    foreach ($otherSpecialCharacters as $char) {
+      if (!is_string($char) || strlen($char) !== 1) {
+        throw new \InvalidArgumentException('$char is not of unit length.');
+      }
       $replaceSequences[] = ($escapeCharacter . $char);
     }
-
-    return str_replace($searchSequences, $replaceSequences, $str);
+    return str_replace($otherSpecialCharacters, $replaceSequences, $intermediateResult);
   }
 
   /**
