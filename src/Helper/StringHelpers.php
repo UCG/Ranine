@@ -11,17 +11,17 @@ namespace Ranine\Helper;
  */
 final class StringHelpers {
 
-  public const ASCII_GROUP_SEPARATOR = '0x1D';
+  public const ASCII_GROUP_SEPARATOR = "0x1D";
 
   /**
    * ASCII record separator character string.
    */
-  public const ASCII_RECORD_SEPARATOR = '0x1E';
+  public const ASCII_RECORD_SEPARATOR = "0x1E";
 
   /**
    * ASCII unit separator character string.
    */
-  public const ASCII_UNIT_SEPARATOR = '0x1F';
+  public const ASCII_UNIT_SEPARATOR = "0x1F";
 
   /**
    * Empty private constructor to ensure no one instantiates this class.
@@ -54,7 +54,7 @@ final class StringHelpers {
       if (!$isFirstIteration) {
         $output .= $separator;
       }
-      $output .= static::escape($item, $separator, '\e');
+      $output .= static::escape($item, $separator, "\e");
       $isFirstIteration = FALSE;
     }
 
@@ -77,7 +77,7 @@ final class StringHelpers {
    * @throws \InvalidArgumentException
    *   Thrown if $escapeCharacter is not of unit length.
    */
-  public static function escape(string $str, string $otherSpecialCharacters, string $escapeCharacter = '\e') {
+  public static function escape(string $str, string $otherSpecialCharacters, string $escapeCharacter = "\e") {
     if (strlen($escapeCharacter) !== 1) {
       throw new \InvalidArgumentException('$escapeCharacter is not of unit length.');
     }
