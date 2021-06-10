@@ -11,17 +11,17 @@ namespace Ranine\Helper;
  */
 final class StringHelpers {
 
-  public const ASCII_GROUP_SEPARATOR = "0x1D";
+  public const ASCII_GROUP_SEPARATOR = "\x1D";
 
   /**
    * ASCII record separator character string.
    */
-  public const ASCII_RECORD_SEPARATOR = "0x1E";
+  public const ASCII_RECORD_SEPARATOR = "\x1E";
 
   /**
    * ASCII unit separator character string.
    */
-  public const ASCII_UNIT_SEPARATOR = "0x1F";
+  public const ASCII_UNIT_SEPARATOR = "\x1F";
 
   /**
    * Empty private constructor to ensure no one instantiates this class.
