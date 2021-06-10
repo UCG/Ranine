@@ -89,11 +89,11 @@ final class StringHelpers {
     // Escape everything else.
     /** @var string[] */
     $replaceSequences = [];
-    foreach ($otherSpecialCharacters as $char) {
+    foreach ($otherSpecialCharacters as $key => $char) {
       if (!is_string($char) || strlen($char) !== 1) {
         throw new \InvalidArgumentException('$char is not of unit length.');
       }
-      $replaceSequences[] = ($escapeCharacter . $char);
+      $replaceSequences[$key] = ($escapeCharacter . $char);
     }
     return str_replace($otherSpecialCharacters, $replaceSequences, $intermediateResult);
   }
