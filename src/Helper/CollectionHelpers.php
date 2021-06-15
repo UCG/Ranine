@@ -61,11 +61,12 @@ final class CollectionHelpers {
         if ($isFirstIteration) {
           $currentStartValue = $value;
           $currentEndValue = $value;
+          $isFirstIteration = FALSE;
         }
         else {
-          // If the current value is more than one away from the current endpoint,
-          // we've reached a gap, so we yield the current interval and reset the
-          // current start value.
+          // If the current value is more than one away from the current
+          // endpoint, we've reached a gap, so we yield the current interval and
+          // reset the current start value.
           if ($value > ($currentEndValue + 1)) {
             yield $currentStartValue => $currentEndValue;
             $currentStartValue = $value;
