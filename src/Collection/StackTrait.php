@@ -73,10 +73,7 @@ trait StackTrait {
       throw new InvalidOperationException('Cannot pop from an empty stack.');
     }
 
-    $lastKey = array_key_last($this->arr);
-    $lastElement = $this->arr[$lastKey];
-    unset($this->arr[$lastKey]);
-    return $lastElement;
+    return array_pop($this->arr);
   }
 
   /**
@@ -85,7 +82,7 @@ trait StackTrait {
    * @param mixed $element
    */
   private function pushInternal($element) : void {
-    $this->arr[] = $element;
+    array_push($this->arr, $element);
   }
 
 }

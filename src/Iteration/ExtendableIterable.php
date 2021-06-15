@@ -116,13 +116,30 @@ class ExtendableIterable implements \IteratorAggregate {
   }
 
   /**
-   * Gets an iterator for looping through values associated with this object.
+   * Expands sub-iterables of this collection.
    *
-   * @return \Iterator
-   *   Iterator.
+   * @param callable $expansion
+   *   Of the form ($key, $value) => ?iterable, this function returns either
+   *   NULL (if the element is not to be expanded) or an iterable (if the
+   *   element is to be expanded into that iterable).
+   *
+   * @return ExtendableIterable
+   *   Resulting iterator, which will iterate through items in this iterable
+   *   that were not expanded, and through the expansion of any sub-iterables,
+   *   as they are encountered.
    */
-  public function getIterator() : \Iterator {
-    yield from $this->source;
+  public function expand(callable $expansion) : ExtendableIterable {
+    return new static((function () use ($expansion) {
+      foreach ($this->source as $key => $value) {
+        $subElements = $expansion($key, $value);
+        if ($subElements === NULL) {
+          yield $key => $value;
+        }
+        else {
+          yield from $subElements;
+        }
+      }
+    })());
   }
 
   /**
@@ -178,6 +195,27 @@ class ExtendableIterable implements \IteratorAggregate {
     }
 
     throw new InvalidOperationException('The collection is empty.');
+  }
+
+  /**
+   * Gets an iterator for looping through values associated with this object.
+   *
+   * @return \Iterator
+   *   Iterator.
+   */
+  public function getIterator() : \Iterator {
+    yield from $this->source;
+  }
+
+  /**
+   * Yields all the keys from this collection.
+   */
+  public function getKeys() : ExtendableIterable {
+    return new static((function () {
+      foreach ($this->source as $key => $value) {
+        yield $key;
+      }
+    })());
   }
 
   /**
@@ -386,6 +424,10 @@ class ExtendableIterable implements \IteratorAggregate {
         $otherGenerator->next();
       }
     })());
+  }
+
+  public static function empty() : ExtendableIterable {
+    return new static(new \EmptyIterator());
   }
 
   /**
