@@ -53,7 +53,7 @@ final class CollectionHelpers {
 
     ksort($integersAsKeys, SORT_NUMERIC);
 
-    return new ExtendableIterable((function () use ($integersAsKeys) {
+    return ExtendableIterable::from((function () use ($integersAsKeys) {
       $isFirstIteration = TRUE;
       $currentStartValue = 0;
       $currentEndValue = 0;
