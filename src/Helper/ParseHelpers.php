@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Ranine\Helper;
 
 use Ranine\Exception\ParseException;
+use Ranine\Iteration\ExtendableIterable;
 
 /**
  * Static helper methods to deal with parsing.
@@ -76,6 +77,56 @@ final class ParseHelpers {
     }
 
     return FALSE;
+  }
+
+  /**
+   * Attempts to parse $range as an inclusive range of integer values.
+   *
+   * @param string $range
+   *   Range, which should be in the form "[start]$divider[end]", where [start]
+   *   and [end] are string representations of integers which form the inclusive
+   *   lower and upper bounds of the range, respectively.
+   * @param \Ranine\Iteration\ExtendableIterable|null $output
+   *   Sorted collection, whose values are the values in the range, or 'NULL' if
+   *   the parsing failed.
+   * @param string $divider
+   *   The string dividing the two halves of the range.
+   *
+   * @return bool
+   *   Returns 'TRUE' if the parse succeeded; else returns 'FALSE'.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown if $divider is empty.
+   */
+  public static function tryParseIntRange(string $range, ?ExtendableIterable &$output, string $divider = '-') : bool {
+    if ($divider === '') {
+      throw new \InvalidArgumentException('$divider is empty.');
+    }
+
+    $output = NULL;
+
+    if ($range === '') {
+      return FALSE;
+    }
+    $rangeParts = explode($divider, $range, 2);
+    if (!is_array($rangeParts) || count($rangeParts) !== 2) {
+      return FALSE;
+    }
+    /** @var string[] $rangeParts */
+    $lower = 0;
+    if (!static::tryParseInt($rangeParts[0], $lower)) {
+      return FALSE;
+    }
+    $upper = 0;
+    if (!static::tryParseInt($rangeParts[1], $upper)) {
+      return FALSE;
+    }
+    if ($upper < $lower) {
+      return FALSE;
+    }
+
+    $output = ExtendableIterable::fromRange($lower, $upper);
+    return TRUE;
   }
 
 }
