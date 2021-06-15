@@ -229,18 +229,18 @@ class ExtendableIterable implements \IteratorAggregate {
   }
 
   /**
-   * Lazily maps the given iterable collection to a generator.
+   * Maps each key/value pair in the collection to another key/value pair.
    *
    * @param iterable $input
    *   Input collection.
+   * @param callable|null $valueMap
+   *   Value map - of form ($key, $value) : mixed - takes each key and value and
+   *   returns an output value. If 'NULL' is passed for this parameter, the
+   *   value map ($k, $v) => $v is used.
    * @param callable|null $keyMap
    *   Key map - of form ($key, $value) : string|int - takes each key and value
    *   and returns an output key. If 'NULL' is passed for this parameter, the
    *   key map ($k, $v) => $k is used.
-   * @param callable $valueMap
-   *   Value map - of form ($key, $value) : mixed - takes each key and value and
-   *   returns an output value. If 'NULL' is passed for this parameter, the
-   *   value map ($k, $v) => $v is used.
    *
    * @return \Ranine\Iteration\ExtendableIterable
    *   Output generator. The order of elements is preserved.
@@ -256,6 +256,34 @@ class ExtendableIterable implements \IteratorAggregate {
     return new static((function () use ($keyMap, $valueMap) {
       foreach ($this->source as $key => $value) {
         yield $keyMap($key, $value) => $valueMap($key, $value);
+      }
+    })());
+  }
+
+  /**
+   * Maps each key/value pair to a value, generating sequential keys.
+   *
+   * The keys are integers that start at zero, and increase by one as one moves
+   * through the output iterator.
+   *
+   * @param callable|null $valueMap
+   *   Value map - of form ($key, $value) : mixed - takes each key and value and
+   *   returns an output value. If 'NULL' is passed for this parameter, the
+   *   value map ($k, $v) => $v is used.
+   *
+   * @return \Ranine\Iteration\ExtendableIterable
+   *   Output generator. The order of elements is preserved.
+   */
+  public function mapSequentialKeys(?callable $valueMap) : ExtendableIterable {
+    if ($valueMap === NULL) {
+      $valueMap = fn($k, $v) => $v;
+    }
+
+    return new static((function () use ($valueMap) {
+      $i = 0;
+      foreach ($this->source as $key => $value) {
+        yield $i => $valueMap($key, $value);
+        $i++;
       }
     })());
   }
