@@ -110,6 +110,7 @@ final class EqualityHelpers {
       foreach ($arr2 as $key2 => $value2) {
         if (!array_key_exists($key2, $usedKeys) && $value2 === $value1) {
           $foundValue = TRUE;
+          break;
         }
       }
       if ($foundValue) {
