@@ -23,15 +23,11 @@ final class ParseHelpers {
   /**
    * Attempts to parse $number (a string or integer) as an integer.
    *
-   * If $number is an integer, this function sets $result = $number. If it is a
-   * string, this function casts $number to an integer and checks to ensure it
-   * matches the "canonical" representation of that integer formed by casting
-   * the integer back to a string. If the match succeeds, $result is set to the
-   * casted version of $number. If $number is not a string nor an integer, or
-   * if the match fails, this function throws an exception.
+   * If $number is an integer, this function returns $number. If it is a string
+   * the method used in parseIntFromString($number) is used to parse $number. If
+   * it is neither, the parse operation fails.
    *
    * @param mixed $number
-   *   Number to parse.
    *
    * @return int
    *   Result of parse operation.
@@ -40,6 +36,28 @@ final class ParseHelpers {
    *   Thrown if the parse operation fails.
    */
   public static function parseInt($number) : int {
+    $result = 0;
+    if (!static::tryParseInt($number, $result)) {
+      throw new ParseException('Could not parse as integer.');
+    }
+    return $result;
+  }
+
+  /**
+   * Attempts to parse $number as an integer.
+   *
+   * This function casts $number to an integer and checks to ensure it matches
+   * the "canonical" representation of that integer formed by casting the
+   * integer back to a string. If the match succeeds, the casted version of
+   * $number is returned.
+   *
+   * @return int
+   *   Result of parse operation.
+   *
+   * @throws \Ranine\Exception\ParseException
+   *   Thrown if the parse operation fails.
+   */
+  public static function parseIntFromString(string $number) : int {
     $result = 0;
     if (!static::tryParseInt($number, $result)) {
       throw new ParseException('Could not parse as integer.');
@@ -58,8 +76,7 @@ final class ParseHelpers {
    *   The string dividing the two halves of the range.
    *
    * @return \Ranine\Iteration\ExtendableIterable
-   *   Sorted collection, whose values are the values in the range, or 'NULL' if
-   *   the parsing failed.
+   *   Sorted collection, whose values are the values in the range.
    *
    * @throws \InvalidArgumentException
    *   Thrown if $divider is empty.
@@ -78,32 +95,47 @@ final class ParseHelpers {
    * Attempts to parse $number (a string or integer) as an integer.
    *
    * If $number is an integer, this function sets $result = $number. If it is a
-   * string, this function casts $number to an integer and checks to ensure it
-   * matches the "canonical" representation of that integer formed by casting
-   * the integer back to a string. If the match succeeds, $result is set to the
-   * casted version of $number. If $number is not a string nor an integer, or
-   * if the match fails, this function returns 'FALSE'.
+   * string, tryParseIntFromString($number, $result) is used to parse $number.
+   * If it is neither, the parse operation fails.
    *
    * @param mixed $number
-   *   Number to parse.
    * @param int &$result
    *   Result of parse operation (undefined if operation failed).
    *
    * @return bool
-   *   Returns 'TRUE' if the parse succeeded; else returns 'FALSE'.
+   *   Returns TRUE if the parse succeeded; else returns FALSE.
    */
   public static function tryParseInt($number, int &$result) : bool {
     if (is_int($number)) {
-      return $number;
+      $result = $number;
+      return TRUE;
     }
-    else if (is_string($number)) {
-      $result = (int) $number;
-      if (((string) $result) === $number) {
-        return TRUE;
-      }
+    elseif (is_string($number)) {
+      return static::tryParseIntFromString($number, $result);
     }
+    else {
+      return FALSE;
+    }
+  }
 
-    return FALSE;
+  /**
+   * Attempts to parse $number as an integer.
+   *
+   * This function casts $number to an integer and checks to ensure it matches
+   * the "canonical" representation of that integer formed by casting the
+   * integer back to a string. If the match succeeds, $result is set to the
+   * casted version of $number and the function returns TRUE. If the match
+   * fails, this function returns FALSE.
+   *
+   * @param int &$result
+   *   Result of parse operation (undefined if operation failed).
+   *
+   * @return bool
+   *   Returns TRUE if parse operation succeeds; else returns FALSE.
+   */
+  public static function tryParseIntFromString(string $number, int &$result) : bool {
+    $result = (int) $number;
+    return (((string) $result) === $number) ? TRUE : FALSE;
   }
 
   /**
@@ -114,21 +146,19 @@ final class ParseHelpers {
    *   and [end] are string representations of integers which form the inclusive
    *   lower and upper bounds of the range, respectively.
    * @param \Ranine\Iteration\ExtendableIterable|null $output
-   *   Sorted collection, whose values are the values in the range, or 'NULL' if
-   *   the parsing failed.
+   *   Collection, whose values are sorted from lowest to highest and are the
+   *   values in the range, or NULL if the parsing failed.
    * @param string $divider
    *   The string dividing the two halves of the range.
    *
    * @return bool
-   *   Returns 'TRUE' if the parse succeeded; else returns 'FALSE'.
+   *   Returns TRUE if the parse succeeded; else returns FALSE.
    *
    * @throws \InvalidArgumentException
    *   Thrown if $divider is empty.
    */
   public static function tryParseIntRange(string $range, ?ExtendableIterable &$output, string $divider = '-') : bool {
-    if ($divider === '') {
-      throw new \InvalidArgumentException('$divider is empty.');
-    }
+    ThrowHelpers::throwIfEmptyString($divider, 'divider');
 
     $output = NULL;
 
@@ -141,11 +171,11 @@ final class ParseHelpers {
     }
     /** @var string[] $rangeParts */
     $lower = 0;
-    if (!static::tryParseInt($rangeParts[0], $lower)) {
+    if (!static::tryParseIntFromString($rangeParts[0], $lower)) {
       return FALSE;
     }
     $upper = 0;
-    if (!static::tryParseInt($rangeParts[1], $upper)) {
+    if (!static::tryParseIntFromString($rangeParts[1], $upper)) {
       return FALSE;
     }
     if ($upper < $lower) {

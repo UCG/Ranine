@@ -5,12 +5,15 @@ declare(strict_types = 1);
 namespace Ranine\Helper;
 
 /**
- * Static helper methods to deal with strings.
+ * Static helper methods and constants to deal with strings.
  *
  * @static
  */
 final class StringHelpers {
 
+  /**
+   * ASCII group separator character string.
+   */
   public const ASCII_GROUP_SEPARATOR = "\x1D";
 
   /**
@@ -32,18 +35,16 @@ final class StringHelpers {
   /**
    * Assembles $items into a single string with $separator between values.
    *
-   * There is no terminating, and no loading separator. Separator is escaped
-   * from all items using the ASCII ESC character.
+   * The separator is escaped from all items using the ASCII ESC character,
+   * which is also used to escape instances of itself.
    *
-   * @param string $separator
-   *   Separator.
-   * @param string ...$items
-   *   Strings to assemble.
+   * @return string
+   *   Assembled strings, with neither a leading nor a trailing separator.
    *
    * @throws \InvalidArgumentException
    *   Thrown if $separator is not of unit length.
    */
-  public static function assemble(string $separator, string ...$items) {
+  public static function assemble(string $separator, string ...$items) : string {
     if (strlen($separator) !== 1) {
       throw new \InvalidArgumentException('$separator is not of unit length.');
     }
@@ -67,8 +68,6 @@ final class StringHelpers {
    * Escapes, with $escapeCharacter, all instances of $escapeCharacter and every
    * character in $otherSpecialCharacters.
    *
-   * @param string $str
-   *   String to escape.
    * @param string[] $otherSpecialCharacters
    *   Special characters to escape; each should be a string of unit length.
    * @param string $escapeCharacter
@@ -76,7 +75,7 @@ final class StringHelpers {
    *
    * @throws \InvalidArgumentException
    *   Thrown if $escapeCharacter is not of unit length, or if an element in
-   *   $otherSpecialCharacters is not an array of length one.
+   *   $otherSpecialCharacters is not a string of length one.
    */
   public static function escape(string $str, array $otherSpecialCharacters, string $escapeCharacter = "\e") {
     if (strlen($escapeCharacter) !== 1) {
@@ -91,7 +90,7 @@ final class StringHelpers {
     $replaceSequences = [];
     foreach ($otherSpecialCharacters as $key => $char) {
       if (!is_string($char) || strlen($char) !== 1) {
-        throw new \InvalidArgumentException('$char is not of unit length.');
+        throw new \InvalidArgumentException('An element of $otherSpecialCharacters is not a string of unit length.');
       }
       $replaceSequences[$key] = ($escapeCharacter . $char);
     }
@@ -99,39 +98,31 @@ final class StringHelpers {
   }
 
   /**
-   * Get $str, or a default message if $str is NULL or empty.
-   *
-   * If $str is NULL or empty, returns $defaultMessage; else, returns $str.
+   * Gets $str, or returns $defaultMessage if $str is NULL or empty.
    */
   public static function getValueOrDefault(?string $str, ?string $defaultMessage) : ?string {
     return static::isNullOrEmpty($str) ? $defaultMessage : $str;
   }
 
   /**
-   * If $str is an empty string, converts it to 'NULL'.
+   * If $str is an empty string, converts it to NULL.
    *
    * @return string|null
-   *   Returns $str if $str !== ""; otherwise, returns 'NULL'.
+   *   Returns $str if $str !== ""; otherwise, returns NULL.
    */
   public static function emptyToNull(?string $str) : ?string {
     return ($str === '') ? NULL : $str;
   }
 
   /**
-   * Checks if $value is a non-empty string.
-   *
-   * @return bool
-   *   Returns 'TRUE' if $value is a non-empty string, else returns 'FALSE'.
+   * Tells whether $value is a non-empty string.
    */
   public static function isNonEmptyString($value) : bool {
     return (is_string($value) && $value !== '') ? TRUE : FALSE;
   }
 
   /**
-   * Checks if $str is either 'NULL' or an empty string.
-   *
-   * @return bool
-   *   'TRUE' if $str is 'NULL' or empty string, else 'FALSE'.
+   * Tells whether $str is either NULL or an empty string.
    */
   public static function isNullOrEmpty(?string $str) : bool {
     return ($str === NULL || $str === '') ? TRUE : FALSE;

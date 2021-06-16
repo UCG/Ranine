@@ -11,14 +11,14 @@ use Ranine\Helper\ThrowHelpers;
  * Iterates through an iterable object while providing useful extension methods.
  *
  * Sample use -- calculate sum of squares of first five items from array input
- * and where x^2 < 100:
+ * and where x < 10
  * <code>
  * <?php
  * $input = [2, 3, 7, 77, 99, 110];
  * $sum = ExtendableIterable::from($input)
  *  ->take(5)
+ *  ->filter(fn($k, $v) => $v < 10)
  *  ->map(fn($k, $v) => $v * $v)
- *  ->filter(fn($k, $v) => $v < 100)
  *  ->reduce(fn($k, $v, $sum) => $sum + $v, 0);
  * // $sum = 2*2 + 3*3 + 7*7 = 62
  * </code>
@@ -41,14 +41,10 @@ class ExtendableIterable implements \IteratorAggregate {
   }
 
   /**
-   * Checks to see if $predicate applies to all items in this collection.
+   * Tells whether $predicate applies to all items in this collection.
    *
    * @param callable $predicate
-   *   Predicate, of form ($key, $value) : bool
-   *
-   * @return bool
-   *   Returns 'TRUE' if $predicate evaluates to 'TRUE' for all items; else
-   *   returns 'FALSE'.
+   *   Predicate, of form ($key, $value) : bool.
    */
   public function all(callable $predicate) : bool {
     foreach ($this->source as $key => $value) {
@@ -61,14 +57,10 @@ class ExtendableIterable implements \IteratorAggregate {
   }
 
   /**
-   * Checks to see if $predicate applies to any item in this collection.
+   * Tells whether $predicate applies to any item in this collection.
    *
    * @param callable $predicate
    *   Predicate, of form ($key, $value) : bool
-   *
-   * @return bool
-   *   Returns 'TRUE' if $predicate evaluates to 'TRUE' for at least one item;
-   *   else returns 'FALSE'.
    */
   public function any(callable $predicate) : bool {
     foreach ($this->source as $key => $value) {
@@ -82,9 +74,6 @@ class ExtendableIterable implements \IteratorAggregate {
 
   /**
    * Appends elements from $other on the end of this iterator.
-   *
-   * @param iterable $other
-   *   Iterator to append.
    *
    * @return \Ranine\Iteration\ExtendableIterable
    *   Appended output -- the order of elements in this iterator and $source is
@@ -139,10 +128,7 @@ class ExtendableIterable implements \IteratorAggregate {
    */
   public function count() : int {
     if (is_array($this->source) || ($this->source instanceof \Countable)) {
-      // Note: Intelephense gives a type error unless we do something like this.
-      /** @var array|\Countable */
-      $countableSource = $this->source;
-      return count($countableSource);
+      return count($this->source);
     }
     else {
       return iterator_count($this->source);
@@ -157,7 +143,7 @@ class ExtendableIterable implements \IteratorAggregate {
    *   NULL (if the element is not to be expanded) or an iterable (if the
    *   element is to be expanded into that iterable).
    *
-   * @return ExtendableIterable
+   * @return \Ranine\Iteration\ExtendableIterable
    *   Resulting iterator, which will iterate through items in this iterable
    *   that were not expanded, and through the expansion of any sub-iterables,
    *   as they are encountered.
@@ -177,11 +163,11 @@ class ExtendableIterable implements \IteratorAggregate {
   }
 
   /**
-   * Filters on the collection's values.
+   * Filters out elements from this collection.
    *
    * @param callable $filter
    *   Filter - of form ($key, $value) : bool - takes each key and value and
-   *   returns 'TRUE' (to preserve the value in the output) or 'FALSE' (to not
+   *   returns TRUE (to preserve the value in the output) or FALSE (to not
    *   preserve the value in the output).
    *
    * @return \Ranine\Iteration\ExtendableIterable
@@ -210,8 +196,7 @@ class ExtendableIterable implements \IteratorAggregate {
     foreach ($this->source as $value) {
       return $value;
     }
-
-    throw new InvalidOperationException('The collection is empty.');
+    static::throwEmptyCollectionException();
   }
 
   /**
@@ -227,22 +212,36 @@ class ExtendableIterable implements \IteratorAggregate {
     foreach ($this->source as $key => $value) {
       return $key;
     }
+    static::throwEmptyCollectionException();
+  }
 
-    throw new InvalidOperationException('The collection is empty.');
+  /**
+   * Grabs the first key and value of this collection, if possible.
+   *
+   * @param mixed $key
+   *   First key.
+   * @param mixed $value
+   *   First value.
+   *
+   * @throws \Ranine\Exception\InvalidOperationException
+   *   Thrown if the collection if empty.
+   */
+  public function firstKeyAndValue(&$key, &$value) : void {
+    foreach ($this->source as $key => $value) {
+      return;
+    }
+    static::throwEmptyCollectionException();
   }
 
   /**
    * Gets an iterator for looping through values associated with this object.
-   *
-   * @return \Iterator
-   *   Iterator.
    */
   public function getIterator() : \Iterator {
     yield from $this->source;
   }
 
   /**
-   * Yields all the keys from this collection.
+   * Gets a collection consisting that can iterate the keys from this iterable.
    */
   public function getKeys() : ExtendableIterable {
     return new static((function () {
@@ -253,10 +252,14 @@ class ExtendableIterable implements \IteratorAggregate {
   }
 
   /**
-   * Checks whether the collection is empty.
+   * Tells whether the collection is empty.
+   *
+   * NOTE: This function will begin advancing through the collection if it isn't
+   * empty, which could prevent foreach() from being used on the collection in
+   * the future.
    */
   public function isEmpty() : bool {
-    foreach ($this->source as $value) {
+    foreach ($this->source as $v) {
       return FALSE;
     }
     return TRUE;
@@ -265,19 +268,17 @@ class ExtendableIterable implements \IteratorAggregate {
   /**
    * Maps each key/value pair in the collection to another key/value pair.
    *
-   * @param iterable $input
-   *   Input collection.
    * @param callable|null $valueMap
    *   Value map - of form ($key, $value) : mixed - takes each key and value and
-   *   returns an output value. If 'NULL' is passed for this parameter, the
+   *   returns an output value. If NULL is passed for this parameter, the
    *   value map ($k, $v) => $v is used.
    * @param callable|null $keyMap
-   *   Key map - of form ($key, $value) : string|int - takes each key and value
-   *   and returns an output key. If 'NULL' is passed for this parameter, the
-   *   key map ($k, $v) => $k is used.
+   *   Key map - of form ($key, $value) : mixed - takes each key and value and
+   *   returns an output key. If NULL is passed for this parameter, the key map
+   *   ($k, $v) => $k is used.
    *
    * @return \Ranine\Iteration\ExtendableIterable
-   *   Output generator. The order of elements is preserved.
+   *   Output iterable. The order of elements is preserved.
    */
   public function map(?callable $valueMap, ?callable $keyMap = NULL) : ExtendableIterable {
     if ($valueMap === NULL) {
@@ -302,7 +303,7 @@ class ExtendableIterable implements \IteratorAggregate {
    *
    * @param callable|null $valueMap
    *   Value map - of form ($key, $value) : mixed - takes each key and value and
-   *   returns an output value. If 'NULL' is passed for this parameter, the
+   *   returns an output value. If NULL is passed for this parameter, the
    *   value map ($k, $v) => $v is used.
    *
    * @return \Ranine\Iteration\ExtendableIterable
@@ -329,8 +330,8 @@ class ExtendableIterable implements \IteratorAggregate {
    *   Reduction - of form ($key, $value, $aggregate) : mixed - produces
    *   resulting value of aggregate object (in that step of aggregation) from
    *   current value of aggregate object and key and value. The resulting value
-   *   of the aggregate object, which will be passed to the reduction for the
-   *   next key and value.
+   *   of the aggregate object will be passed to the reduction for the next key
+   *   and value.
    * @param mixed $initialValue
    *   Initial value of the aggregate object (passed to $reduction on its first
    *   call).
@@ -374,18 +375,18 @@ class ExtendableIterable implements \IteratorAggregate {
   }
 
   /**
-   * Iterates through at most $max elements while $predicate is 'TRUE'.
+   * Iterates through at most $max elements while $predicate is TRUE.
    *
    * @param callable $predicate
    *   Predicate, of form ($key, $value) : bool.
    * @param int|null $max
-   *   Max number of elements to take. Pass 'NULL' for "unlimited."
+   *   Max number of elements to take. Pass NULL for "unlimited."
    *
-   * @return ExtendableIterable
+   * @return \Ranine\Iteration\ExtendableIterable
    *   Items. The order of elements is preserved.
    *
    * @throws \InvalidArgumentException
-   *   Thrown if $num is less than zero.
+   *   Thrown if $max is an integer less than zero.
    */
   public function takeWhile(callable $predicate, ?int $max = NULL) : ExtendableIterable {
     if ($max === NULL) {
@@ -399,7 +400,8 @@ class ExtendableIterable implements \IteratorAggregate {
       })());
     }
     else {
-      ThrowHelpers::throwIfLessThanZero((int) $max, 'max');
+      /** int $max */
+      ThrowHelpers::throwIfLessThanZero($max, 'max');
       return new static((function () use ($predicate, $max) {
         $i = 0;
         foreach ($this->source as $key => $value) {
@@ -424,16 +426,14 @@ class ExtendableIterable implements \IteratorAggregate {
    */
   public function toArray(bool $preserveKeys = TRUE) : array {
     if (is_array($this->source)) {
-      // This is necessary to make Intelephense work.
       /** @var array */
-      $sourceArray = $this->source;
-      return $sourceArray;
+      $source = $this->source;
+      return $source;
     }
     elseif (($this->source instanceof \ArrayObject)) {
-      // Again, this is necessary to make Intelephense work.
       /** @var \ArrayObject */
-      $sourceArrayObject = $this->source;
-      return $sourceArrayObject->getArrayCopy();
+      $source = $this->source;
+      return $source->getArrayCopy();
     }
     else {
       return iterator_to_array($this->source, $preserveKeys);
@@ -441,68 +441,129 @@ class ExtendableIterable implements \IteratorAggregate {
   }
 
   /**
-   * Creates a collection by producing output values from two iterables.
+   * Creates a collection by combining this iterable with another.
    *
    * The two iterables are iterated through simultaneously, and output keys
-   * and values are given by $keyMap and $valueMap (respectively) while both
-   * iterables are valid. If one iterable terminates before the other, the
-   * remaining output keys and values are taken from the remaining keys/values
-   * of the longer iterable.
+   * and values are given by:
+   * - $keyMapBoth and $valueMapBoth (respectively), if both iterables are
+   *   valid.
+   * - $keyMapFirst and $valueMapFirst (respectively), if $other has terminated,
+   *   but this iterable still has remaining items.
+   * - $keyMapFirst and $valueMapFirst (respectively), if this iterable has
+   *   terminated, but $other is still valid.
+   *
+   * When one iterable terminates, iteration continues through the other
+   * iterable if it is still valid.
    *
    * @param iterable $other
    *   Other iterable.
-   * @param callable $keyMap
-   *   Map to produce output keys, of form
+   * @param callable $keyMapBoth
+   *   Map to produce output keys when both iterators are valid, of form
    *   ($keyFromThisObject, $valueFromThisObject, $keyFromOtherIterable,
-   *   $valueFromOtherIterable) : string|int
-   * @param callable $valueMap
-   *   Map to produce output values, of form
+   *   $valueFromOtherIterable) : mixed.
+   * @param callable $valueMapBoth
+   *   Map to produce output values when both iterators are valid, of form
    *   ($keyFromThisObject, $valueFromThisObject, $keyFromOtherIterable,
-   *   $valueFromOtherIterable) : mixed
+   *   $valueFromOtherIterable) : mixed.
+   * @param callable|null $keyMapCurrent
+   *   Map to produce output keys when only this iterable (this instance)
+   *   remains valid, of form
+   *   ($keyFromThisObject, $valueFromThisObject) : mixed. If NULL is passed,
+   *   the map ($k, $v) => $k is used.
+   * @param callable|null $valueMapCurrent
+   *   Map to produce output values when only this iterable (this instance)
+   *   remains valid, of form
+   *   ($keyFromThisObject, $valueFromThisObject) : mixed. If NULL is passed,
+   *   the map ($k, $v) => $v is used.
+   * @param callable|null $keyMapOther
+   *   Map to produce output keys when only $other is valid, of form
+   *   ($keyFromOtherIterable, $valueFromOtherIterable) : mixed. If NULL is
+   *   passed, the map ($k, $v) => $k is used.
+   * @param callable|null $valueMapOther
+   *   Map to produce output values when only $other is valid, of form
+   *   ($keyFromOtherIterable, $valueFromOtherIterable) : mixed. If NULL is
+   *   passed, the map ($k, $v) => $v is used.
    *
    * @return ExtendableIterable
    *   Resulting collection. The order of elements in this iterator and $other
    *   is preserved.
    */
-  public function zip(iterable $other, callable $keyMap, callable $valueMap) : ExtendableIterable {
+  public function zip(iterable $other,
+    callable $keyMapBoth,
+    callable $valueMapBoth,
+    ?callable $keyMapCurrent = NULL,
+    ?callable $valueMapCurrent = NULL,
+    ?callable $keyMapOther = NULL,
+    ?callable $valueMapOther = NULL) : ExtendableIterable {
+    if ($keyMapCurrent === NULL) {
+      $keyMapCurrent = fn($k) => $k;
+    }
+    if ($keyMapOther === NULL) {
+      $keyMapOther = fn($k) => $k;
+    }
+    if ($valueMapCurrent === NULL) {
+      $valueMapCurrent = fn($k, $v) => $v;
+    }
+    if ($valueMapOther === NULL) {
+      $valueMapOther = fn($k, $v) => $v;
+    }
+
     // Wrap $other in a generator in order to ensure we can iterate through it
     // manually.
     $otherGenerator = (function () use ($other) { yield from $other; })();
-    return new static((function () use ($otherGenerator, $keyMap, $valueMap) {
+    return new static((function () use ($otherGenerator, $keyMapBoth,
+      $valueMapBoth, $keyMapCurrent, $valueMapCurrent, $keyMapOther,
+      $valueMapOther) {
       $otherGenerator->rewind();
       foreach ($this->source as $key1 => $value1) {
         if ($otherGenerator->valid()) {
           $key2 = $otherGenerator->key();
           $value2 = $otherGenerator->current();
-          yield $keyMap($key1, $value1, $key2, $value2) => $valueMap($key1, $value1, $key2, $value2);
+          yield $keyMapBoth($key1, $value1, $key2, $value2) => $valueMapBoth($key1, $value1, $key2, $value2);
           $otherGenerator->next();
         }
         else {
-          yield $key1 => $value1;
+          yield $keyMapCurrent($key1, $value1) => $valueMapCurrent($key1, $value1);
         }
       }
       while ($otherGenerator->valid()) {
-        yield $otherGenerator->key() => $otherGenerator->current();
+        $key2 = $otherGenerator->key();
+        $value2 = $otherGenerator->current();
+        yield $keyMapOther($key2, $value2) => $valueMapOther($key2, $value2);
         $otherGenerator->next();
       }
     })());
   }
 
+  /**
+   * Creates an returns a new empty extendable iterable.
+   */
   public static function empty() : ExtendableIterable {
-    return new static(new \EmptyIterator());
+    return new static([]);
   }
 
   /**
-   * Creates a new extendable iterator from $source.
+   * Creates and returns a new extendable iterable from $source.
    *
    * @param iterable $source
    *   Source object over which we are iterating.
-   *
-   * @return \Ranine\Iteration\ExtendableIterable
-   *   Extendable iterator.
    */
   public static function from(iterable $source) : ExtendableIterable {
     return new static($source);
+  }
+
+  /**
+   * Returns an extendable iterable containing the single key/value pair given.
+   *
+   * @param mixed $key
+   *   Key.
+   * @param mixed $value
+   *   Value.
+   */
+  public static function fromKeyAndValue($key, $value) : ExtendableIterable {
+    return new static((function () use ($key, $value) {
+      yield $key => $value;
+    })());
   }
 
   /**
@@ -512,9 +573,6 @@ class ExtendableIterable implements \IteratorAggregate {
    *   Inclusive start value for range.
    * @param int $end
    *   Inclusive end value for range.
-   *
-   * @return \Ranine\Iteration\ExtendableIterable
-   *   Output range.
    */
   public static function fromRange(int $start, int $end) : ExtendableIterable {
     return new static((function () use ($start, $end) {
@@ -522,6 +580,15 @@ class ExtendableIterable implements \IteratorAggregate {
         yield $i;
       }
     })());
+  }
+
+  /**
+   * Throws an exception indicating an empty collection.
+   *
+   * @throws \Ranine\Exception\InvalidOperationException
+   */
+  private static function throwEmptyCollectionException() : void {
+    throw new InvalidOperationException('The collection is empty.');
   }
 
 }

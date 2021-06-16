@@ -14,11 +14,16 @@ use PHPUnit\Framework\TestCase;
  */
 trait MockTimeServiceCreationTrait {
 
+  use MockObjectCreationTrait;
+
   /**
    * Creates a mock time service object.
    *
    * @return \PHPUnit\Framework\MockObject\MockObject|\Drupal\Component\Datetime\TimeInterface
-   *   Mocked configuration factory
+   *   Mock time interface.
+   *
+   * @throws \LogicException
+   *   Thrown if current object is not a \PHPUnit\Framework\TestCase object.
    */
   private function getMockTimeServiceObject() : TimeInterface {
     if (!($this instanceof TestCase)) {
@@ -26,7 +31,7 @@ trait MockTimeServiceCreationTrait {
     }
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|\Drupal\Component\Datetime\TimeInterface */
-    $mockTimeObtainer = $this->createMock('\\Drupal\\Component\\Datetime\\TimeInterface');
+    $mockTimeObtainer = $this->createMockNoAutoMethodConfig('\\Drupal\\Component\\Datetime\\TimeInterface');
     $mockTimeObtainer->method('getCurrentMicroTime')->willReturnCallback(fn() : float => microtime(TRUE));
     $mockTimeObtainer->method('getCurrentTime')->willReturnCallback(fn() : int => time());
     $mockTimeObtainer->method('getRequestMicroTime')->willReturnCallback(fn() : float => $_SERVER['REQUEST_TIME_FLOAT'] ?? microtime(TRUE));

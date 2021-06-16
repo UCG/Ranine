@@ -12,7 +12,7 @@ use Ranine\Exception\InvalidArraySchemaException;
 class ArraySchemaRule {
 
   /**
-   * Child validation rules, or 'NULL' if children aren't to be validated.
+   * Child validation rules, or NULL if children aren't to be validated.
    *
    * @var \Ranine\Validation\ArraySchemaRule[]|null
    */
@@ -37,13 +37,13 @@ class ArraySchemaRule {
    *   Validation rule. It should take one parameter. If validation fails, it
    *   should return a
    *   \Ranine\Exception\InvalidArraySchemaException
-   *   exception to be thrown. If validation succeeds, it should return 'NULL'.
+   *   exception to be thrown. If validation succeeds, it should return NULL.
    * @param bool $isElementRequired
    *   Whether the element corresponding to this rule is required as part of the
    *   schema definition.
    * @param \Ranine\Validation\ArraySchemaRule[]|null $children
    *   Collection of schema rule children, each rule keyed on the corresponding
-   *   key in an array under validation. 'NULL' indicates that the children are
+   *   key in an array under validation. NULL indicates that the children are
    *   not to be validated.
    *
    * @throws \InvalidArgumentException
@@ -78,7 +78,7 @@ class ArraySchemaRule {
    * Determines whether element corresponding to this rule is required,
    *
    * @return bool
-   *   Returns 'TRUE' if element is required; else returns 'FALSE'.
+   *   Returns TRUE if element is required; else returns FALSE.
    */
   public function isElementRequired() : bool {
     return $this->isElementRequired;
@@ -88,7 +88,7 @@ class ArraySchemaRule {
    * Checks if children corresponding to this rule should be validated.
    *
    * @return bool
-   *   Returns 'TRUE' if children should be validated; else returns 'FALSE'.
+   *   Returns TRUE if children should be validated; else returns FALSE.
    */
   public function shouldValidateChildren() : bool {
     return $this->children === NULL ? FALSE : TRUE;

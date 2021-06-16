@@ -14,8 +14,10 @@ use PHPUnit\Framework\TestCase;
  */
 trait MockConfigFactoryCreationTrait {
 
+  use MockObjectCreationTrait;
+
   /**
-   * Creates a mock configuration factory.
+   * Creates and returns a a mock configuration factory.
    *
    * The configuration factory will return a settings configuration object if
    * the $configObjectName configuration object is requested with the get()
@@ -28,7 +30,6 @@ trait MockConfigFactoryCreationTrait {
    *   Settings array.
    *
    * @return \PHPUnit\Framework\MockObject\MockObject|\Drupal\Core\Config\ConfigFactoryInterface
-   *   Mocked configuration factory
    *
    * @throws \LogicException
    *   Thrown if current object is not a \PHPUnit\Framework\TestCase object.
@@ -40,13 +41,7 @@ trait MockConfigFactoryCreationTrait {
 
     // Mock a configuration object and factory.
     /** @var \PHPUnit\Framework\MockObject\MockObject|\Drupal\Core\Config\ImmutableConfig */
-    $mockConfiguration = $this->getMockBuilder('\\Drupal\\Core\\Config\\ImmutableConfig')
-      ->disableOriginalConstructor()
-      ->disableOriginalClone()
-      ->disableArgumentCloning()
-      ->disallowMockingUnknownTypes()
-      ->disableAutoReturnValueGeneration()
-      ->getMock();
+    $mockConfiguration = $this->createMockNoAutoMethodConfig('\\Drupal\\Core\\Config\\ImmutableConfig');
     $mockConfiguration->method('get')->willReturnCallback(function ($setting) use ($settings) {
       if (array_key_exists($setting, $settings)) {
         return $settings[$setting];
@@ -56,13 +51,7 @@ trait MockConfigFactoryCreationTrait {
       }
     });
     /** @var \PHPUnit\Framework\MockObject\MockObject|\Drupal\Core\Config\ConfigFactoryInterface */
-    $mockConfigFactory = $this->getMockBuilder('\\Drupal\\Core\\Config\\ConfigFactoryInterface')
-      ->disableOriginalConstructor()
-      ->disableOriginalClone()
-      ->disableArgumentCloning()
-      ->disallowMockingUnknownTypes()
-      ->disableAutoReturnValueGeneration()
-      ->getMock();
+    $mockConfigFactory = $this->createMockNoAutoMethodConfig('\\Drupal\\Core\\Config\\ConfigFactoryInterface');
     $mockConfigFactory->method('get')->willReturnCallback(function (string $configuration) use ($mockConfiguration, $configObjectName) {
       if ($configuration === $configObjectName) {
         return $mockConfiguration;

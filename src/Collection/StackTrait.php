@@ -18,8 +18,6 @@ trait StackTrait {
    *
    * Could also be implemented with a linked list, which might be useful for
    * large stacks.
-   *
-   * @var array
    */
   private array $arr = [];
 
@@ -40,10 +38,7 @@ trait StackTrait {
   }
 
   /**
-   * Checks if the given stack is empty.
-   *
-   * @return bool
-   *   Returns 'TRUE' if empty; else 'FALSE'.
+   * Tells whether the stack is empty.
    */
   public function isEmpty() : bool {
     return empty($this->arr);
@@ -53,7 +48,6 @@ trait StackTrait {
    * Returns (but does not remove) the top element of the stack.
    *
    * @return mixed
-   *   Top stack element.
    */
   private function peekInternal() {
     return end($this->arr);
@@ -63,7 +57,6 @@ trait StackTrait {
    * Returns and removes the top element of the stack.
    *
    * @return mixed
-   *   Top stack element.
    *
    * @throws \Ranine\Exception\InvalidOperationException
    *   Thrown if the stack is empty.

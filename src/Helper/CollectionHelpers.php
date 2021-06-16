@@ -22,7 +22,8 @@ final class CollectionHelpers {
   /**
    * Gets integer ranges, in sorted order, from the given integers.
    *
-   * The smallest possible number of ranges is returned.
+   * The smallest possible number of ranges is returned. This function runs in
+   * O(n) (best case), O(n*log n) (average case), or O(n^2) (worst case).
    *
    * @param iterable<int> $integers
    *   Collection whose values are integers.
@@ -39,7 +40,7 @@ final class CollectionHelpers {
    *   Thrown if a value in $integers was not an integer.
    */
   public static function getSortedRanges(iterable $integers) : ExtendableIterable {
-    /** @var null[] */
+    /** @var array<int, null> */
     $integersAsKeys = [];
     foreach ($integers as $value) {
       if (!is_int($value)) {
@@ -57,7 +58,7 @@ final class CollectionHelpers {
       $isFirstIteration = TRUE;
       $currentStartValue = 0;
       $currentEndValue = 0;
-      foreach ($integersAsKeys as $value => $x) {
+      foreach ($integersAsKeys as $value => $discard) {
         if ($isFirstIteration) {
           $currentStartValue = $value;
           $currentEndValue = $value;

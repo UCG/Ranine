@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Ranine\Testing\Traits;
 
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
+use Drupal\Core\Entity\EntityStorageInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -14,15 +15,17 @@ use PHPUnit\Framework\TestCase;
  */
 trait MockEntityTypeManagerCreationTrait {
 
+  use MockObjectCreationTrait;
+
   /**
-   * Creates a mock entity type manager.
+   * Creates and returns a mock entity type manager.
    *
    * The mock entity storage objects defined will have (only) their load(),
    * loadByProperties(), and loadMultiple() methods properly defined. The mock
    * entity type manager will have only its getStorage() method properly
    * defined.
    *
-   * @param array $entitiesAndTypes
+   * @param array<string, array> $entitiesAndTypes
    *   This array should have the following structure. The mock entity objects
    *   should all define a working toArray() method. Type names are in round
    *   brackets (), and placeholders are in curly brackets {}:
@@ -33,13 +36,12 @@ trait MockEntityTypeManagerCreationTrait {
    *       'entities' => [
    *         {entity_id} =>
    *           (\Drupal\Core\Entity\EntityInterface) {mock_entity_object},
-   *         {...}
+   *         {...},
    *       ]
-   *     ], {...}
+   *     ], {...},
    *   ]
    *
    * @return \PHPUnit\Framework\MockObject\MockObject|\Drupal\Core\Entity\EntityTypeManagerInterface
-   *   Mock entity type manager.
    *
    * @throws \LogicException
    *   Thrown if current object is not a \PHPUnit\Framework\TestCase object.
@@ -48,14 +50,17 @@ trait MockEntityTypeManagerCreationTrait {
     if (!($this instanceof TestCase)) {
       throw new \LogicException('The object this method is called upon must be a \\PHPUnit\\Framework\\TestCase instance.');
     }
+
     // Create the mock storage objects.
+    /** @var \Drupal\Core\Entity\EntityStorageInterface[] */
     $entityStorageObjects = [];
     foreach ($entitiesAndTypes as $entityTypeId => $storageDefinition) {
+      /** @var string */
       $storageInterfaceName = $storageDefinition['storage_interface'];
       /** @var \Drupal\Core\Entity\EntityInterface[] */
       $entities = $storageDefinition['entities'];
       /** @var \PHPUnit\Framework\MockObject\MockObject|\Drupal\Core\Entity\EntityStorageInterface */
-      $storage = $this->createMock($storageInterfaceName);
+      $storage = $this->createMockNoAutoMethodConfig($storageInterfaceName);
       $storage->method('load')->willReturnCallback(fn($id) => $entities[$id] ?? NULL);
       $storage->method('loadMultiple')->willReturnCallback(function (?array $ids) use ($entities) : array {
         if ($ids === NULL) {
@@ -87,9 +92,10 @@ trait MockEntityTypeManagerCreationTrait {
       });
       $entityStorageObjects[$entityTypeId] = $storage;
     }
+
     // Create the mock entity type manager.
-    $mockEntityTypeManager = $this->createMock('\\Drupal\\Core\\Entity\\EntityTypeManagerInterface');
-    $mockEntityTypeManager->method('getStorage')->willReturnCallback(function (string $entity_type_id) use ($entityStorageObjects) {
+    $mockEntityTypeManager = $this->createMockNoAutoMethodConfig('\\Drupal\\Core\\Entity\\EntityTypeManagerInterface');
+    $mockEntityTypeManager->method('getStorage')->willReturnCallback(function (string $entity_type_id) use ($entityStorageObjects) : EntityStorageInterface {
       if (array_key_exists($entity_type_id, $entityStorageObjects)) {
         return $entityStorageObjects[$entity_type_id];
       }

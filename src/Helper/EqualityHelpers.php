@@ -17,26 +17,19 @@ final class EqualityHelpers {
   private function __construct() {
   }
 
-    /**
-   * Checks if the keys/values of the two arrays are equal.
+  /**
+   * Tells whether the keys/values of the two arrays are equal.
    *
-   * Equality is reached if two things are true, provided $recursive is 'FALSE':
+   * Equality is reached if two things are true, provided $recursive is FALSE:
    * 1) for each key/value pair in $arr1, there is a strictly equal key/value
    * pair in $arr2, and 2) for each key/value pair in $arr2, there is a strictly
-   * equal key/value pair in $arr1. If $recursive is 'TRUE', equality will be
+   * equal key/value pair in $arr1. If $recursive is TRUE, equality will be
    * checked as above, exactly that value equality between arrays is checked
    * recursively using this same procedure.
    *
-   * @param array $arr1
-   *   Array 1.
-   * @param array $arr2
-   *   Array 2.
    * @param bool $recursive
    *   Whether equality for sub-arrays should be checked recursively, using this
    *   function.
-   *
-   * @return bool
-   *   Returns 'TRUE' if arrays are equal, else 'FALSE'.
    */
   public static function areArraysEqualStrictOrderInvariant(array $arr1, array $arr2, bool $recursive = FALSE) : bool {
     if (count($arr1) !== count($arr2)) {
@@ -62,7 +55,7 @@ final class EqualityHelpers {
             return $value === $context[$key];
           }
         },
-        fn($k, $v, $c) : array => $c[$k],
+        fn($key, $value, array $context) : array => $context[$key],
         $arr2);
     }
     else {
@@ -80,30 +73,18 @@ final class EqualityHelpers {
   }
 
   /**
-   * Checks if the values in two arrays are equal.
+   * Tells whether the values in two arrays are equal.
    *
    * Equality is defined such that equality is obtained if and only if for each
    * element in $arr1, there is exactly one matching element in $arr2 with the
-   * same value, and visa versa.
-   *
-   * @param array $arr1
-   *   Array 1.
-   * @param array $arr2
-   *   Array 2.
-   *
-   * @return bool
-   *   Returns 'TRUE' if array values are equal, else 'FALSE'.
+   * same value, and visa versa. Runs in O(n*m).
    */
   public static function areArrayValuesEqualStrict(array $arr1, array $arr2) : bool {
     if (count($arr1) !== count($arr2)) {
       return FALSE;
     }
 
-    // @todo Optimize if values can be nicely represented as strings/integers,
-    // and maybe for cases where values can be sorted, and for in-between cases.
-    // Right now this runs in O(n*m).
-
-    // Set up a table of the used keys in $arr2.
+    /** @var null[] */
     $usedKeys = [];
     foreach ($arr1 as $value1) {
       $foundValue = FALSE;

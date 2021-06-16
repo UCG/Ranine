@@ -15,7 +15,6 @@ class Stack implements \IteratorAggregate {
    * Returns (but does not remove) the top element of the stack.
    *
    * @return mixed
-   *   Top stack element.
    */
   public function peek() {
     return $this->peekInternal();
@@ -25,7 +24,6 @@ class Stack implements \IteratorAggregate {
    * Returns and removes the top element of the stack.
    *
    * @return mixed
-   *   Top stack element.
    *
    * @throws \Ranine\Exception\InvalidOperationException
    *   Thrown if the stack is empty.

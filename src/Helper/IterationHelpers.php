@@ -39,22 +39,22 @@ final class IterationHelpers {
    *   Operation to apply for every element, of the form
    *   ($key, $value, $context) : bool. The "context" object stores information
    *   associated with the current level being traversed. The return value
-   *   indicates whether iteration should be continued ('TRUE' to continue,
-   *   'FALSE' to halt).
+   *   indicates whether iteration should be continued (TRUE to continue,
+   *   FALSE to halt).
    * @param callable|null $drillDown
    *   Of the form ($key, $value, $context) : mixed, this is called before
    *   moving down a level, and allows information to be stored, as the return
    *   value of this callable, with the level to which we are moving. The key
    *   and value of the node whose children we are about to move down to are
    *   passed to this function, along with the current context (of the level
-   *   *above* the level whose context information we are creating). If 'NULL'
-   *   is passed for this parameter, the function ($k, $v, $c) => NULL is used.s
+   *   *above* the level whose context information we are creating). If NULL
+   *   is passed for this parameter, the function ($k, $v, $c) => NULL is used.
    * @param mixed $initialContext
    *   The context information to be stored at the root level.
    *
    * @return bool
-   *   Returns 'FALSE' if it was necessary to exit early because of a 'FALSE'
-   *   return value of $operation; otherwise returns 'TRUE'.
+   *   Returns FALSE if it was necessary to exit early because of a FALSE
+   *   return value of $operation; otherwise returns TRUE.
    */
   public static function walkRecursiveIterator(\RecursiveIterator $iterator, callable $operation, ?callable $drillDown = NULL, $initialContext = NULL) : bool {
     if ($drillDown === NULL) {
@@ -70,7 +70,7 @@ final class IterationHelpers {
     // Stores information associated with each parent level. This is a
     // collection of two-element arrays, the first element of which is a
     // ?\RecursiveIterator object indicating the parent \RecursiveIterator for
-    // this level ('NULL' indicates no parent), and the second is the user
+    // this level (NULL indicates no parent), and the second is the user
     // context information.
     $parentLevels = new Stack();
 
@@ -83,8 +83,8 @@ final class IterationHelpers {
     $currentContext = $initialContext;
     // Loop until we run out of elements.
     do {
-      // These are set at the beginning of the loop, not when we move up or
-      // down a level.
+      // The key and value are set at the beginning of the loop, not when we
+      // move up or down a level.
       $key = $currentIterator->key();
       $value = $currentIterator->current();
 
@@ -135,7 +135,7 @@ final class IterationHelpers {
    *   Parent iterator.
    *
    * @return \RecursiveIterator|null
-   *   Child iterator, or 'NULL' if the iterator had no child iterator, or the
+   *   Child iterator, or NULL if the iterator had no child iterator, or the
    *   child iterator was empty.
    */
   private static function prepareChildIterator(\RecursiveIterator $parent) : ?\RecursiveIterator {
