@@ -98,6 +98,40 @@ class ExtendableIterable implements \IteratorAggregate {
   }
 
   /**
+   * Appends a single key/value pair to the end of this collection.
+   *
+   * @param mixed $key
+   *   Key.
+   * @param mixed $value
+   *   Value.
+   *
+   * @return \Ranine\Iteration\ExtendableIterable
+   *   Resulting iterable.
+   */
+  public function appendKeyAndValue($key, $value) : ExtendableIterable {
+    return new static((function () use ($key, $value) {
+      yield from $this->source;
+      yield $key => $value;
+    })());
+  }
+
+  /**
+   * Appends a single value to the end of this collection.
+   *
+   * @param mixed $value
+   *   Value to append.
+   *
+   * @return \Ranine\Iteration\ExtendableIterable
+   *   Resulting iterable.
+   */
+  public function appendValue($value) : ExtendableIterable {
+    return new static((function () use ($value) {
+      yield from $this->source;
+      yield $value;
+    })());
+  }
+
+  /**
    * Counts the elements in this iterable.
    *
    * @return int
