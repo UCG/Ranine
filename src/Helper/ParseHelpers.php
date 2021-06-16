@@ -48,6 +48,33 @@ final class ParseHelpers {
   }
 
   /**
+   * Attempts to parse $range as an inclusive range of integer values.
+   *
+   * @param string $range
+   *   Range, which should be in the form "[start]$divider[end]", where [start]
+   *   and [end] are string representations of integers which form the inclusive
+   *   lower and upper bounds of the range, respectively.
+   * @param string $divider
+   *   The string dividing the two halves of the range.
+   *
+   * @return \Ranine\Iteration\ExtendableIterable
+   *   Sorted collection, whose values are the values in the range, or 'NULL' if
+   *   the parsing failed.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown if $divider is empty.
+   * @throws \Ranine\Exception\ParseException
+   *   Thrown if the parsing failed.
+   */
+  public static function parseIntRange(string $range, string $divider = '-') : ExtendableIterable {
+    $result = NULL;
+    if (!static::tryParseIntRange($range, $result, $divider)) {
+      throw new ParseException('Could not parse integer range.');
+    }
+    return $result;
+  }
+
+  /**
    * Attempts to parse $number (a string or integer) as an integer.
    *
    * If $number is an integer, this function sets $result = $number. If it is a
