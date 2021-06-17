@@ -49,16 +49,26 @@ final class IterationHelpers {
    *   passed to this function, along with the current context (of the level
    *   *above* the level whose context information we are creating). If NULL
    *   is passed for this parameter, the function ($k, $v, $c) => NULL is used.
+   * @param callable|null $levelFinish
+   *   Of the form ($context) : bool, this is called after there are no more
+   *   siblings left at a given level. $context is the context of the current
+   *   level, and the return value indicates whether iteration should be
+   *   continued (TRUE to continue, FALSE to halt). If NULL is passed for this
+   *   parameter, the function ($c) => TRUE is used.
+   *
    * @param mixed $initialContext
    *   The context information to be stored at the root level.
    *
    * @return bool
-   *   Returns FALSE if it was necessary to exit early because of a FALSE
-   *   return value of $operation; otherwise returns TRUE.
+   *   Returns FALSE if $operation or $levelFinish returned FALSE at some point;
+   *   otherwise returns TRUE.
    */
-  public static function walkRecursiveIterator(\RecursiveIterator $iterator, callable $operation, ?callable $drillDown = NULL, $initialContext = NULL) : bool {
+  public static function walkRecursiveIterator(\RecursiveIterator $iterator, callable $operation, ?callable $drillDown = NULL, ?callable $levelFinish = NULL, $initialContext = NULL) : bool {
     if ($drillDown === NULL) {
       $drillDown = fn() => NULL;
+    }
+    if ($levelFinish === NULL) {
+      $levelFinish = fn() => TRUE;
     }
 
     // Prepare the iterator.
@@ -116,7 +126,10 @@ final class IterationHelpers {
 
       // Move 3. Work our way back up the tree, if necessary.
       while (!$currentIterator->valid() && $parentIterator !== NULL) {
-        // Move up a level.
+        // Since we're done one level, call the level finish function.
+        $levelFinish($currentContext);
+
+        // Try to move up a level.
         /** @var \RecursiveIterator */
         $currentIterator = $parentIterator;
         list($parentIterator, $currentContext) = $parentLevels->pop();
@@ -125,7 +138,7 @@ final class IterationHelpers {
       }
     } while ($currentIterator->valid());
 
-    return TRUE;
+    return $levelFinish($initialContext);
   }
 
   /**

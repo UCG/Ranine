@@ -58,7 +58,28 @@ class IterationHelpersTest extends TestCase {
             return FALSE;
         }
       },
-      fn($k) => $k, NULL));
+      fn($k) => $k, function (?int $context) use (&$currentSum, $sumOfValues) : bool {
+        switch ($context) {
+          case NULL:
+            return $currentSum === $sumOfValues ? TRUE : FALSE;
+
+          case 1:
+            return $currentSum === 42 ? TRUE : FALSE;
+
+          case 4:
+            return $currentSum === 23 ? TRUE : FALSE;
+
+          case 8:
+            return $currentSum === 42 ? TRUE : FALSE;
+
+          case 11:
+            return $currentSum === $sumOfValues ? TRUE : FALSE;
+
+          default:
+            return FALSE;
+        }
+      }, NULL));
     $this->assertTrue($currentSum === $sumOfValues);
   }
+
 }

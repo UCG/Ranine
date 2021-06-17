@@ -10,6 +10,7 @@ use Ranine\Exception\ExtraElementsArraySchemaException;
 use Ranine\Exception\InvalidArraySchemaException;
 use Ranine\Exception\MissingElementArraySchemaException;
 use PHPUnit\Framework\TestCase;
+use Ranine\Exception\InvalidTypeArraySchemaException;
 
 /**
  * Tests the ArraySchema class.
@@ -191,7 +192,7 @@ class ArraySchemaTest extends TestCase {
         ]),
         '1_3' => new ArraySchemaRule(fn($x) => $x === 'a' ? NULL : new InvalidArraySchemaException(static::BAD_SCHEMA_MESSAGE_1_3)),
       ]),
-      '2' => new ArraySchemaRule(fn($x) => is_bool($x) ? NULL : new InvalidArraySchemaException(static::BAD_SCHEMA_MESSAGE_2)),
+      '2' => new ArraySchemaRule(fn($x) => is_bool($x) ? NULL : new InvalidTypeArraySchemaException(static::BAD_SCHEMA_MESSAGE_2)),
     ]);
   }
 

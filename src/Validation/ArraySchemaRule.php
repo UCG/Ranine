@@ -34,10 +34,11 @@ class ArraySchemaRule {
    * Creates a new array schema validation rule.
    *
    * @param callable $validation
-   *   Validation rule. It should take one parameter. If validation fails, it
-   *   should return a
-   *   \Ranine\Exception\InvalidArraySchemaException
-   *   exception to be thrown. If validation succeeds, it should return NULL.
+   *   Validation rule, of the form
+   *   (mixed $value) : ?\Ranine\Exception\InvalidArraySchemaException. $value
+   *   is the array value being validated. On validation failure, this function
+   *   should return a \Ranine\Exception\InvalidArraySchemaException exception
+   *   to be thrown. If validation succeeds, it should return NULL.
    * @param bool $isElementRequired
    *   Whether the element corresponding to this rule is required as part of the
    *   schema definition.
@@ -66,39 +67,29 @@ class ArraySchemaRule {
 
   /**
    * Gets all the child validation rules.
-   *
-   * @return array
-   *   Child rules.
    */
   public function getChildren() : array {
     return $this->children ?? [];
   }
 
   /**
-   * Determines whether element corresponding to this rule is required,
-   *
-   * @return bool
-   *   Returns TRUE if element is required; else returns FALSE.
+   * Tells whether the element corresponding to this rule is required.
    */
   public function isElementRequired() : bool {
     return $this->isElementRequired;
   }
 
   /**
-   * Checks if children corresponding to this rule should be validated.
-   *
-   * @return bool
-   *   Returns TRUE if children should be validated; else returns FALSE.
+   * Tells whether children corresponding to this rule should be validated.
    */
   public function shouldValidateChildren() : bool {
     return $this->children === NULL ? FALSE : TRUE;
   }
 
   /**
-   * Validates the given element.
+   * Validates $element.
    *
    * @param mixed $element
-   *   Element to validate.
    *
    * @throws \Ranine\Exception\InvalidArraySchemaException
    *   Thrown if validation fails.
