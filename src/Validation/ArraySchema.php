@@ -28,7 +28,7 @@ class ArraySchema {
   /**
    * Creates a new \Ranine\Validation\ArraySchema object.
    *
-   * @param iterable $rules
+   * @param array $rules
    *   The rules of the schema. Each value must be a validation rule (a
    *   \Ranine\Validation\ArraySchemaRule object), and the corresponding
    *   key is the array key for the rule.
@@ -36,13 +36,14 @@ class ArraySchema {
    * @throws \InvalidArgumentException
    *   Thrown if $rules doesn't meet the requirements given above.
    */
-  public function __construct(iterable $rules) {
-    foreach ($rules as $key => $rule) {
+  public function __construct(array $rules) {
+    foreach ($rules as $k => $rule) {
       if (!($rule instanceof ArraySchemaRule)) {
         throw new \InvalidArgumentException('$rules contains an invalid value.');
       }
-      $this->rules[$key] = $rule;
     }
+
+    $this->rules = $rules;
   }
 
   /**
@@ -123,12 +124,13 @@ class ArraySchema {
     // Validate the descendents. As a context for each level, store the parent
     // data array and current number of data elements found associated with a
     // rule.
-    $context = new class($this->data, 0) {
+    $context = new class($this->data) {
       private array $data;
       private int $numRuleAssociatedElements;
 
       public function __construct(array $data) {
         $this->data = $data;
+        $this->numRuleAssociatedElements = 0;
       }
 
       public function getData() : array {
@@ -148,67 +150,49 @@ class ArraySchema {
         return new self($this->data[$key]);
       }
 
-      /**
-       * @return self
-       */
-      public function incrementNumRuleAssociatedElements() {
+      public function incrementNumRuleAssociatedElements() : void {
         $this->numRuleAssociatedElements++;
-        return $this;
       }
 
     };
 
-    // @todo: Finish.
-    IterationHelpers::walkRecursiveIterator($iterator, function($key, array $value) {
-      /** @var \Ranine\Validation\ArraySchemaRule */
-      $rule = $value[0];
+    IterationHelpers::walkRecursiveIterator($iterator, function($key, ArraySchemaRule $rule, $context) {
       /** @var array */
-      $data = $value[1][$key];
-      static::validateTopLevel($rule->getChildren(), $data);
-      return NULL;
-    }, fn($k, $v, $c) => $c->getSubContext($k), $context);
-  }
+      $data = $context->getData();
 
-  /**
-   * Validates the top-level (no drilling) down of $data against $rules.
-   *
-   * @param \Ranine\Validation\ArraySchemaRule[] $rules
-   *   Rules.
-   * @param array $data
-   *   Data.
-   * 
-   * @throws \Ranine\Exception\InvalidArraySchemaException
-   *   Thrown if the schema of the root level of $data is invalid.
-   */
-  private static function validateTopLevel(array $rules, array $data) : void {
-    $numDataElements = count($data);
-    // Every data element must have a corresponding rule, so the number of data
-    // elements cannot be greater than the number of rules.
-    if ($numDataElements > count($rules)) {
-      throw new ExtraElementsArraySchemaException();
-    }
-
-    $maxElementsInData = 0;
-    foreach ($rules as $key => $rule) {
       $keyExistsInData = array_key_exists($key, $data);
-
       // Required elements must exist.
       if ($rule->isElementRequired() && !array_key_exists($key, $data)) {
         throw new MissingElementArraySchemaException();
       }
       if ($keyExistsInData) {
-        // Otherwise, perform validation of the element.
+        // Perform validation of the element.
         $element = $data[$key];
-        $rule->validate($element);
-        if ($rule->shouldValidateChildren() && !is_array($element)) {
-          throw new InvalidTypeArraySchemaException('Array key should be an array and it is not.');
+        if ($rule->shouldValidateChildren()) {
+          // If we have children we should validate, this needs to be an array
+          // without too many elements.
+          if (is_array($element)) {
+            if (count($element) > count($rule->getChildren())) {
+              throw new ExtraElementsArraySchemaException();
+            }
+          }
+          else {
+            throw new InvalidTypeArraySchemaException('Array key should be an array and it is not.');
+          }
         }
-        $maxElementsInData++;
+        $rule->validate($element);
+        $context->incrementNumRuleAssociatedElements();
       }
-    }
-    if ($numDataElements > $maxElementsInData) {
-      throw new ExtraElementsArraySchemaException();
-    }
+      return TRUE;
+    }, fn($k, $v, $c) => $c->getSubContext($k), function ($context) {
+      // Ensure that the level doesn't have too many elements (all elements must
+      // have associated rules, so it can't have more elements than it did
+      // elements that were associated with rules).
+      if (count($context->getData()) > $context->getNumRuleAssociatedElements()) {
+        throw new ExtraElementsArraySchemaException();
+      }
+      return TRUE;
+    }, $context);
   }
 
 }
