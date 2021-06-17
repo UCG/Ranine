@@ -124,7 +124,7 @@ class ArraySchema {
     // Validate the descendents. As a context for each level, store the parent
     // data array and current number of data elements found associated with a
     // rule.
-    $context = new class($this->data) {
+    $context = new class($data) {
       private array $data;
       private int $numRuleAssociatedElements;
 
