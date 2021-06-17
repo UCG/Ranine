@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Ranine\Validation;
 
 use Ranine\Exception\ExtraElementsArraySchemaException;
+use Ranine\Exception\InvalidOperationException;
 use Ranine\Exception\InvalidTypeArraySchemaException;
 use Ranine\Exception\MissingElementArraySchemaException;
 use Ranine\Helper\IterationHelpers;
@@ -73,7 +74,8 @@ class ArraySchema {
       private $key;
       /** @var \Ranine\Validation\ArraySchemaRule[] */
       private array $rules;
-      private ArraySchemaRule $value;
+      /** @var \Ranine\Validation\ArraySchemaRule|bool */
+      private $value;
 
       /**
        * @param \Ranine\Validation\ArraySchemaRule[] $rules
@@ -85,6 +87,9 @@ class ArraySchema {
       }
 
       public function current() : ArraySchemaRule {
+        if (!$this->valid()) {
+          throw new InvalidOperationException();
+        }
         return $this->value;
       }
 
@@ -92,10 +97,16 @@ class ArraySchema {
        * @return self
        */
       public function getChildren() {
+        if (!$this->valid()) {
+          throw new InvalidOperationException();
+        }
         return new self($this->value->getChildren());
       }
 
       public function hasChildren() : bool {
+        if (!$this->valid()) {
+          throw new InvalidOperationException();
+        }
         return ($this->value->shouldValidateChildren() && count($this->value->getChildren()) > 0) ? TRUE : FALSE;
       }
 
@@ -103,6 +114,9 @@ class ArraySchema {
        * @return string|int
        */
       public function key() {
+        if (!$this->valid()) {
+          throw new InvalidOperationException();
+        }
         return $this->key;
       }
 
