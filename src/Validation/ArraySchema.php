@@ -170,7 +170,7 @@ class ArraySchema {
 
     };
 
-    IterationHelpers::walkRecursiveIterator($iterator, function($key, ArraySchemaRule $rule, $context) {
+    IterationHelpers::walkRecursiveIterator($iterator, function($key, ArraySchemaRule $rule, $context) : bool {
       /** @var array */
       $data = $context->getData();
 
@@ -198,7 +198,17 @@ class ArraySchema {
         $context->incrementNumRuleAssociatedElements();
       }
       return TRUE;
-    }, fn($k, $v, $c) => $c->getSubContext($k), function ($context) {
+    }, function ($key, $value, &$context) : bool {
+      /** @var array */
+      $data = $context->getData();
+      if (array_key_exists($key, $data)) {
+        $context = $context->getSubContext($key);
+        return TRUE;
+      }
+      else {
+        return FALSE;
+      }
+     }, function ($context) {
       // Ensure that the level doesn't have too many elements (all elements must
       // have associated rules, so it can't have more elements than it did
       // elements that were associated with rules).

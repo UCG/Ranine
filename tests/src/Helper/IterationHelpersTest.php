@@ -58,7 +58,10 @@ class IterationHelpersTest extends TestCase {
             return FALSE;
         }
       },
-      fn($k) => $k, function (?int $context) use (&$currentSum, $sumOfValues) : bool {
+      function(int $key, $value, ?int &$context) {
+        $context = $key;
+        return TRUE;
+      }, function (?int $context) use (&$currentSum, $sumOfValues) : bool {
         switch ($context) {
           case NULL:
             return $currentSum === $sumOfValues ? TRUE : FALSE;

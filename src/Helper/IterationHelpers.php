@@ -42,13 +42,11 @@ final class IterationHelpers {
    *   indicates whether iteration should be continued (TRUE to continue,
    *   FALSE to halt).
    * @param callable|null $drillDown
-   *   Of the form ($key, $value, $context) : mixed, this is called before
-   *   moving down a level, and allows information to be stored, as the return
-   *   value of this callable, with the level to which we are moving. The key
-   *   and value of the node whose children we are about to move down to are
-   *   passed to this function, along with the current context (of the level
-   *   *above* the level whose context information we are creating). If NULL
-   *   is passed for this parameter, the function ($k, $v, $c) => NULL is used.
+   *   Of the form ($key, $value, &$context) : bool, this is called before
+   *   moving down a level, and allows one to prevent the drill-down operation
+   *   (by returning FALSE). The context is passed by reference, so that it can
+   *   be changed for the lower level. If NULL is passed for this parameter, the
+   *   function ($k, $v, &$c) { $c = NULL; return TRUE; } is used.
    * @param callable|null $levelFinish
    *   Of the form ($context) : bool, this is called after there are no more
    *   siblings left at a given level. $context is the context of the current
@@ -65,7 +63,10 @@ final class IterationHelpers {
    */
   public static function walkRecursiveIterator(\RecursiveIterator $iterator, callable $operation, ?callable $drillDown = NULL, ?callable $levelFinish = NULL, $initialContext = NULL) : bool {
     if ($drillDown === NULL) {
-      $drillDown = fn() => NULL;
+      $drillDown = function($k, $v, &$c) {
+        $c = NULL;
+        return TRUE;
+      };
     }
     if ($levelFinish === NULL) {
       $levelFinish = fn() => TRUE;
@@ -110,15 +111,20 @@ final class IterationHelpers {
 
       // Move 1:
       if (($childIterator = static::prepareChildIterator($currentIterator)) !== NULL) {
-        // Push the current level onto $parentLevels, and create and store the
-        // current level information.
-        $parentLevels->push([$parentIterator, $currentContext]);
-        $parentIterator = $currentIterator;
-        $currentContext = $drillDown($key, $value, $currentContext);
-        // Move to the child iterator.
-        /** @var \RecursiveIterator */
-        $currentIterator = $childIterator;
-        continue;
+        // Decide whether or not to move to the lower level, and set the context
+        // for that level.
+        $lowerLevelContext = $currentContext;
+        if ($drillDown($key, $value, $lowerLevelContext)) {
+          // Push the current level onto $parentLevels, and create and store the
+          // current level information.
+          $parentLevels->push([$parentIterator, $currentContext]);
+          $parentIterator = $currentIterator;
+          $currentContext = $lowerLevelContext;
+          // Move to the child iterator.
+          /** @var \RecursiveIterator */
+          $currentIterator = $childIterator;
+          continue;
+        }
       }
 
       // Move 2: Try to move the iterator forward.
