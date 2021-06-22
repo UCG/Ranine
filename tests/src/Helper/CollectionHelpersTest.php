@@ -16,6 +16,23 @@ use Ranine\Helper\CollectionHelpers;
 class CollectionHelpersTest extends TestCase {
 
   /**
+   * Tests the condenseAndSortRanges() method.
+   *
+   * @covers ::condenseAndSortRanges
+   */
+  public function testCondenseAndSortRanges() : void {
+    $output1 = CollectionHelpers::condenseAndSortRanges([-1 => 3, 3 => 4, 5 => 5, 7 => 7, 8 => 8, -4 => 1, 18 => 20]);
+    $output2 = CollectionHelpers::condenseAndSortRanges([-1 => -1, -2 => -1, 5 => 5, 5 => 6, 7 => 7]);
+    $output3 = CollectionHelpers::condenseAndSortRanges([0 => 0]);
+    $output4 = CollectionHelpers::condenseAndSortRanges([]);
+
+    $this->assertTrue($output1->toArray() === [-4 => 5, 7 => 8, 18 => 20]);
+    $this->assertTrue($output2->toArray() === [-2 => -1, 5 => 7]);
+    $this->assertTrue($output3->toArray() === [0 => 0]);
+    $this->assertTrue($output4->toArray() === []);
+  }
+
+  /**
    * Tests the getSortedRanges() method.
    *
    * @covers ::getSortedRanges
