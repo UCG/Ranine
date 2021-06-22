@@ -43,6 +43,10 @@ final class CollectionHelpers {
    *   Thrown if a key in $ranges is greater than its value.
    */
   public static function condenseAndSortRanges(array $ranges) : ExtendableIterable {
+    if (empty($ranges)) {
+      return ExtendableIterable::empty();
+    }
+
     ksort($ranges, SORT_NUMERIC);
 
     return ExtendableIterable::from((function () use ($ranges) {

@@ -29,7 +29,7 @@ class CollectionHelpersTest extends TestCase {
     $this->assertTrue($output1->toArray() === [-4 => 5, 7 => 8, 18 => 20]);
     $this->assertTrue($output2->toArray() === [-2 => -1, 5 => 7]);
     $this->assertTrue($output3->toArray() === [0 => 0]);
-    $this->assertTrue($output4->toArray() === []);
+    $this->assertTrue($output4->isEmpty());
   }
 
   /**
