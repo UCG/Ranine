@@ -33,7 +33,7 @@ class BinaryStreamTest extends TestCase {
     })();
     $stream = new BinaryStream($streamSource);
     $firstTwoLines = $stream->readBytes(strlen($firstLine) + strlen($secondLine) + 1);
-    $this->assertTrue($firstTwoLines === ($firstLine. "\n" . $secondLine));
+    $this->assertTrue(((string) $firstTwoLines) === ($firstLine. "\n" . $secondLine));
   }
 
   /**
@@ -55,7 +55,7 @@ class BinaryStreamTest extends TestCase {
     // Cut it off before the first colon.
     $result = $stream->readUntil(fn(StringPart $part, int $currentStartPosition) : int =>
       strpos($part->getBackingString(), ':', $currentStartPosition + $part->getStartPosition()) - $part->getStartPosition());
-    $this->assertTrue($result === ($firstPart . ':'));
+    $this->assertTrue(((string) $result) === ($firstPart . ':'));
   }
 
 }

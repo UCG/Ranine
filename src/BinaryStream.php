@@ -179,16 +179,12 @@ class BinaryStream {
     if (!$this->input->valid()) {
       return '';
     }
+
+    /** @var string */
+    $chunk = $this->input->current();
+    $this->buffer->append($chunk);
     $this->input->next();
-    if ($this->input->valid()) {
-      /** @var string */
-      $chunk = $this->input->current();
-      $this->buffer->append($chunk);
-      return $chunk;
-    }
-    else {
-      return '';
-    }
+    return $chunk;
   }
 
 }

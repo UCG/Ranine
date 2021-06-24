@@ -82,6 +82,21 @@ class StringPart {
   }
 
   /**
+   * Gets the string representation of this string part.
+   */
+  public function __toString() : string {
+    if ($this->isEmpty()) {
+      return '';
+    }
+    elseif ($this->startPositionInclusive !== 0 || strlen($this->backingString) !== $this->endPositionExclusive) {
+      return substr($this->backingString, $this->startPositionInclusive, $this->getLength());
+    }
+    else {
+      return $this->backingString;
+    }
+  }
+
+  /**
    * Appends $str to the end of this string part and returns this object.
    *
    * @param string $str
@@ -98,7 +113,7 @@ class StringPart {
       $this->endPositionExclusive += strlen($str);
     }
     else {
-      $this->backingString = substr($this->backingString, $this->startPositionInclusive, $this->getLength()) . $str;
+      $this->backingString = ((string) $this) . $str;
       $this->startPositionInclusive = 0;
       $this->endPositionExclusive = strlen($this->backingString);
     }
@@ -113,11 +128,8 @@ class StringPart {
    * itself of the smallest possible length.
    */
   public function clean() : StringPart {
-    if ($this->isEmpty()) {
-      $this->backingString = '';
-    }
-    elseif ($this->startPositionInclusive !== 0 || strlen($this->backingString) !== $this->endPositionExclusive) {
-      $this->backingString = substr($this->backingString, $this->startPositionInclusive, $this->getLength());
+    $this->backingString = (string) $this;
+    if ($this->backingString !== '') {
       $this->startPositionInclusive = 0;
       $this->endPositionExclusive = strlen($this->backingString);
     }
