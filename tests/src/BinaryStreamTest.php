@@ -56,9 +56,11 @@ class BinaryStreamTest extends TestCase {
       yield ' ' . $thirdPart;
     })();
     $stream = new BinaryStream($streamSource);
-    // Cut it off before the first colon.
-    $result = $stream->readUntil(fn(StringPart $part, int $currentStartPosition) : int =>
-      strpos($part->getBackingString(), ':', $currentStartPosition + $part->getStartPosition()) - $part->getStartPosition());
+    // Cut it off at the first colon.
+    $result = $stream->readUntil(function(StringPart $part, int $currentStartPosition) : ?int {
+      $colonLocation = strpos($part->getBackingString(), ':', $currentStartPosition);
+      return ($colonLocation === FALSE) ? NULL : $colonLocation;
+    });
     $this->assertTrue(((string) $result) === ($firstPart . ':'));
   }
 
