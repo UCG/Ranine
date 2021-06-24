@@ -4,8 +4,6 @@ declare(strict_types = 1);
 
 namespace Ranine;
 
-use Ranine\Helper\ThrowHelpers;
-
 /**
  * Represents a part of a string, with a defined beginning and end index.
  */
@@ -42,7 +40,7 @@ class StringPart {
    */
   protected function __construct(string $backingString = '', int $startPositionInclusive = -1, int $endPositionExclusive = 0) {
     $this->backingString = $backingString;
-    $this->endPositionExclusive = $endPositionExclusive + 1;
+    $this->endPositionExclusive = $endPositionExclusive;
     $this->startPositionInclusive = $startPositionInclusive;
   }
 

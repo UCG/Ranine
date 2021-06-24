@@ -82,7 +82,7 @@ class StringPartTest extends TestCase {
     $part = StringPart::create('::' . $firstSentence . $secondSentence . 'jk', 1, strlen($firstSentence) + strlen($secondSentence));
     $result = $part->withNewEndpoints(2, strlen($firstSentence) + 1);
     $this->assertTrue(substr_compare($result->getBackingString(), $firstSentence, $result->getStartPosition(), $result->getLength()) === 0);
-    $this->assertTrue(((string) $part) === $firstSentence);
+    $this->assertTrue(((string) $result) === $firstSentence);
   }
 
 }

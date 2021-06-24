@@ -32,7 +32,7 @@ class BinaryStream {
    *   non-empty.
    */
   public function __construct(iterable $input) {
-    $this->buffer = new StringPart();
+    $this->buffer = StringPart::create();
     $this->input = (function () use ($input) { yield from $input; })();
     $this->input->rewind();
   }
@@ -109,7 +109,7 @@ class BinaryStream {
       $chunk = $this->readChunk();
       if ($chunk === '') {
         $result = clone $this->buffer;
-        $this->buffer = new StringPart();
+        $this->buffer = StringPart::create();
         return $result;
       }
 
