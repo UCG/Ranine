@@ -98,15 +98,14 @@ class BinaryStream {
 
     $chunk = NULL;
     while ($stopPosition === NULL) {
-      $chunk = ($this->input)();
+      $newStartPosition = $this->buffer->getLength() + 1;
+      $chunk = $this->readChunk();
       if ($chunk === '') {
         $result = clone $this->buffer;
         $this->buffer = new StringPart();
         return $result;
       }
 
-      $newStartPosition = $this->buffer->getLength() + 1;
-      $this->buffer->append($chunk);
       $stopPosition = $positionIdentifier($this->buffer, $newStartPosition);
     }
 
