@@ -75,10 +75,11 @@ class BinaryStream {
    * Reads until a position is identified at which to stop.
    *
    * Sequentially reads chunks from the stream, passing the current aggregation
-   * of these chunks to $positionIdentifier. If $positionIdentifier returns a
-   * valid index at which to stop, reading is terminated and the entire string
-   * part up to that index is returned. Reading is also terminated if the end of
-   * the stream is reached.
+   * of these chunks to $positionIdentification. If $positionIdentification
+   * returns a valid index at which to stop, reading is terminated and the
+   * entire string part up to that index is returned. If $positionIdentification
+   * always returns NULL until the end of the stream is reached, NULL is
+   * returned from thsi function.
    *
    * @param callable $positionIdentification
    *   Of the form
@@ -91,11 +92,16 @@ class BinaryStream {
    *   Otherwise, the part of $current from $current->getStartPosition() to the
    *   index returned by $positionIdentification() (inclusive) is returned.
    *
+   * @return \Ranine\StringPart|null
+   *   The part of the stream up to and including the position identified by
+   *   $positionIdentification, or NULL if $positionIdentification always
+   *   returned NULL.
+   *
    * @throws \LogicException
    *   Thrown if $positionIdentifier returns an index that is not within the
    *   string portion passed to it.
    */
-  public function readUntil(callable $positionIdentification) : StringPart {
+  public function readUntil(callable $positionIdentification) : ?StringPart {
     if (!$this->buffer->isEmpty()) {
       $stopPosition = $positionIdentification($this->buffer);
     }
@@ -108,9 +114,7 @@ class BinaryStream {
       $newStartPosition = $this->buffer->getEndPosition() + 1;
       $chunk = $this->readChunk();
       if ($chunk === '') {
-        $result = clone $this->buffer;
-        $this->buffer = StringPart::create();
-        return $result;
+        return NULL;
       }
 
       $stopPosition = $positionIdentification($this->buffer, $newStartPosition);
