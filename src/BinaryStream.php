@@ -92,6 +92,9 @@ class BinaryStream {
     if (!$this->buffer->isEmpty()) {
       $stopPosition = $positionIdentifier($this->buffer);
     }
+    else {
+      $stopPosition = NULL;
+    }
 
     $chunk = NULL;
     while ($stopPosition === NULL) {
