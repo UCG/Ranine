@@ -33,52 +33,17 @@ class StringPart {
   /**
    * Creates a new string part.
    *
-   * The string part is the substring of $backingString spanning the range of
-   * intervals [$startPosition, $endPosition], unless $backingString is empty,
-   * in which case the string part is also empty.
-   *
    * @param string $backingString
    *   Backing string.
-   * @param int $startPosition
+   * @param int $startPositionInclusive
    *   Start position (inclusive). Should be -1 to specify an empty string.
-   * @param int $endPosition
-   *   End position (inclusive). Should be -1 to specify an empty string.
-   *
-   * @throws \InvalidArgumentException
-   *   If $startPosition is -1, thrown if $endPosition is not -1.
-   * @throws \InvalidArgumentException
-   *   If $startPosition is not -1, thrown if either $startPosition or
-   *   $endPosition is less than zero.
-   * @throws \InvalidArgumentException
-   *   Thrown if $startPosition is greater than $endPosition.
-   * @throws \InvalidArgumentException
-   *   Thrown if $endPosition is greater than or equal to the length of
-   *   $backingString.
+   * @param int $endPositionExclusive
+   *   End position (exclusive). Should be 0 to specify an empty string.
    */
-  public function __construct(string $backingString = '', int $startPosition = -1, int $endPosition = -1) {
-    if ($startPosition === -1) {
-      if ($endPosition !== -1) {
-        throw new \InvalidArgumentException('$endPosition is not negative one, even though $startPosition is negative one.');
-      }
-    }
-    else {
-      if ($startPosition < -1) {
-        throw new \InvalidArgumentException('$startPosition is less than negative one.');
-      }
-      if ($endPosition < 0) {
-        throw new \InvalidArgumentException('$endPosition is less than zero when $startPosition is not negative one.');
-      }
-      if ($startPosition > $endPosition) {
-        throw new \InvalidArgumentException('$startPosition is greater than $endPosition.');
-      }
-      if ($endPosition >= strlen($backingString)) {
-        throw new \InvalidArgumentException('$endPosition is greater than or equal to the length of $backingString.');
-      }
-    }
-
+  protected function __construct(string $backingString = '', int $startPositionInclusive = -1, int $endPositionExclusive = 0) {
     $this->backingString = $backingString;
-    $this->endPositionExclusive = $endPosition + 1;
-    $this->startPositionInclusive = $startPosition;
+    $this->endPositionExclusive = $endPositionExclusive + 1;
+    $this->startPositionInclusive = $startPositionInclusive;
   }
 
   /**
@@ -149,41 +114,6 @@ class StringPart {
   }
 
   /**
-   * Sets the current object equal to a substring of the current string part.
-   *
-   * This method changes the current object so that it points to a substring of
-   * the current string part, from $startPosition to $endPosition (or the end of
-   * the string part).
-   *
-   * @param int $startPosition
-   *   Inclusive start position (relative to the string part, not the backing
-   *   string).
-   * @param int|null $endPosition
-   *   Inclusive end position (relative to the string part, not the backing
-   *   string), or 'NULL' to take a substring to the end of the string.
-   *
-   * @return StringPart
-   *   Current object.
-   *
-   * @throws \InvalidArgumentException
-   *   Thrown if $startPosition is greater than $endPosition
-   * @throws \InvalidArgumentException
-   *   Thrown if $startPosition or $endPosition is greater than or equal to the
-   *   length of this string part.
-   * @throws \InvalidArgumentException
-   *   Thrown if $startPosition or $endPosition is less than zero.
-   */
-  public function cut(int $startPosition, ?int $endPosition = NULL) : StringPart {
-    $absoluteStartPositionInclusive = 0;
-    $absoluteEndPositionInclusive = 0;
-    $this->validateAndProcessSubstringArguments($startPosition, $endPosition, $absoluteStartPositionInclusive, $absoluteEndPositionInclusive); 
-    $this->startPositionInclusive = $absoluteStartPositionInclusive;
-    $this->endPositionExclusive = $absoluteEndPositionInclusive;
-
-    return $this;
-  }
-
-  /**
    * Gets the string backing this string part.
    */
   public function getBackingString() : string {
@@ -230,75 +160,140 @@ class StringPart {
   }
 
   /**
-   * Takes a substring from a start position to (opt) an end position.
+   * Changes the current string part's start and/or end positions.
    *
    * @param int $startPosition
-   *   Inclusive start position (relative to the string part, not the backing
-   *   string).
-   * @param int|null $endPosition
-   *   Inclusive end position (relative to the string part, not the backing
-   *   string), or 'NULL' to take a substring to the end of the string.
+   *   Inclusive start position, relative to the backing string. Must be -1 if
+   *   the backing string is empty.
+   * @param int $endPosition
+   *   Inclusive end position, relative to the backing string. Must be -1 if the
+   *   backing string is empty.
    *
-   * @return StringPart
-   *   The resulting new string part (the current object is not modified).
+   * @return static
+   *   Current object.
    *
    * @throws \InvalidArgumentException
-   *   Thrown if $startPosition is greater than $endPosition
+   *   If $startPosition is -1, thrown if $endPosition is not -1.
    * @throws \InvalidArgumentException
-   *   Thrown if $startPosition or $endPosition is greater than or equal to the
-   *   length of this string part.
+   *   If $startPosition is not -1, thrown if either $startPosition or
+   *   $endPosition is less than zero.
    * @throws \InvalidArgumentException
-   *   Thrown if $startPosition or $endPosition is less than zero.
+   *   Thrown if $startPosition is greater than $endPosition.
+   * @throws \InvalidArgumentException
+   *   Thrown if $endPosition is greater than or equal to the length of the
+   *   backing string.
    */
-  public function substring(int $startPosition, ?int $endPosition = NULL) : StringPart {
-    $absoluteStartPositionInclusive = 0;
-    $absoluteEndPositionInclusive = 0;
-    $this->validateAndProcessSubstringArguments($startPosition, $endPosition, $absoluteStartPositionInclusive, $absoluteEndPositionInclusive); 
-    return new StringPart($this->backingString, $absoluteStartPositionInclusive, $absoluteEndPositionInclusive);
+  public function recut(int $startPosition, int $endPosition) : StringPart {
+    static::validateStartAndEndPosition($startPosition, $endPosition, $this->backingString);
+    $this->startPositionInclusive = $startPosition;
+    $this->endPositionExclusive = $endPosition + 1;
+
+    return $this;
   }
 
   /**
-   * Validates and processes the given args of the substring()/cut() methods.
+   * Creates a new string part based on the same backing string.
+   *
+   * The new string part, although it has the same backing string, may have
+   * different endpoints (as are specified here).
    *
    * @param int $startPosition
-   *   Inclusive start position (relative to the string part, not the backing
-   *   string).
-   * @param int|null $endPosition
-   *   Inclusive end position (relative to the string part, not the backing
-   *   string), or 'NULL' to take a substring to the end of the string.
-   * @param int $absoluteStartPositionInclusive
-   *   The resulting absolute (relative to the backing string) inclusive start
-   *   position.
-   * @param int $absoluteEndPositionInclusive
-   *   The resulting absolute (relative to the backing string) end position.
+   *   Inclusive start position of new string part, relative to the backing
+   *   string. Must be -1 if the backing string is empty.
+   * @param int $endPosition
+   *   Inclusive end position of new string part, relative to the backing
+   *   string. Must be -1 if the backing string is empty.
+   *
+   * @return static
+   *   The resulting new string part (the current object is not modified).
    *
    * @throws \InvalidArgumentException
-   *   Thrown if $startPosition is greater than $endPosition
+   *   If $startPosition is -1, thrown if $endPosition is not -1.
    * @throws \InvalidArgumentException
-   *   Thrown if $startPosition or $endPosition is greater than or equal to the
-   *   length of this string part.
+   *   If $startPosition is not -1, thrown if either $startPosition or
+   *   $endPosition is less than zero.
    * @throws \InvalidArgumentException
-   *   Thrown if $startPosition or $endPosition is less than zero.
+   *   Thrown if $startPosition is greater than $endPosition.
+   * @throws \InvalidArgumentException
+   *   Thrown if $endPosition is greater than or equal to the length of the
+   *   backing string.
    */
-  private function validateAndProcessSubstringArguments(int $startPosition, ?int $endPosition = NULL, int &$absoluteStartPositionInclusive, int &$absoluteEndPositionInclusive) {
-    ThrowHelpers::throwIfLessThanZero($startPosition, 'startPosition');
-    $absoluteStartPositionInclusive = $startPosition + $this->startPositionInclusive;
+  public function withNewEndpoints(int $startPosition, int $endPosition) : StringPart {
+    static::validateStartAndEndPosition($startPosition, $endPosition, $this->backingString);
+    return new static($this->backingString, $startPosition, $endPosition + 1);
+  }
 
-    if ($endPosition === NULL) {
-      if ($absoluteStartPositionInclusive >= $this->endPositionExclusive) {
-        throw new \InvalidArgumentException('$startPosition is greater than the length of this string part.');
+  /**
+   * Creates and returns a new string part.
+   *
+   * The string part is the substring of $backingString spanning the range of
+   * intervals [$startPosition, $endPosition], unless $backingString is empty,
+   * in which case the string part is also empty.
+   *
+   * @param string $backingString
+   *   Backing string.
+   * @param int $startPosition
+   *   Start position (inclusive). Should be -1 to specify an empty string.
+   * @param int $endPosition
+   *   End position (inclusive). Should be -1 to specify an empty string.
+   *
+   * @throws \InvalidArgumentException
+   *   If $startPosition is -1, thrown if $endPosition is not -1.
+   * @throws \InvalidArgumentException
+   *   If $startPosition is not -1, thrown if either $startPosition or
+   *   $endPosition is less than zero.
+   * @throws \InvalidArgumentException
+   *   Thrown if $startPosition is greater than $endPosition.
+   * @throws \InvalidArgumentException
+   *   Thrown if $endPosition is greater than or equal to the length of
+   *   $backingString.
+   */
+  public static function create(string $backingString = '', int $startPosition = -1, int $endPosition = -1) : StringPart {
+    static::validateStartAndEndPosition($startPosition, $endPosition, $backingString);
+    return new static($backingString, $startPosition, $endPosition + 1);
+  }
+
+  /**
+   * Validates the given start and end position variables.
+   *
+   * Throws exception(s) on validation failure.
+   *
+   * @param int $inclusiveStartPosition
+   *   Inclusive start position, relative to the backing string.
+   * @param int $inclusiveEndPosition
+   *   Inclusive end position, relative to the backing string.
+   * @param string $backingString
+   *   Backing string.
+   *
+   * @throws \InvalidArgumentException
+   *   If $startPosition is -1, thrown if $endPosition is not -1.
+   * @throws \InvalidArgumentException
+   *   If $startPosition is not -1, thrown if either $startPosition or
+   *   $endPosition is less than zero.
+   * @throws \InvalidArgumentException
+   *   Thrown if $startPosition is greater than $endPosition.
+   * @throws \InvalidArgumentException
+   *   Thrown if $endPosition is greater than or equal to the length of
+   *   $backingString.
+   */
+  protected static function validateStartAndEndPosition(int $startPosition, int $endPosition, string $backingString) : void {
+    if ($startPosition === -1) {
+      if ($endPosition !== -1) {
+        throw new \InvalidArgumentException('$endPosition is not negative one, even though $startPosition is negative one.');
       }
-      $absoluteEndPositionInclusive = $this->endPositionExclusive - 1;
     }
     else {
-      /** @var int $endPosition */
-      ThrowHelpers::throwIfLessThanZero($endPosition, 'endPosition');
+      if ($startPosition < -1) {
+        throw new \InvalidArgumentException('$startPosition is less than negative one.');
+      }
+      if ($endPosition < 0) {
+        throw new \InvalidArgumentException('$endPosition is less than zero when $startPosition is not negative one.');
+      }
       if ($startPosition > $endPosition) {
         throw new \InvalidArgumentException('$startPosition is greater than $endPosition.');
       }
-      $absoluteEndPositionInclusive = $endPosition + $this->startPositionInclusive;
-      if ($absoluteEndPositionInclusive >= $this->endPositionExclusive) {
-        throw new \InvalidArgumentException('$endPosition is greater than the length of this string part.');
+      if ($endPosition >= strlen($backingString)) {
+        throw new \InvalidArgumentException('$endPosition is greater than or equal to the length of the backing string.');
       }
     }
   }

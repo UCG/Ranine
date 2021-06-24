@@ -56,12 +56,19 @@ class BinaryStream {
     }
 
     $chunk = NULL;
+
     while (($bufferLength = $this->buffer->getLength()) < $numBytes && $chunk !== '') {
       $chunk = $this->readChunk();
     }
 
-    $stopPosition = ($bufferLength < $numBytes ? $bufferLength : $numBytes) - 1;
-    return $this->cutOffBuffer($stopPosition, $chunk ?? $this->buffer->getBackingString());
+    $stopPosition = ($bufferLength < $numBytes ? $bufferLength : $numBytes) - 1 + $this->buffer->getStartPosition();
+    if ($stopPosition === -1) {
+      // An empty string.
+      return StringPart::create();
+    }
+    else {
+      return $this->cutOffBuffer($stopPosition, $chunk ?? $this->buffer->getBackingString());
+    }
   }
 
   /**
@@ -73,24 +80,24 @@ class BinaryStream {
    * part up to that index is returned. Reading is also terminated if the end of
    * the stream is reached.
    *
-   * @param callable $predicate
+   * @param callable $positionIdentification
    *   Of the form
    *   (\Ranine\StringPart $current, int $newPartStartPosition) : ?int, this
    *   function is passed the current concatenation ($current) of all the chunks
    *   produced since the readUntil() method was called, and the start index of
    *   the part of $current that was appended since the last call to
-   *   $positionIdentifier(). If $positionIdentifier() returns NULL, chunks
-   *   continue to be read from the stream and passed to $positionIdentifier.
-   *   Otherwise, the part of $current from zero to the index returned by
-   *   $positionIdentifier() (inclusive) is returned.
+   *   $positionIdentification(). If that function returns NULL, chunks continue
+   *   to be read from the stream and passed to $positionIdentification().
+   *   Otherwise, the part of $current from $current->getStartPosition() to the
+   *   index returned by $positionIdentification() (inclusive) is returned.
    *
    * @throws \LogicException
    *   Thrown if $positionIdentifier returns an index that is not within the
    *   string portion passed to it.
    */
-  public function readUntil(callable $positionIdentifier) : StringPart {
+  public function readUntil(callable $positionIdentification) : StringPart {
     if (!$this->buffer->isEmpty()) {
-      $stopPosition = $positionIdentifier($this->buffer);
+      $stopPosition = $positionIdentification($this->buffer);
     }
     else {
       $stopPosition = NULL;
@@ -98,7 +105,7 @@ class BinaryStream {
 
     $chunk = NULL;
     while ($stopPosition === NULL) {
-      $newStartPosition = $this->buffer->getLength() + 1;
+      $newStartPosition = $this->buffer->getEndPosition() + 1;
       $chunk = $this->readChunk();
       if ($chunk === '') {
         $result = clone $this->buffer;
@@ -106,11 +113,11 @@ class BinaryStream {
         return $result;
       }
 
-      $stopPosition = $positionIdentifier($this->buffer, $newStartPosition);
+      $stopPosition = $positionIdentification($this->buffer, $newStartPosition);
     }
 
-    if ($stopPosition < 0 || $stopPosition >= $this->buffer->getLength()) {
-      throw new \LogicException('$stopPosition returned an invalid index.');
+    if ($stopPosition > $this->buffer->getEndPosition() || $stopPosition < $this->buffer->getStartPosition()) {
+      throw new \LogicException('Invalid index returned from $positionIdentification() was invalid.');
     }
 
     return $this->cutOffBuffer($stopPosition, $chunk ?? $this->buffer->getBackingString());
@@ -119,12 +126,13 @@ class BinaryStream {
   /**
    * Cuts up the buffer into two parts, returning the first.
    *
-   * Cuts off the [0, $stopPosition] part of the buffer and returns it, and sets
-   * the buffer equal to a new buffer containing the rest of the previous
+   * Cuts off the [(buffer start position), $stopPosition] part of the buffer
+   * and returns it, and sets the buffer equal to a new buffer containing the
+   * rest of the previous
    * buffer.
    *
    * @param int $stopPosition
-   *   Last index of first part of buffer.
+   *   Last index of first part of buffer (nonnegative).
    * @param ?string $lastChunk
    *   If not NULL, a string meeting the following conditions:
    *   1) If the length of $lastChunk is less than or equal to that of buffer,
@@ -142,26 +150,25 @@ class BinaryStream {
    *   First cut of buffer.
    */
   protected function cutOffBuffer(int $stopPosition, ?string $lastChunk) : StringPart {
-    $firstCut = $this->buffer->substring(0, $stopPosition);
+    $firstCut = $this->buffer->withNewEndpoints($this->buffer->getStartPosition(), $stopPosition);
 
-    $bufferLength = $this->buffer->getLength();
-    if ($stopPosition === ($bufferLength - 1)) {
+    if ($stopPosition === $this->buffer->getEndPosition()) {
       $this->buffer->clear();
     }
     elseif ($lastChunk === NULL) {
-      $this->buffer->cut($stopPosition + 1)->clean();
+      $this->buffer->recut($stopPosition + 1, $this->buffer->getEndPosition())->clean();
     }
     else {
       /** @var string $lastChunk */
       $startPosition = $stopPosition + 1;
       $lastChunkLength = strlen($lastChunk);
-      $newStartPosition = $startPosition - ($bufferLength - $lastChunkLength);
+      $newStartPosition = $startPosition - ($this->buffer->getEndPosition() + 1 - $lastChunkLength);
       if ($newStartPosition < 0) {
         // A valid start position was not found in $lastChunk.
-        $this->buffer->cut($startPosition)->clean();
+        $this->buffer->recut($startPosition, $this->buffer->getEndPosition())->clean();
       }
       else {
-        $this->buffer = new StringPart($lastChunk, $newStartPosition, $lastChunkLength - 1);
+        $this->buffer = StringPart::create($lastChunk, $newStartPosition, $lastChunkLength - 1);
       }
     }
 

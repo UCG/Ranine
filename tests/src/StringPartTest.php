@@ -23,14 +23,20 @@ class StringPartTest extends TestCase {
   public function testAppend() : void {
     $firstSentence = 'In a sort of ghastly simplicity we remove the organ and demand the function. ';
     $secondSentence = 'We make men without chests and expect of them virtue and enterprise.';
+    // ~ C. S. Lewis, The Abolition of Man
 
-    $part = new StringPart('::' . $firstSentence, 2, strlen($firstSentence) + 1);
+    $part = StringPart::create('::' . $firstSentence, 2, strlen($firstSentence) + 1);
     $part->append($secondSentence);
-    $this->assertTrue(substr_compare($part->getBackingString(), $firstSentence . $secondSentence, $part->getStartPosition(), $part->getLength()) === 0);
 
-    $part = new StringPart('::' . $firstSentence . '::', 2, strlen($firstSentence) + 1);
+    $comparison = $firstSentence . $secondSentence;
+
+    $this->assertTrue(substr_compare($part->getBackingString(), $comparison, $part->getStartPosition(), $part->getLength()) === 0);
+    $this->assertTrue(((string) $part) === $comparison);
+
+    $part = StringPart::create('::' . $firstSentence . '::', 2, strlen($firstSentence) + 1);
     $part->append($secondSentence);
-    $this->assertTrue(substr_compare($part->getBackingString(), $firstSentence . $secondSentence, $part->getStartPosition(), $part->getLength()) === 0);
+    $this->assertTrue(substr_compare($part->getBackingString(), $comparison, $part->getStartPosition(), $part->getLength()) === 0);
+    $this->assertTrue(((string) $part) === $comparison);
   }
 
   /**
@@ -40,45 +46,43 @@ class StringPartTest extends TestCase {
    */
   public function testClean() : void {
     $sentence = 'But the Court has cheated both sides, robbing the winners of an honest victory, and the losers of the peace that comes from a fair defeat.';
-    $part = new StringPart('::.' . $sentence . 'jku', 3, strlen($sentence) + 2);
+    // ~ A. Scalia, J., dissenting in United States v. Windsor
+
+    $part = StringPart::create('::.' . $sentence . 'jku', 3, strlen($sentence) + 2);
     $part->clean();
     $this->assertTrue($part->getBackingString() === $sentence);
   }
 
   /**
-   * Tests the cut() method.
+   * Tests the recut() method.
    *
-   * @covers ::cut
+   * @covers ::recut
    */
-  public function testCut() : void {
-    $firstSentence = 'We make men without chests and expect of them virtue and enterprise. ';
-    $secondSentence = 'We laugh at honour and are shocked to find traitors in our midst.';
+  public function testRecut() : void {
+    $firstSentence = 'We laugh at honour and are shocked to find traitors in our midst. ';
+    $secondSentence = 'We castrate and bid the geldings be fruitful.';
+    // ~ C. S. Lewis, The Abolition of Man
 
-    $part = new StringPart('::' . $firstSentence . $secondSentence . 'jk', 1, strlen($firstSentence) + strlen($secondSentence));
-    $part->cut(1, strlen($firstSentence));
+    $part = StringPart::create('::' . $firstSentence . $secondSentence . 'jk', 1, strlen($firstSentence) + strlen($secondSentence));
+    $part->recut(2, strlen($firstSentence) + 1);
     $this->assertTrue(substr_compare($part->getBackingString(), $firstSentence, $part->getStartPosition(), $part->getLength()) === 0);
-
-    $part = new StringPart('::' . $firstSentence . $secondSentence, 2, strlen($firstSentence) + strlen($secondSentence) + 1);
-    $part->cut(strlen($firstSentence));
-    $this->assertTrue(substr_compare($part->getBackingString(), $secondSentence, $part->getStartPosition(), $part->getLength()) === 0);
+    $this->assertTrue(((string) $part) === $firstSentence);
   }
 
   /**
-   * Tests the substring() method.
+   * Tests the withNewEndpoints() method.
    *
-   * @covers ::substring
+   * @covers ::withNewEndpoints
    */
-  public function testSubstring() : void {
+  public function testWithNewEndpoints() : void {
     $firstSentence = 'The whole point of seeing through something is to see something through it. ';
     $secondSentence = 'To "see through" all things is the same as not to see.';
+    // ~ C. S. Lewis, The Abolition of Man
 
-    $part = new StringPart('::' . $firstSentence . $secondSentence . 'jk', 1, strlen($firstSentence) + strlen($secondSentence));
-    $result = $part->substring(1, strlen($firstSentence));
+    $part = StringPart::create('::' . $firstSentence . $secondSentence . 'jk', 1, strlen($firstSentence) + strlen($secondSentence));
+    $result = $part->withNewEndpoints(2, strlen($firstSentence) + 1);
     $this->assertTrue(substr_compare($result->getBackingString(), $firstSentence, $result->getStartPosition(), $result->getLength()) === 0);
-
-    $part = new StringPart('::' . $firstSentence . $secondSentence, 2, strlen($firstSentence) + strlen($secondSentence) + 1);
-    $result = $part->substring(strlen($firstSentence));
-    $this->assertTrue(substr_compare($result->getBackingString(), $secondSentence, $result->getStartPosition(), $result->getLength()) === 0);
+    $this->assertTrue(((string) $part) === $firstSentence);
   }
 
 }

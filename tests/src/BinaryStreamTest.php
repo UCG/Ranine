@@ -22,9 +22,11 @@ class BinaryStreamTest extends TestCase {
    * @covers ::readBytes
    */
   public function testReadBytes() : void {
-    $firstLine = 'Oh, Sir, the good die first,';
+    $firstLine = 'O Sir! the good die first,';
     $secondLine = 'And they whose hearts are dry as summer dust';
     $thirdLine = 'Burn to the socket.';
+    // ~ W. Wordsworth, The Ruined Cottage
+
     $streamSource = (function () use ($firstLine, $secondLine, $thirdLine) {
       yield $firstLine;
       yield "\n";
@@ -45,6 +47,8 @@ class BinaryStreamTest extends TestCase {
     $firstPart = 'It\'s all God\'s will';
     $secondPart = 'you can die in your sleep,';
     $thirdPart = 'and God can spare you in battle.';
+    // ~ L. Tolstoy, War and Peace
+
     $streamSource = (function () use ($firstPart, $secondPart, $thirdPart) {
       yield $firstPart;
       yield ': ';
