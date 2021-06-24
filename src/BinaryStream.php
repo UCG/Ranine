@@ -72,6 +72,139 @@ class BinaryStream {
   }
 
   /**
+   * Reads a unsigned 8-bit integer from the stream, if possible.
+   *
+   * @return int|null
+   *   Result, or NULL if the stream did not contain such an integer.
+   */
+  public function readUInt8() : ?int {
+    $byte = $this->readBytes(1);
+    if ($byte->isEmpty()) {
+      return NULL;
+    }
+    $result = unpack('C', $byte->getBackingString(), $byte->getStartPosition());
+    if (!is_array($result) || !array_key_exists(1, $result)) {
+      return NULL;
+    }
+    assert(is_int($result[1]));
+    return $result[1];
+  }
+
+  /**
+   * Reads a unsigned 16-bit big-endian integer from the stream, if possible.
+   *
+   * @return int|null
+   *   Result, or NULL if the stream did not contain such an integer.
+   */
+  public function readUInt16BE() : ?int {
+    $bytes = $this->readBytes(2);
+    if ($bytes->getLength() !== 2) {
+      return NULL;
+    }
+    $result = unpack('n', $bytes->getBackingString(), $bytes->getStartPosition());
+    if (!is_array($result) || !array_key_exists(1, $result)) {
+      return NULL;
+    }
+    assert(is_int($result[1]));
+    return $result[1];
+  }
+
+  /**
+   * Reads a unsigned 16-bit little-endian integer from the stream, if possible.
+   *
+   * @return int|null
+   *   Result, or NULL if the stream did not contain such an integer.
+   */
+  public function readUInt16LE() : ?int {
+    $bytes = $this->readBytes(2);
+    if ($bytes->getLength() !== 2) {
+      return NULL;
+    }
+    $result = unpack('v', $bytes->getBackingString(), $bytes->getStartPosition());
+    if (!is_array($result) || !array_key_exists(1, $result)) {
+      return NULL;
+    }
+    assert(is_int($result[1]));
+    return $result[1];
+  }
+
+  /**
+   * Reads a unsigned 32-bit big-endian integer from the stream, if possible.
+   *
+   * @return int|null
+   *   Result, or NULL if the stream did not contain such an integer.
+   */
+  public function readUInt32BE() : ?int {
+    $bytes = $this->readBytes(4);
+    if ($bytes->getLength() !== 4) {
+      return NULL;
+    }
+    $result = unpack('N', $bytes->getBackingString(), $bytes->getStartPosition());
+    if (!is_array($result) || !array_key_exists(1, $result)) {
+      return NULL;
+    }
+    assert(is_int($result[1]));
+    return $result[1];
+  }
+
+  /**
+   * Reads a unsigned 32-bit little-endian integer from the stream, if possible.
+   *
+   * @return int|null
+   *   Result, or NULL if the stream did not contain such an integer.
+   */
+  public function readUInt32LE() : ?int {
+    $bytes = $this->readBytes(4);
+    if ($bytes->getLength() !== 4) {
+      return NULL;
+    }
+    $result = unpack('V', $bytes->getBackingString(), $bytes->getStartPosition());
+    if (!is_array($result) || !array_key_exists(1, $result)) {
+      return NULL;
+    }
+    assert(is_int($result[1]));
+    return $result[1];
+  }
+
+  /**
+   * Reads a unsigned 64-bit big-endian integer from the stream, if possible.
+   *
+   * @return int|null
+   *   Result, or NULL if the stream did not contain such an integer.
+   */
+  public function readUInt64BE() : ?int {
+    $bytes = $this->readBytes(8);
+    if ($bytes->getLength() !== 8) {
+      return NULL;
+    }
+    $result = unpack('J', $bytes->getBackingString(), $bytes->getStartPosition());
+    if (!is_array($result) || !array_key_exists(1, $result)) {
+      return NULL;
+    }
+    assert(is_int($result[1]));
+    return $result[1];
+  }
+
+  /**
+   * Reads a unsigned 64-bit little-endian integer from the stream, if possible.
+   *
+   * @return int|null
+   *   Result, or NULL if the stream did not contain such an integer.
+   */
+  public function readUInt64LE() : ?int {
+    $bytes = $this->readBytes(8);
+    if ($bytes->getLength() !== 8) {
+      return NULL;
+    }
+    $result = unpack('P', $bytes->getBackingString(), $bytes->getStartPosition());
+    if (!is_array($result) || !array_key_exists(1, $result)) {
+      return NULL;
+    }
+    assert(is_int($result[1]));
+    return $result[1];
+  }
+
+  /**
    * Reads until a position is identified at which to stop.
    *
    * Sequentially reads chunks from the stream, passing the current aggregation

@@ -17,6 +17,35 @@ use Ranine\StringPart;
 class BinaryStreamTest extends TestCase {
 
   /**
+   * Tests various integer reading methods.
+   *
+   * @covers ::readUInt8
+   * @covers ::readUInt16BE
+   * @covers ::readUInt16LE
+   * @covers ::readUInt32BE
+   * @covers ::readUInt32LE
+   * @covers ::readUInt64BE
+   * @covers ::readUInt64LE
+   */
+  public function testIntegerReading() : void {
+    $source = (function () {
+      $str = pack('CVNnvPJ', 1, 1, 2, 3, 5, 8, 13);
+      yield substr($str, 0, 9);
+      yield substr($str, 9, 3);
+      yield substr($str, 12);
+    })();
+    $stream = new BinaryStream($source);
+    
+    $this->assertTrue($stream->readUint8() === 1);
+    $this->assertTrue($stream->readUint32LE() === 1);
+    $this->assertTrue($stream->readUint32BE() === 2);
+    $this->assertTrue($stream->readUint16BE() === 3);
+    $this->assertTrue($stream->readUint16LE() === 5);
+    $this->assertTrue($stream->readUint64LE() === 8);
+    $this->assertTrue($stream->readUint64BE() === 13);
+  }
+
+  /**
    * Tests the readBytes() method.
    *
    * @covers ::readBytes
