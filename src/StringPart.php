@@ -98,7 +98,7 @@ class StringPart {
       $this->endPositionExclusive += strlen($str);
     }
     else {
-      $this->backingString = substr($str, $this->startPositionInclusive, $this->getLength()) . $str;
+      $this->backingString = substr($this->backingString, $this->startPositionInclusive, $this->getLength()) . $str;
       $this->startPositionInclusive = 0;
       $this->endPositionExclusive = strlen($this->backingString);
     }
@@ -116,7 +116,7 @@ class StringPart {
     if ($this->isEmpty()) {
       $this->backingString = '';
     }
-    else {
+    elseif ($this->startPositionInclusive !== 0 || strlen($this->backingString) !== $this->endPositionExclusive) {
       $this->backingString = substr($this->backingString, $this->startPositionInclusive, $this->getLength());
       $this->startPositionInclusive = 0;
       $this->endPositionExclusive = strlen($this->backingString);

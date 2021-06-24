@@ -57,8 +57,7 @@ class BinaryStream {
 
     $chunk = NULL;
     while (($bufferLength = $this->buffer->getLength()) < $numBytes && $chunk !== '') {
-      $chunk = ($this->input)();
-      $this->buffer->append($chunk);
+      $chunk = $this->readChunk();
     }
 
     $stopPosition = ($bufferLength < $numBytes ? $bufferLength : $numBytes) - 1;
