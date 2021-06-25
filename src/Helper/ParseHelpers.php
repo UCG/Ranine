@@ -92,6 +92,33 @@ final class ParseHelpers {
   }
 
   /**
+   * Attempts to get the integer endpoints of $range.
+   *
+   * @param string $range
+   *   Range, which should be in the form "[start]$divider[end]", where [start]
+   *   and [end] are string representations of integers which form the start and
+   *   end of the range, respectively.
+   * @param int &start
+   *   Start of range.
+   * @param int &end
+   *   End of range.
+   * @param string $divider
+   *   The string dividing the two halves of the range.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown if $divider is empty.
+   * @throws \Ranine\Exception\ParseException
+   *   Thrown if the parsing failed.
+   */
+  public static function parseIntRangeEndpoints(string $range, int &$start, int &$end, string $divider = '-') : void {
+    $start = 0;
+    $end = 0;
+    if (!static::tryParseIntRangeEndpoints($range, $start, $end, $divider)) {
+      throw new ParseException('Could not parse integer range.');
+    }
+  }
+
+  /**
    * Attempts to parse $number (a string or integer) as an integer.
    *
    * If $number is an integer, this function sets $result = $number. If it is a
@@ -145,7 +172,7 @@ final class ParseHelpers {
    *   Range, which should be in the form "[start]$divider[end]", where [start]
    *   and [end] are string representations of integers which form the inclusive
    *   lower and upper bounds of the range, respectively.
-   * @param \Ranine\Iteration\ExtendableIterable|null $output
+   * @param \Ranine\Iteration\ExtendableIterable|null &$output
    *   Collection, whose values are sorted from lowest to highest and are the
    *   values in the range, or NULL if the parsing failed.
    * @param string $divider
@@ -158,9 +185,37 @@ final class ParseHelpers {
    *   Thrown if $divider is empty.
    */
   public static function tryParseIntRange(string $range, ?ExtendableIterable &$output, string $divider = '-') : bool {
-    ThrowHelpers::throwIfEmptyString($divider, 'divider');
-
     $output = NULL;
+    $start = 0;
+    $end = 0;
+
+    static::tryParseIntRangeEndpoints($range, $start, $end, $divider);
+    $output = ExtendableIterable::fromRange($start, $end);
+    return TRUE;
+  }
+
+  /**
+   * Attempts to get the integer endpoints of $range.
+   *
+   * @param string $range
+   *   Range, which should be in the form "[start]$divider[end]", where [start]
+   *   and [end] are string representations of integers which form the start and
+   *   end of the range, respectively.
+   * @param int &start
+   *   Start of range.
+   * @param int &end
+   *   End of range.
+   * @param string $divider
+   *   The string dividing the two halves of the range.
+   *
+   * @return bool
+   *   Returns TRUE if the parse succeeded; else returns FALSE.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown if $divider is empty.
+   */
+  public static function tryParseIntRangeEndpoints(string $range, int &$start, int &$end, string $divider = '-') : bool {
+    ThrowHelpers::throwIfEmptyString($divider, 'divider');
 
     if ($range === '') {
       return FALSE;
@@ -170,19 +225,16 @@ final class ParseHelpers {
       return FALSE;
     }
     /** @var string[] $rangeParts */
-    $lower = 0;
-    if (!static::tryParseIntFromString($rangeParts[0], $lower)) {
+    if (!static::tryParseIntFromString($rangeParts[0], $start)) {
       return FALSE;
     }
-    $upper = 0;
-    if (!static::tryParseIntFromString($rangeParts[1], $upper)) {
+    if (!static::tryParseIntFromString($rangeParts[1], $end)) {
       return FALSE;
     }
-    if ($upper < $lower) {
+    if ($end < $start) {
       return FALSE;
     }
 
-    $output = ExtendableIterable::fromRange($lower, $upper);
     return TRUE;
   }
 
