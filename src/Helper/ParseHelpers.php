@@ -189,9 +189,13 @@ final class ParseHelpers {
     $start = 0;
     $end = 0;
 
-    static::tryParseIntRangeEndpoints($range, $start, $end, $divider);
-    $output = ExtendableIterable::fromRange($start, $end);
-    return TRUE;
+    if (static::tryParseIntRangeEndpoints($range, $start, $end, $divider)) {
+      $output = ExtendableIterable::fromRange($start, $end);
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
   }
 
   /**

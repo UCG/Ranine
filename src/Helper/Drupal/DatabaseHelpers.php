@@ -32,35 +32,37 @@ final class DatabaseHelpers {
    *
    * Transaction re-execution takes place automatically after a deadlock, but
    * the caller can force re-execution (if the maximum repeat count hasn't been
-   * reached) manually by returning 'FALSE' from $transactionExecution.
-   *
-   * The transaction is retried up to a maximum of TRANSACTION_REPEAT_COUNT
-   * times.
+   * reached) manually by returning FALSE from $transactionExecution.
    *
    * @param callable $transactionExecution
    *   Function executing transaction statements, of form () : bool. Should
-   *   return 'TRUE' if transaction was executed successfully, 'FALSE' if
-   *   transaction failed and should be re-tried if possible, and should
-   *   otherwise thrown an exception.
+   *   return TRUE if transaction was executed successfully, and FALSE if
+   *   transaction failed (for a non-deadlock, non-lock timeout reason) and
+   *   should be re-tried if possible. Otherwise, this function should throw an
+   *   exception.
    * @param \Drupal\Core\Database\Connection $databaseConnection
    *   Database connection with which to execute the transaction.
    * @param int $numberOfRetryAttempts
-   *   Number of times to retry the transaction.
+   *   Maximum number of times to retry the transaction.
+   *
+   * @return bool
+   *   Returns TRUE if the transaction was completed successfully; returns FALSE
+   *   if $transactionExecution() returned FALSE on the last retry attempt.
    *
    * @throws \Drupal\Core\Database\DatabaseExceptionWrapper
    *   Thrown if a database error occurs.
    * @throws \InvalidArgumentException
    *   Thrown if $numberOfRetryAttempts is negative.
    */
-  public static function executeDatabaseTransaction(callable $transactionExecution, Connection $databaseConnection, int $numberOfRetryAttempts = 10) : void {
+  public static function executeDatabaseTransaction(callable $transactionExecution, Connection $databaseConnection, int $numberOfRetryAttempts = 10) : bool {
     ThrowHelpers::throwIfLessThanZero($numberOfRetryAttempts, 'numberOfRetryAttempts');
 
-    // Start the transaction, and repeat for up to TRANSACTION_REPEAT_COUNT
-    // times if the transaction deadlocks or $transactionExecution returns
-    // 'FALSE'.
-    $didDeadlock = FALSE;
+    // Start the transaction, and repeat for up to $numberOfRetryAttempts times
+    // if the transaction deadlocks, a lock times out, or $transactionExecution
+    // returns FALSE.
+    $wasLockError = FALSE;
     for ($i = 0; $i <= $numberOfRetryAttempts; $i++) {
-      $didDeadlock = FALSE;
+      $wasLockError = FALSE;
       // Start the transaction.
       $transaction = $databaseConnection->startTransaction();
       try {
@@ -70,7 +72,7 @@ final class DatabaseHelpers {
           // explicitly to force commit.
           unset($transaction);
           // Return to caller -- transaction is finished.
-          return;
+          return TRUE;
         }
         else {
           // Transaction execution failed. Rollback.
@@ -92,11 +94,11 @@ final class DatabaseHelpers {
         // retried, as both those codes could be caused by deadlocks. Otherwise,
         // rethrow the exception.
         $mysqlErrorCode = static::getMySqlErrorCode($e);
-        if ($mysqlErrorCode !== static::MYSQL_ERROR_CODE_DEADLOCK_DETECTED && $mysqlErrorCode !== static::MYSQL_ERROR_LOCK_TIMEOUT) {
-          throw $e;
+        if ($mysqlErrorCode === static::MYSQL_ERROR_CODE_DEADLOCK_DETECTED || $mysqlErrorCode === static::MYSQL_ERROR_LOCK_TIMEOUT) {
+          $wasLockError = TRUE;
         }
         else {
-          $didDeadlock = TRUE;
+          throw $e;
         }
       }
       catch (\Throwable $e) {
@@ -108,18 +110,20 @@ final class DatabaseHelpers {
       }
     }
 
-    // If we got this far, we must have retried TRANSACTION_REPEAT_COUNT times
+    // If we got this far, we must have retried $numberOfRetryAttempts times
     // and still encountered a problem. We'll just fail, in this case...
     // Also, roll back the transaction.
     if (isset($transaction)) {
       $transaction->rollBack;
     }
 
-    // Throw the deadlock exception, if applicable.
-    if ($didDeadlock) {
+    // Throw the locking exception, if applicable.
+    if ($wasLockError) {
       assert(isset($e));
       throw $e;
     }
+
+    return FALSE;
   }
 
   /**

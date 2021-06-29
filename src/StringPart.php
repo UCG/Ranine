@@ -66,7 +66,10 @@ class StringPart {
    *   String to append.
    */
   public function append(string $str) : StringPart {
-    if ($this->isEmpty() && $str !== '') {
+    if ($str === '') {
+      return $this;
+    }
+    elseif ($this->isEmpty()) {
       $this->backingString = $str;
       $this->startPositionInclusive = 0;
       $this->endPositionExclusive = strlen($str);
@@ -85,7 +88,7 @@ class StringPart {
   }
 
   /**
-   * Makes the backing string of minimal length and returns this object.
+   * Cuts away extraneous parts of the backing string and returns this object.
    *
    * This method makes the backing string of this object into a substring of
    * itself of the smallest possible length.
@@ -225,8 +228,9 @@ class StringPart {
    * Creates and returns a new string part.
    *
    * The string part is the substring of $backingString spanning the range of
-   * intervals [$startPosition, $endPosition], unless $backingString is empty,
-   * in which case the string part is also empty.
+   * characters [$startPosition, $endPosition], unless $backingString is empty
+   * and $startPosition === $endPosition === -1, in which case the string part
+   * is empty.
    *
    * @param string $backingString
    *   Backing string.
@@ -281,7 +285,7 @@ class StringPart {
       }
     }
     else {
-      if ($startPosition < -1) {
+      if ($startPosition < 0) {
         throw new \InvalidArgumentException('$startPosition is less than negative one.');
       }
       if ($endPosition < 0) {
