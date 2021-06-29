@@ -79,7 +79,7 @@ final class DatabaseHelpers {
         else {
           // Transaction execution failed. Rollback.
           if (isset($transaction)) {
-            $transaction->rollBack;
+            $transaction->rollBack();
           }
         }
       }
@@ -88,7 +88,7 @@ final class DatabaseHelpers {
         // deadlock error code, but we do it here no matter what just to be
         // safe).
         if (isset($transaction)) {
-          $transaction->rollBack;
+          $transaction->rollBack();
         }
 
         // Check the MySQL error code -- if it corresponds to a detected
@@ -106,7 +106,7 @@ final class DatabaseHelpers {
       catch (\Throwable $e) {
         // Rollback and rethrow.
         if (isset($transaction)) {
-          $transaction->rollBack;
+          $transaction->rollBack();
         }
         throw $e;
       }
@@ -116,7 +116,7 @@ final class DatabaseHelpers {
     // and still encountered a problem. We'll just fail, in this case...
     // Also, roll back the transaction.
     if (isset($transaction)) {
-      $transaction->rollBack;
+      $transaction->rollBack();
     }
 
     // Throw the locking exception, if applicable.
