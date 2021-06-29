@@ -2,6 +2,8 @@
 
 declare (strict_types = 1);
 
+namespace Ranine\Helper\Drupal;
+
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Ranine\Helper\ThrowHelpers;
