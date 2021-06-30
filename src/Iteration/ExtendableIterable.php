@@ -121,6 +121,27 @@ class ExtendableIterable implements \IteratorAggregate {
   }
 
   /**
+   * Calls a function for each key and value in the iterable.
+   *
+   * The processing function is called once for each element of the iterable,
+   * just before the corresponding key and value are yielded.
+   *
+   * @param callable $processing
+   *   Of the form ($key, $value) : void.
+   *
+   * @return ExtendableIterable
+   *   Resulting iterable.
+   */
+  public function apply(callable $processing) : ExtendableIterable {
+    return new static((function () use ($processing) {
+      foreach ($this->source as $key => $value) {
+        $processing($key, $value);
+        yield $key => $value;
+      }
+    })());
+  }
+
+  /**
    * Counts the elements in this iterable.
    *
    * @return int
