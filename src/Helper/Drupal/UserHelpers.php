@@ -149,7 +149,7 @@ final class UserHelpers {
             if (!$isFirstAttribute) {
               hash_update($hashContext, StringHelpers::ASCII_RECORD_SEPARATOR);
             }
-            $attributeSerialization = $binaryAttributeRepresentationRetrieval($user);
+            $attributeSerialization = $binaryAttributeRepresentationRetrieval($user, $attributeType);
             if (!is_string($attributeSerialization)) {
               throw new \LogicException('The $binaryAttributeRepresentationRetrieval returned a non-string attribute serialization.');
             }
