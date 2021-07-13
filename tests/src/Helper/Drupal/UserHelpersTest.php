@@ -72,6 +72,7 @@ class UserHelpersTest extends TestCase {
     // Attribute separator = ASCII record sep = 0x1E
     $binaryRepresentation =
       'eve@example.com' . "\x1E" . 'A' . "\x1E" . "\e\eE\e\x1Dv\e\x1E\e\e\e\ee" . "\x1D" .
+      "\x1D" .
       'abel@example.com' . "\x1E" . 'B' . "\x1E" . 'pst';
     $expectedHash = hash('sha1', $binaryRepresentation, TRUE);
 
