@@ -76,7 +76,7 @@ class UserHelpersTest extends TestCase {
       'abel@example.com' . "\x1E" . 'B' . "\x1E" . 'pst';
     $expectedHash = hash('sha1', $binaryRepresentation, TRUE);
 
-    $hash = UserHelpers::getAttributeHash($mockEntityTypeManager,
+    $hash = UserHelpers::getAttributeHash($mockStorage,
       [2, 3, 5],
       ['email', 'status', 'timezone'],
       $binaryRepresentationRetrieval,

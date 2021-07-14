@@ -5,6 +5,7 @@ declare (strict_types = 1);
 namespace Ranine\Helper\Drupal;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\user\UserStorageInterface;
 use Ranine\Helper\StringHelpers;
 use Ranine\Helper\ThrowHelpers;
 use Ranine\Iteration\ExtendableIterable;
@@ -23,8 +24,8 @@ final class UserHelpers {
   /**
    * Gets the SHA-1 hash of a given set of attributes for a given set of users.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   Entity type manager.
+   * @param \Drupal\user\UserStorageInterface $userStorage
+   *   User storage.
    * @param iterable<int> $sortedUids
    *   UIDs in sorted (low to high) order with no duplicates.
    * @param string[] $sortedAttributeTypes
@@ -72,7 +73,7 @@ final class UserHelpers {
    *   Thrown if $binaryAttributeRepresentationRetrieval does not return a
    *   string.
    */
-  public static function getAttributeHash(EntityTypeManagerInterface $entityTypeManager,
+  public static function getAttributeHash(UserStorageInterface $userStorage,
     iterable $sortedUids,
     array $sortedAttributeTypes,
     callable $binaryAttributeRepresentationRetrieval,
@@ -105,72 +106,53 @@ final class UserHelpers {
       yield $pageId => $page;
     })());
 
-    $userStorage = $entityTypeManager->getStorage('user');
-    $entityType = $userStorage->getEntityType();
-    $wasStaticCacheEnabled = $entityType->isStaticallyCacheable();
-    try {
-      // Disable static caching (for performance reasons) while we loop through
-      // the users -- otherwise all the users we load would end up in memory and
-      // not be garbage collected.
-      $entityType->set('static_cache', FALSE);
+    // Create the hash context, used to compute a hash of a long string
+    // without first loading the entire string into memory.
+    /** @var \HashContext|resource */
+    $hashContext = hash_init('sha1');
+    // We use the record and group separator to divide attributes and users,
+    // respectively, so we want to escape these from attribute serializations.
+    /** @var string[] */
+    $specialCharacters = [StringHelpers::ASCII_RECORD_SEPARATOR, StringHelpers::ASCII_GROUP_SEPARATOR];
 
-      // Create the hash context, used to compute a hash of a long string
-      // without first loading the entire string into memory.
-      /** @var \HashContext|resource */
-      $hashContext = hash_init('sha1');
-      // We use the record and group separator to divide attributes and users,
-      // respectively, so we want to escape these from attribute serializations.
-      /** @var string[] */
-      $specialCharacters = [StringHelpers::ASCII_RECORD_SEPARATOR, StringHelpers::ASCII_GROUP_SEPARATOR];
+    // Loop through all the users and form the hash.
+    $isFirstUser = TRUE;
+    foreach ($pages as $page) {
+      /** @var int[] $page */
+      // Load all entities for this page.
+      /** @var \Drupal\user\UserInterface[] */
+      $users = $userStorage->loadMultiple($page);
+      // Loop through the UIDs.
+      foreach ($page as $uid) {
+        if (!$isFirstUser) {
+          hash_update($hashContext, StringHelpers::ASCII_GROUP_SEPARATOR);
+        }
 
-      // Loop through all the users and form the hash.
-      $isFirstUser = TRUE;
-      foreach ($pages as $page) {
-        /** @var int[] $page */
-        // Load all entities for this page.
-        /** @var \Drupal\user\UserInterface[] */
-        $users = $userStorage->loadMultiple($page);
-        // Loop through the UIDs.
-        foreach ($page as $uid) {
-          if (!$isFirstUser) {
-            hash_update($hashContext, StringHelpers::ASCII_GROUP_SEPARATOR);
-          }
+        if (!array_key_exists($uid, $users)) {
+          goto next_user;            
+        }
+        $user = $users[$uid];
+        if (!$userFilter($user)) {
+          goto next_user;
+        }
 
-          if (!array_key_exists($uid, $users)) {
-            goto next_user;            
+        $isFirstAttribute = TRUE;
+        foreach ($sortedAttributeTypes as $attributeType) {
+          if (!$isFirstAttribute) {
+            hash_update($hashContext, StringHelpers::ASCII_RECORD_SEPARATOR);
           }
-          $user = $users[$uid];
-          if (!$userFilter($user)) {
-            goto next_user;
+          $attributeSerialization = $binaryAttributeRepresentationRetrieval($user, $attributeType);
+          if (!is_string($attributeSerialization)) {
+            throw new \LogicException('The $binaryAttributeRepresentationRetrieval returned a non-string attribute serialization.');
           }
-
-          $isFirstAttribute = TRUE;
-          foreach ($sortedAttributeTypes as $attributeType) {
-            if (!$isFirstAttribute) {
-              hash_update($hashContext, StringHelpers::ASCII_RECORD_SEPARATOR);
-            }
-            $attributeSerialization = $binaryAttributeRepresentationRetrieval($user, $attributeType);
-            if (!is_string($attributeSerialization)) {
-              throw new \LogicException('The $binaryAttributeRepresentationRetrieval returned a non-string attribute serialization.');
-            }
-            $escapedAttributeSerialization = StringHelpers::escape($attributeSerialization, $specialCharacters);
-            hash_update($hashContext, $escapedAttributeSerialization);
-            $isFirstAttribute = FALSE;
-          }
+          $escapedAttributeSerialization = StringHelpers::escape($attributeSerialization, $specialCharacters);
+          hash_update($hashContext, $escapedAttributeSerialization);
+          $isFirstAttribute = FALSE;
+        }
 
 next_user:
-          $isFirstUser = FALSE;
-        }
-        
-        // Reset the static cache, just in case our attempt to disable it
-        // failed.
-        $userStorage->resetCache();
+        $isFirstUser = FALSE;
       }
-
-    }
-    finally {
-      // Restore user static caching to previous setting.
-      $entityType->set('static_cache', $wasStaticCacheEnabled);
     }
 
     return hash_final($hashContext, TRUE);
