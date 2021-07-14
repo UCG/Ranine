@@ -157,4 +157,29 @@ final class CollectionHelpers {
     })());
   }
 
+  /**
+   * Removes duplicate values from $arr, assuming $arr is sorted.
+   *
+   * @param array &$arr
+   *   Array, sorted such that identical values appear next to each other.
+   */
+  public static function removeDuplicatesFromSortedArray(array &$arr) {
+    /** @var (string|int)[] */
+    $keysOfDuplicateElements = [];
+    $isPastFirstIteration = FALSE;
+    $lastValue = NULL;
+    foreach ($arr as $key => $value) {
+      if ($isPastFirstIteration) {
+        if ($lastValue === $value) {
+          $keysOfDuplicateElements[] = $key;
+        }
+      }
+      $lastValue = $value;
+      $isPastFirstIteration = TRUE;
+    }
+    foreach ($keysOfDuplicateElements as $key) {
+      unset($arr[$key]);
+    }
+  }
+
 }
