@@ -65,7 +65,7 @@ class StringPartTest extends TestCase {
     // ~L. Tolstoy, The Death of Ivan Ilych
     $part = StringPart::create($firstPart . $secondPart . $thirdPart, strlen($firstPart), strlen($firstPart) + strlen($secondPart) + strlen($thirdPart) - 1);
     $this->assertFalse($part->equals(str_replace('a', 'b', $secondPart)));
-    $this->assertTrue($part->equals($thirdPart));
+    $this->assertTrue($part->equals($secondPart));
   }
 
   /**
