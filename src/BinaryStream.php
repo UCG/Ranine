@@ -220,7 +220,8 @@ class BinaryStream {
    *   function is passed the current concatenation ($current) of all the chunks
    *   produced since the readUntil() method was called, and the start index of
    *   the part of $current that was appended since the last call to
-   *   $positionIdentification(). If that function returns NULL, chunks continue
+   *   $positionIdentification() (or, if this is the first call, the start index
+   *   of $current). If that function returns NULL, chunks continue
    *   to be read from the stream and passed to $positionIdentification().
    *   Otherwise, the part of $current from $current->getStartPosition() to the
    *   index returned by $positionIdentification() (inclusive) is returned.
