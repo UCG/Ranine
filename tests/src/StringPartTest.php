@@ -63,7 +63,7 @@ class StringPartTest extends TestCase {
     $secondPart = 'vague impulses which he had always suppressed, might have been precisely what mattered,';
     $thirdPart = 'and all the rest not been the real thing.';
     // ~L. Tolstoy, The Death of Ivan Ilych
-    $part = StringPart::create($firstPart . $secondPart . $thirdPart, strlen($firstPart), strlen($firstPart) + strlen($secondPart) + strlen($thirdPart));
+    $part = StringPart::create($firstPart . $secondPart . $thirdPart, strlen($firstPart), strlen($firstPart) + strlen($secondPart) + strlen($thirdPart) - 1);
     $this->assertFalse($part->equals(str_replace('a', 'b', $secondPart)));
     $this->assertTrue($part->equals($thirdPart));
   }
@@ -76,9 +76,9 @@ class StringPartTest extends TestCase {
   public function testEqualsStringPart() : void {
     $firstSentence = 'There are a dozen views about everything until you know the answer.';
     $secondSentence = 'Then there\'s never more than one.';
-    $part1 = StringPart::create($firstSentence . $secondSentence, strlen($firstSentence), strlen($firstSentence) + strlen($secondSentence));
-    $part2 = StringPart::create($firstSentence . $secondSentence, strlen($firstSentence) - 1, strlen($firstSentence) + strlen($secondSentence) - 1);
-    $part3 = StringPart::create('a' . $secondSentence, 1, strlen($secondSentence) + 1);
+    $part1 = StringPart::create($firstSentence . $secondSentence, strlen($firstSentence), strlen($firstSentence) + strlen($secondSentence) - 1);
+    $part2 = StringPart::create($firstSentence . $secondSentence, strlen($firstSentence) - 1, strlen($firstSentence) + strlen($secondSentence) - 2);
+    $part3 = StringPart::create('a' . $secondSentence, 1, strlen($secondSentence));
     $this->assertFalse($part1->equalsStringPart($part2));
     $this->assertFalse($part2->equalsStringPart($part1));
     $this->assertTrue($part1->equalsStringPart($part3));
