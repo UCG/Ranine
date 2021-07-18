@@ -63,7 +63,7 @@ class StringPartTest extends TestCase {
     $secondPart = 'vague impulses which he had always suppressed, might have been precisely what mattered,';
     $thirdPart = 'and all the rest not been the real thing.';
     // ~L. Tolstoy, The Death of Ivan Ilych
-    $part = StringPart::create($firstPart . $secondPart . $thirdPart, strlen($firstPart), strlen($firstPart) + strlen($secondPart) + strlen($thirdPart) - 1);
+    $part = StringPart::create($firstPart . $secondPart . $thirdPart, strlen($firstPart), strlen($firstPart) + strlen($secondPart) - 1);
     $this->assertFalse($part->equals(str_replace('a', 'b', $secondPart)));
     $this->assertTrue($part->equals($secondPart));
   }
