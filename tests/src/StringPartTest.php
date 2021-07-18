@@ -54,6 +54,38 @@ class StringPartTest extends TestCase {
   }
 
   /**
+   * Tests the equals() method.
+   *
+   * @covers ::equals
+   */
+  public function testEquals() : void {
+    $firstPart = 'It occurred to him that those scarcely perceptible impulses of his to protest what people of high rank considered good,';
+    $secondPart = 'vague impulses which he had always suppressed, might have been precisely what mattered,';
+    $thirdPart = 'and all the rest not been the real thing.';
+    // ~L. Tolstoy, The Death of Ivan Ilych
+    $part = StringPart::create($firstPart . $secondPart . $thirdPart, strlen($firstPart), strlen($firstPart) + strlen($secondPart) + strlen($thirdPart));
+    $this->assertFalse($part->equals(str_replace('a', 'b', $secondPart)));
+    $this->assertTrue($part->equals($thirdPart));
+  }
+
+  /**
+   * Tests the equalsStringPart() method.
+   *
+   * @covers ::equalsStringPart
+   */
+  public function testEqualsStringPart() : void {
+    $firstSentence = 'There are a dozen views about everything until you know the answer.';
+    $secondSentence = 'Then there\'s never more than one.';
+    $part1 = StringPart::create($firstSentence . $secondSentence, strlen($firstSentence), strlen($firstSentence) + strlen($secondSentence));
+    $part2 = StringPart::create($firstSentence . $secondSentence, strlen($firstSentence) - 1, strlen($firstSentence) + strlen($secondSentence) - 1);
+    $part3 = StringPart::create('a' . $secondSentence, 1, strlen($secondSentence) + 1);
+    $this->assertFalse($part1->equalsStringPart($part2));
+    $this->assertFalse($part2->equalsStringPart($part1));
+    $this->assertTrue($part1->equalsStringPart($part3));
+    $this->assertTrue($part3->equalsStringPart($part1));
+  }
+
+  /**
    * Tests the recut() method.
    *
    * @covers ::recut

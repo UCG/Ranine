@@ -115,6 +115,60 @@ class StringPart {
   }
 
   /**
+   * Tells whether this string part is equal to another string.
+   *
+   * Equality is determined by comparing the part of the backing string
+   * corresponding to this string part with $other.
+   *
+   * @param string $str
+   *   Other string.
+   */
+  public function equals(string $other) : bool {
+    $length = $this->getLength();
+    if (strlen($other) !== $length) {
+      return FALSE;
+    }
+    else {
+      return substr_compare($this->backingString, $other, $this->startPositionInclusive, $length) === 0;
+    }
+  }
+
+  /**
+   * Tells whether this string part is equal to another string part.
+   *
+   * Equality is determined by comparing the part of the backing string
+   * corresponding to this string part with the part of $other's backing string
+   * corresponding to it.
+   *
+   * @param StringPart $other
+   *   Other string.
+   */
+  public function equalsStringPart(StringPart $other) : bool {
+    // Unfortunately, there doesn't seem to be a built in "double substring
+    // compare" function that takes two indices. We might have to compare
+    // character by character, but we handle some special cases first.
+    $length = $this->getLength();
+    if ($length !== $other->getLength()) {
+      return FALSE;
+    }
+    elseif ($this->startPositionInclusive === 0) {
+      return substr_compare($other->backingString, $this->backingString, $other->startPositionInclusive, $length);
+    }
+    elseif ($other->startPositionInclusive === 0) {
+      return substr_compare($this->backingString, $other->backingString, $this->startPositionInclusive, $length);
+    }
+    else {
+      for ($i = $this->startPositionInclusive, $j = $other->startPositionInclusive;
+        $i < $this->endPositionExclusive; $i++, $j++) {
+        if ($this->backingString[$i] !== $other->backingString[$j]) {
+          return FALSE;
+        }
+      }
+      return TRUE;
+    }
+  }
+
+  /**
    * Gets the string backing this string part.
    */
   public function getBackingString() : string {
