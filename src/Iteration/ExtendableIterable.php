@@ -75,7 +75,7 @@ class ExtendableIterable implements \IteratorAggregate {
   /**
    * Appends elements from $other on the end of this iterator.
    *
-   * @return \Ranine\Iteration\ExtendableIterable
+   * @return static
    *   Appended output -- the order of elements in this iterator and $source is
    *   preserved.
    */
@@ -94,7 +94,7 @@ class ExtendableIterable implements \IteratorAggregate {
    * @param mixed $value
    *   Value.
    *
-   * @return \Ranine\Iteration\ExtendableIterable
+   * @return static
    *   Resulting iterable.
    */
   public function appendKeyAndValue($key, $value) : ExtendableIterable {
@@ -110,7 +110,7 @@ class ExtendableIterable implements \IteratorAggregate {
    * @param mixed $value
    *   Value to append.
    *
-   * @return \Ranine\Iteration\ExtendableIterable
+   * @return static
    *   Resulting iterable.
    */
   public function appendValue($value) : ExtendableIterable {
@@ -129,7 +129,7 @@ class ExtendableIterable implements \IteratorAggregate {
    * @param callable $processing
    *   Of the form ($key, $value) : void.
    *
-   * @return ExtendableIterable
+   * @return static
    *   Resulting iterable.
    */
   public function apply(callable $processing) : ExtendableIterable {
@@ -157,6 +157,47 @@ class ExtendableIterable implements \IteratorAggregate {
   }
 
   /**
+   * Divides this iterable into groups.
+   *
+   * @param int $maxPieces
+   *   Maximum number of pieces into which to divide this iterable.
+   * @param int $targetSizeOfPiece
+   *   Target number of elements to put into each output piece. The last piece
+   *   of the output group may have more pieces than this, if it is necessary to
+   *   meet the requirement set by $maxPieces. The last piece may also have less
+   *   pieces than this, if there were not enough remaining elements.
+   *
+   * @return static
+   *   The resulting pieces of this iterable. Iterating through each of the
+   *   values of the return object in turn will result in an iteration over the
+   *   same elements defining this current iterable. The keys of the return
+   *   object are the IDs of the pieces (0, 1, 2, etc.). The values are
+   *   \Ranine\Iteration\ExtendableIterable objects.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown if $maxPieces or $targetSizeOfPiece is less than or equal to zero.
+   */
+  public function divide(int $maxPieces, int $targetSizeOfPiece) : ExtendableIterable {
+    ThrowHelpers::throwIfLessThanOrEqualToZero($maxPieces, 'maxPieces');
+    ThrowHelpers::throwIfLessThanOrEqualToZero($targetSizeOfPiece, 'targetSizeOfPiece');
+
+    $maxPiecesLessOne = $maxPieces - 1;
+    return new static((function () use ($maxPiecesLessOne, $targetSizeOfPiece) {
+      $iterator = $this->getIterator();
+      $iterator->rewind();
+      if (!$iterator->valid()) {
+        yield ExtendableIterable::empty();
+      }
+      for ($currentPieceId = 0; $currentPieceId < $maxPiecesLessOne && $iterator->valid(); $currentPieceId++) {
+        yield $this->takeNoReset($targetSizeOfPiece, $iterator);
+      }
+      if ($currentPieceId === $maxPiecesLessOne) {
+        yield $this->takeRemainingNoReset($iterator);
+      }
+    })());
+  }
+
+  /**
    * Expands sub-iterables of this collection.
    *
    * @param callable $expansion
@@ -164,7 +205,7 @@ class ExtendableIterable implements \IteratorAggregate {
    *   NULL (if the element is not to be expanded) or an iterable (if the
    *   element is to be expanded into that iterable).
    *
-   * @return \Ranine\Iteration\ExtendableIterable
+   * @return static
    *   Resulting iterator, which will iterate through items in this iterable
    *   that were not expanded, and through the expansion of any sub-iterables,
    *   as they are encountered.
@@ -191,7 +232,7 @@ class ExtendableIterable implements \IteratorAggregate {
    *   returns TRUE (to preserve the value in the output) or FALSE (to not
    *   preserve the value in the output).
    *
-   * @return \Ranine\Iteration\ExtendableIterable
+   * @return static
    *   Filtered output -- the order of elements in this iterator is preserved.
    */
   public function filter(callable $filter) : ExtendableIterable {
@@ -298,7 +339,7 @@ class ExtendableIterable implements \IteratorAggregate {
    *   returns an output key. If NULL is passed for this parameter, the key map
    *   ($k, $v) => $k is used.
    *
-   * @return \Ranine\Iteration\ExtendableIterable
+   * @return static
    *   Output iterable. The order of elements is preserved.
    */
   public function map(?callable $valueMap, ?callable $keyMap = NULL) : ExtendableIterable {
@@ -327,7 +368,7 @@ class ExtendableIterable implements \IteratorAggregate {
    *   returns an output value. If NULL is passed for this parameter, the
    *   value map ($k, $v) => $v is used.
    *
-   * @return \Ranine\Iteration\ExtendableIterable
+   * @return static
    *   Output generator. The order of elements is preserved.
    */
   public function mapSequentialKeys(?callable $valueMap) : ExtendableIterable {
@@ -374,7 +415,7 @@ class ExtendableIterable implements \IteratorAggregate {
    * @param int $num
    *   Number of elements to take.
    *
-   * @return \Ranine\Iteration\ExtendableIterable
+   * @return static
    *   Items. The order of elements is preserved.
    *
    * @throws \InvalidArgumentException
@@ -403,7 +444,7 @@ class ExtendableIterable implements \IteratorAggregate {
    * @param int|null $max
    *   Max number of elements to take. Pass NULL for "unlimited."
    *
-   * @return \Ranine\Iteration\ExtendableIterable
+   * @return static
    *   Items. The order of elements is preserved.
    *
    * @throws \InvalidArgumentException
@@ -505,7 +546,7 @@ class ExtendableIterable implements \IteratorAggregate {
    *   ($keyFromOtherIterable, $valueFromOtherIterable) : mixed. If NULL is
    *   passed, the map ($k, $v) => $v is used.
    *
-   * @return ExtendableIterable
+   * @return static
    *   Resulting collection. The order of elements in this iterator and $other
    *   is preserved.
    */
@@ -552,6 +593,43 @@ class ExtendableIterable implements \IteratorAggregate {
         $value2 = $otherGenerator->current();
         yield $keyMapOther($key2, $value2) => $valueMapOther($key2, $value2);
         $otherGenerator->next();
+      }
+    })());
+  }
+
+  /**
+   * Takes a certain number of elements from $iterator.
+   *
+   * Does not reset the iterator prior to taking elements from it. If $iterator
+   * is exhausted before $num elements are taken, this method finishes
+   * prematurely.
+   *
+   * @param int $num
+   *   (Positive) number of elements to try to take.
+   *
+   * @return static
+   */
+  private function takeNoReset(int $num, \Iterator $iterator) : ExtendableIterable {
+    return new static((function () use ($num, $iterator) {
+      $i = 0;
+      while ($iterator->valid() && $i < $num) {
+        yield $iterator->key() => $iterator->current();
+        $iterator->next();
+        $i++;
+      }
+    })());
+  }
+
+  /**
+   * Takes the remaining elements from $iterator without resetting it.
+   *
+   * @return static
+   */
+  private function takeRemainingNoReset(\Iterator $iterator) : ExtendableIterable {
+    return new static((function () use ($iterator) {
+      while ($iterator->valid()) {
+        yield $iterator->key() => $iterator->current();
+        $iterator->next();
       }
     })());
   }
