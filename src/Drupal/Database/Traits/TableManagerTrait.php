@@ -46,12 +46,15 @@ trait TableManagerTrait {
    *   Database connection.
    * @param string $tableName
    *   Table name.
+   * @param string $tableNameVariableNameOnException
+   *   Variable name to use when throwing an exception when $tableName is
+   *   invalid.
    *
    * @throws \InvalidArgumentException
    *   Thrown if $tableName is empty.
    */
-  private function initializeConnectionAndTableName(Connection $databaseConnection, string $tableName) {
-    ThrowHelpers::throwIfEmptyString($tableName, 'tableName');
+  private function initializeConnectionAndTableName(Connection $databaseConnection, string $tableName, string $tableNameVariableNameOnException) {
+    ThrowHelpers::throwIfEmptyString($tableName, $tableNameVariableNameOnException);
 
     $this->databaseConnection = $databaseConnection;
     $this->tableName = $tableName;
