@@ -157,47 +157,6 @@ class ExtendableIterable implements \IteratorAggregate {
   }
 
   /**
-   * Divides this iterable into groups.
-   *
-   * @param int $maxPieces
-   *   Maximum number of pieces into which to divide this iterable.
-   * @param int $targetSizeOfPiece
-   *   Target number of elements to put into each output piece. The last piece
-   *   of the output group may have more pieces than this, if it is necessary to
-   *   meet the requirement set by $maxPieces. The last piece may also have less
-   *   pieces than this, if there were not enough remaining elements.
-   *
-   * @return static
-   *   The resulting pieces of this iterable. Iterating through each of the
-   *   values of the return object in turn will result in an iteration over the
-   *   same elements defining this current iterable. The keys of the return
-   *   object are the IDs of the pieces (0, 1, 2, etc.). The values are
-   *   \Ranine\Iteration\ExtendableIterable objects.
-   *
-   * @throws \InvalidArgumentException
-   *   Thrown if $maxPieces or $targetSizeOfPiece is less than or equal to zero.
-   */
-  public function divide(int $maxPieces, int $targetSizeOfPiece) : ExtendableIterable {
-    ThrowHelpers::throwIfLessThanOrEqualToZero($maxPieces, 'maxPieces');
-    ThrowHelpers::throwIfLessThanOrEqualToZero($targetSizeOfPiece, 'targetSizeOfPiece');
-
-    $maxPiecesLessOne = $maxPieces - 1;
-    return new static((function () use ($maxPiecesLessOne, $targetSizeOfPiece) {
-      $iterator = $this->getIterator();
-      $iterator->rewind();
-      if (!$iterator->valid()) {
-        yield ExtendableIterable::empty();
-      }
-      for ($currentPieceId = 0; $currentPieceId < $maxPiecesLessOne && $iterator->valid(); $currentPieceId++) {
-        yield $this->takeNoReset($targetSizeOfPiece, $iterator);
-      }
-      if ($currentPieceId === $maxPiecesLessOne) {
-        yield $this->takeRemainingNoReset($iterator);
-      }
-    })());
-  }
-
-  /**
    * Expands sub-iterables of this collection.
    *
    * @param callable $expansion
@@ -593,43 +552,6 @@ class ExtendableIterable implements \IteratorAggregate {
         $value2 = $otherGenerator->current();
         yield $keyMapOther($key2, $value2) => $valueMapOther($key2, $value2);
         $otherGenerator->next();
-      }
-    })());
-  }
-
-  /**
-   * Takes a certain number of elements from $iterator.
-   *
-   * Does not reset the iterator prior to taking elements from it. If $iterator
-   * is exhausted before $num elements are taken, this method finishes
-   * prematurely.
-   *
-   * @param int $num
-   *   (Positive) number of elements to try to take.
-   *
-   * @return static
-   */
-  private function takeNoReset(int $num, \Iterator $iterator) : ExtendableIterable {
-    return new static((function () use ($num, $iterator) {
-      $i = 0;
-      while ($iterator->valid() && $i < $num) {
-        yield $iterator->key() => $iterator->current();
-        $iterator->next();
-        $i++;
-      }
-    })());
-  }
-
-  /**
-   * Takes the remaining elements from $iterator without resetting it.
-   *
-   * @return static
-   */
-  private function takeRemainingNoReset(\Iterator $iterator) : ExtendableIterable {
-    return new static((function () use ($iterator) {
-      while ($iterator->valid()) {
-        yield $iterator->key() => $iterator->current();
-        $iterator->next();
       }
     })());
   }
