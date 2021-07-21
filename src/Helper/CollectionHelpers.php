@@ -29,7 +29,7 @@ final class CollectionHelpers {
    *   Ranges of integers, where the keys represent the inclusive start values
    *   of the ranges, and the values represent the inclusive end values.
    *
-   * @return \Ranine\Iteration\ExtendableIterable
+   * @return \Ranine\Iteration\ExtendableIterable|iterable<int, int>
    *   A collection whose keys are the starting values in inclusive ranges of
    *   integers, and whose values are the ending values in these ranges. The
    *   array is sorted from smallest starting value to largest starting value,
@@ -42,7 +42,7 @@ final class CollectionHelpers {
    * @throws \InvalidArgumentException
    *   Thrown if a key in $ranges is greater than its value.
    */
-  public static function condenseAndSortRanges(array $ranges) : ExtendableIterable {
+  public static function condenseAndSortRanges(array $ranges) {
     if (empty($ranges)) {
       return ExtendableIterable::empty();
     }
@@ -103,7 +103,7 @@ final class CollectionHelpers {
    * @param iterable<int> $integers
    *   Collection whose values are integers.
    *
-   * @return \Ranine\Iteration\ExtendableIterable
+   * @return \Ranine\Iteration\ExtendableIterable|iterable<int, int>
    *   A collection whose keys are the starting values in inclusive ranges of
    *   integers, and whose values are the ending values in these ranges. The
    *   array is sorted from smallest starting value to largest starting value,
@@ -114,7 +114,7 @@ final class CollectionHelpers {
    * @throws \InvalidArgumentException
    *   Thrown if a value in $integers was not an integer.
    */
-  public static function getSortedRanges(iterable $integers) : ExtendableIterable {
+  public static function getSortedRanges(iterable $integers) {
     /** @var array<int, null> */
     $integersAsKeys = [];
     foreach ($integers as $value) {

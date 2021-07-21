@@ -34,7 +34,7 @@ final class DatabaseHelpers {
    *
    * Transaction re-execution takes place automatically after a deadlock, but
    * the caller can force re-execution (if the maximum repeat count hasn't been
-   * reached) manually by returning FALSE from $transactionExecution.
+   * reached) manually by returning FALSE from $transactionExecution().
    *
    * @param callable $transactionExecution
    *   Function executing transaction statements, of form () : bool. Should
@@ -62,7 +62,6 @@ final class DatabaseHelpers {
     // Start the transaction, and repeat for up to $numberOfRetryAttempts times
     // if the transaction deadlocks, a lock times out, or $transactionExecution
     // returns FALSE.
-    $wasLockError = FALSE;
     for ($i = 0; $i <= $numberOfRetryAttempts; $i++) {
       $wasLockError = FALSE;
       // Start the transaction.
@@ -114,10 +113,6 @@ final class DatabaseHelpers {
 
     // If we got this far, we must have retried $numberOfRetryAttempts times
     // and still encountered a problem. We'll just fail, in this case...
-    // Also, roll back the transaction.
-    if (isset($transaction)) {
-      $transaction->rollBack();
-    }
 
     // Throw the locking exception, if applicable.
     if ($wasLockError) {

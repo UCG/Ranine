@@ -75,7 +75,7 @@ final class ParseHelpers {
    * @param string $divider
    *   The string dividing the two halves of the range.
    *
-   * @return \Ranine\Iteration\ExtendableIterable
+   * @return \Ranine\Iteration\ExtendableIterable|iterable<int>
    *   Sorted collection, whose values are the values in the range.
    *
    * @throws \InvalidArgumentException
@@ -83,7 +83,7 @@ final class ParseHelpers {
    * @throws \Ranine\Exception\ParseException
    *   Thrown if the parsing failed.
    */
-  public static function parseIntRange(string $range, string $divider = '-') : ExtendableIterable {
+  public static function parseIntRange(string $range, string $divider = '-') {
     $result = NULL;
     if (!static::tryParseIntRange($range, $result, $divider)) {
       throw new ParseException('Could not parse integer range.');
@@ -172,7 +172,7 @@ final class ParseHelpers {
    *   Range, which should be in the form "[start]$divider[end]", where [start]
    *   and [end] are string representations of integers which form the inclusive
    *   lower and upper bounds of the range, respectively.
-   * @param \Ranine\Iteration\ExtendableIterable|null &$output
+   * @param \Ranine\Iteration\ExtendableIterable|iterable<int>|null &$output
    *   Collection, whose values are sorted from lowest to highest and are the
    *   values in the range, or NULL if the parsing failed.
    * @param string $divider

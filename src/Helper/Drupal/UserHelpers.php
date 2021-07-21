@@ -4,7 +4,6 @@ declare (strict_types = 1);
 
 namespace Ranine\Helper\Drupal;
 
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\user\UserStorageInterface;
 use Ranine\Helper\StringHelpers;
 use Ranine\Helper\ThrowHelpers;
