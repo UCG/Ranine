@@ -11,7 +11,7 @@ use Ranine\Helper\ThrowHelpers;
  * Iterates through an iterable object while providing useful extension methods.
  *
  * Sample use -- calculate sum of squares of first five items from array input
- * and where x < 10
+ * where each item is less than 10:
  * <code>
  * <?php
  * $input = [2, 3, 7, 77, 99, 110];
@@ -107,6 +107,8 @@ class ExtendableIterable implements \IteratorAggregate {
   /**
    * Appends a single value to the end of this collection.
    *
+   * The key is automatically generated.
+   *
    * @param mixed $value
    *   Value to append.
    *
@@ -143,6 +145,10 @@ class ExtendableIterable implements \IteratorAggregate {
 
   /**
    * Counts the elements in this iterable.
+   *
+   * NOTE: This function will advance through the source collection for this
+   * object if it isn't \Countable or an array, which could prevent foreach()
+   * from being used on the collection in the future.
    *
    * @return int
    *   Count.
@@ -223,7 +229,7 @@ class ExtendableIterable implements \IteratorAggregate {
   /**
    * Grabs the first key of this collection, if possible.
    *
-   * @return string|int
+   * @return mixed
    *   First key.
    *
    * @throws \Ranine\Exception\InvalidOperationException
@@ -255,14 +261,16 @@ class ExtendableIterable implements \IteratorAggregate {
   }
 
   /**
-   * Gets an iterator for looping through values associated with this object.
+   * Gets an iterator for looping through the keys/values of this object.
    */
   public function getIterator() : \Iterator {
     yield from $this->source;
   }
 
   /**
-   * Gets a collection consisting that can iterate the keys from this iterable.
+   * Gets a collection that can iterate the keys from this iterable.
+   *
+   * @return static
    */
   public function getKeys() : ExtendableIterable {
     return new static((function () {
@@ -354,8 +362,8 @@ class ExtendableIterable implements \IteratorAggregate {
    *   of the aggregate object will be passed to the reduction for the next key
    *   and value.
    * @param mixed $initialValue
-   *   Initial value of the aggregate object (passed to $reduction on its first
-   *   call).
+   *   Initial value of the aggregate object (passed to $reduction() on its
+   *   first call).
    *
    * @return mixed
    *   Value of the aggregate object returned from the last call to $reduction.
@@ -382,15 +390,18 @@ class ExtendableIterable implements \IteratorAggregate {
    */
   public function take(int $num) : ExtendableIterable {
     ThrowHelpers::throwIfLessThanZero($num, 'num');
+    if ($num === 0) {
+      return static::empty();
+    }
 
     return new static((function () use ($num) {
       $i = 0;
       foreach ($this->source as $key => $value) {
+        yield $key => $value;
+        $i++;
         if ($i === $num) {
           break;
         }
-        yield $key => $value;
-        $i++;
       }
     })());
   }
@@ -423,14 +434,21 @@ class ExtendableIterable implements \IteratorAggregate {
     else {
       /** int $max */
       ThrowHelpers::throwIfLessThanZero($max, 'max');
+      if ($max === 0) {
+        return static::empty();
+      }
+
       return new static((function () use ($predicate, $max) {
         $i = 0;
         foreach ($this->source as $key => $value) {
-          if (!$predicate($key, $value) || $i === $max) {
+          if (!$predicate($key, $value)) {
             break;
           }
           yield $key => $value;
           $i++;
+          if ($i === $max) {
+            break;
+          }
         }
       })());
     }
@@ -446,12 +464,12 @@ class ExtendableIterable implements \IteratorAggregate {
    *   Resulting array. The order of elements is preserved.
    */
   public function toArray(bool $preserveKeys = TRUE) : array {
-    if (is_array($this->source)) {
+    if (is_array($this->source) && $preserveKeys) {
       /** @var array */
       $source = $this->source;
       return $source;
     }
-    elseif (($this->source instanceof \ArrayObject)) {
+    elseif (($this->source instanceof \ArrayObject) && $preserveKeys) {
       /** @var \ArrayObject */
       $source = $this->source;
       return $source->getArrayCopy();
@@ -468,9 +486,9 @@ class ExtendableIterable implements \IteratorAggregate {
    * and values are given by:
    * - $keyMapBoth and $valueMapBoth (respectively), if both iterables are
    *   valid.
-   * - $keyMapFirst and $valueMapFirst (respectively), if $other has terminated,
-   *   but this iterable still has remaining items.
-   * - $keyMapFirst and $valueMapFirst (respectively), if this iterable has
+   * - $keyMapCurrent and $valueMapCurrent (respectively), if $other has
+   *   terminated, but this iterable still has remaining items.
+   * - $keyMapOther and $valueMapOther (respectively), if this iterable has
    *   terminated, but $other is still valid.
    *
    * When one iterable terminates, iteration continues through the other
@@ -558,6 +576,8 @@ class ExtendableIterable implements \IteratorAggregate {
 
   /**
    * Creates an returns a new empty extendable iterable.
+   *
+   * @return static
    */
   public static function empty() : ExtendableIterable {
     return new static([]);
@@ -568,6 +588,8 @@ class ExtendableIterable implements \IteratorAggregate {
    *
    * @param iterable $source
    *   Source object over which we are iterating.
+   *
+   * @return static
    */
   public static function from(iterable $source) : ExtendableIterable {
     return new static($source);
@@ -580,6 +602,8 @@ class ExtendableIterable implements \IteratorAggregate {
    *   Key.
    * @param mixed $value
    *   Value.
+   *
+   * @return static
    */
   public static function fromKeyAndValue($key, $value) : ExtendableIterable {
     return new static((function () use ($key, $value) {
@@ -594,6 +618,8 @@ class ExtendableIterable implements \IteratorAggregate {
    *   Inclusive start value for range.
    * @param int $end
    *   Inclusive end value for range.
+   *
+   * @return static
    */
   public static function fromRange(int $start, int $end) : ExtendableIterable {
     return new static((function () use ($start, $end) {

@@ -59,7 +59,7 @@ final class ParseHelpers {
    */
   public static function parseIntFromString(string $number) : int {
     $result = 0;
-    if (!static::tryParseInt($number, $result)) {
+    if (!static::tryParseIntFromString($number, $result)) {
       throw new ParseException('Could not parse as integer.');
     }
     return $result;
@@ -185,7 +185,6 @@ final class ParseHelpers {
    *   Thrown if $divider is empty.
    */
   public static function tryParseIntRange(string $range, ?ExtendableIterable &$output, string $divider = '-') : bool {
-    $output = NULL;
     $start = 0;
     $end = 0;
 
@@ -194,6 +193,7 @@ final class ParseHelpers {
       return TRUE;
     }
     else {
+      $output = NULL;
       return FALSE;
     }
   }

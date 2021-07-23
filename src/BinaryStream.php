@@ -19,7 +19,7 @@ class BinaryStream {
    *
    * Cannot yield an empty string.
    *
-   * @var \Iterator
+   * @var \Iterator|iterable<string>
    */
   private $input;
 
@@ -41,7 +41,7 @@ class BinaryStream {
    * Attempts to read and return the given number of bytes from the stream.
    *
    * @param int $numBytes
-   *   Number of bytes to read from the string.
+   *   Number of bytes to read from the stream.
    *
    * @throws \InvalidArgumentException
    *   Thrown if $numBytes is less than one.
@@ -208,11 +208,11 @@ class BinaryStream {
    * Reads until a position is identified at which to stop.
    *
    * Sequentially reads chunks from the stream, passing the current aggregation
-   * of these chunks to $positionIdentification. If $positionIdentification
+   * of these chunks to $positionIdentification(). If $positionIdentification()
    * returns a valid index at which to stop, reading is terminated and the
-   * entire string part up to that index is returned. If $positionIdentification
-   * always returns NULL until the end of the stream is reached, NULL is
-   * returned from this function.
+   * entire string part up to and including that index is returned. If
+   * $positionIdentification() always returns NULL until the end of the stream
+   * is reached, NULL is returned from this function.
    *
    * @param callable $positionIdentification
    *   Of the form

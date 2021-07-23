@@ -282,9 +282,9 @@ class StringPart {
    * Creates and returns a new string part.
    *
    * The string part is the substring of $backingString spanning the range of
-   * characters [$startPosition, $endPosition], unless $backingString is empty
-   * and $startPosition === $endPosition === -1, in which case the string part
-   * is empty.
+   * characters [$startPosition, $endPosition], unless
+   * $startPosition === $endPosition === -1, in which case the string part is
+   * empty.
    *
    * @param string $backingString
    *   Backing string.
@@ -312,7 +312,7 @@ class StringPart {
   /**
    * Validates the given start and end position variables.
    *
-   * Throws exception(s) on validation failure.
+   * Throws exception on validation failure.
    *
    * @param int $inclusiveStartPosition
    *   Inclusive start position, relative to the backing string.
