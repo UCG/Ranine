@@ -62,7 +62,7 @@ class StringPartTest extends TestCase {
     $firstPart = 'It occurred to him that those scarcely perceptible impulses of his to protest what people of high rank considered good,';
     $secondPart = 'vague impulses which he had always suppressed, might have been precisely what mattered,';
     $thirdPart = 'and all the rest not been the real thing.';
-    // ~L. Tolstoy, The Death of Ivan Ilych
+    // ~ L. Tolstoy, The Death of Ivan Ilych
     $part = StringPart::create($firstPart . $secondPart . $thirdPart, strlen($firstPart), strlen($firstPart) + strlen($secondPart) - 1);
     $this->assertFalse($part->equals(str_replace('a', 'b', $secondPart)));
     $this->assertTrue($part->equals($secondPart));
@@ -76,6 +76,7 @@ class StringPartTest extends TestCase {
   public function testEqualsStringPart() : void {
     $firstSentence = 'There are a dozen views about everything until you know the answer.';
     $secondSentence = 'Then there\'s never more than one.';
+    // ~ C. S. Lewis, That Hideous Strength
     $part1 = StringPart::create($firstSentence . $secondSentence, strlen($firstSentence), strlen($firstSentence) + strlen($secondSentence) - 1);
     $part2 = StringPart::create($firstSentence . $secondSentence, strlen($firstSentence) - 1, strlen($firstSentence) + strlen($secondSentence) - 2);
     $part3 = StringPart::create('a' . $secondSentence, 1, strlen($secondSentence));
