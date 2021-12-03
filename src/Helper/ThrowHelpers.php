@@ -12,6 +12,12 @@ namespace Ranine\Helper;
 final class ThrowHelpers {
 
   /**
+   * Empty private constructor to ensure no one instantiates this class.
+   */
+  private function __construct() {
+  }
+
+  /**
    * Throws an \InvalidArgumentException if $value is an empty string.
    *
    * @param string $variableName
