@@ -5,26 +5,33 @@ declare(strict_types = 1);
 namespace Ranine\Helper;
 
 /**
+ * Indicates the result of checking if a Content-Type header indicates JSON.
+ */
+enum ContentTypeJsonCheckResult {
+
+  /**
+   * Indicates a valid Content-Type header indicating JSON content.
+   */
+  case Json;
+
+  /**
+   * Indicates a malformed Content-Type header.
+   */
+  case Malformed;
+
+  /**
+   * Indicates a Content-Type header indicating non-JSON data.
+   */
+  case NonJson;
+
+}
+
+/**
  * Static helper methods to deal with HTTP stuff.
  *
  * @static
  */
 final class HttpHelpers {
-
-  /**
-   * Indicates a malformed Content-Type header.
-   */
-  public const CONTENT_TYPE_HEADER_MALFORMED = 1;
-
-  /**
-   * Indicates a Content-Type header indicating non-JSON data.
-   */
-  public const CONTENT_TYPE_HEADER_NON_JSON = 2;
-
-  /**
-   * Indicates a valid Content-Type header.
-   */
-  public const CONTENT_TYPE_HEADER_VALID = 3;
 
   /**
    * Empty private constructor to ensure no one instantiates this class.
@@ -38,24 +45,22 @@ final class HttpHelpers {
    * @param string $contentTypeHeader
    *   Content type header value to check.
    *
-   * @return int
-   *   Status code; one of static::CONTENT_TYPE_HEADER_MALFORMED,
-   *   static::CONTENT_TYPE_HEADER_NOT_JSON, or
-   *   static::CONTENT_TYPE_HEADER_VALID. The meanings of the codes should be
-   *   self-evident :)
+   * @return \Ranine\Helper\ContentTypeJsonCheckResult
+   *   Whether header indicates JSON data, is malformed, or does not indicate
+   *   JSON data.
    */
-  public static function checkJsonContentTypeHeader(string $contentTypeHeader) : int {
+  public static function checkJsonContentTypeHeader(string $contentTypeHeader) : ContentTypeJsonCheckResult {
     $contentTypeParts = explode(';', $contentTypeHeader);
     assert(is_array($contentTypeParts));
     if (empty($contentTypeParts)) {
-      return static::CONTENT_TYPE_HEADER_MALFORMED;
+      return ContentTypeJsonCheckResult::Malformed;
     }
     $numContentTypeParts = count($contentTypeParts);
     if ($numContentTypeParts > 2) {
-      return static::CONTENT_TYPE_HEADER_MALFORMED;
+      return ContentTypeJsonCheckResult::Malformed;
     }
     if (strcasecmp(trim($contentTypeParts[0]), 'application/json') !== 0) {
-      return static::CONTENT_TYPE_HEADER_NON_JSON;
+      return ContentTypeJsonCheckResult::NonJson;
     }
     if ($numContentTypeParts > 1) {
       $secondContentTypePart = trim($contentTypeParts[1]);
@@ -65,20 +70,20 @@ final class HttpHelpers {
           // In this case, this parameter should indicate a UTF-8 or US-ASCII
           // character set.
           if (count($charsetParts) !== 2) {
-            return static::CONTENT_TYPE_HEADER_MALFORMED;
+            return ContentTypeJsonCheckResult::Malformed;
           }
           if (strcasecmp(trim($charsetParts[0]), 'charset') !== 0) {
-            return static::CONTENT_TYPE_HEADER_MALFORMED;
+            return ContentTypeJsonCheckResult::Malformed;
           }
           $characterSet = trim($charsetParts[1]);
           if (strcasecmp($characterSet, 'utf-8') !== 0 && strcasecmp($characterSet, 'us-ascii') !== 0) {
-            return static::CONTENT_TYPE_HEADER_NON_JSON;
+            return ContentTypeJsonCheckResult::NonJson;
           }
         }
       }
     }
 
-    return static::CONTENT_TYPE_HEADER_VALID;
+    return ContentTypeJsonCheckResult::Json;
   }
 
   /**
@@ -88,9 +93,10 @@ final class HttpHelpers {
    *   The contents of the "Authorization" header.
    *
    * @param string $username
-   *   Non-empty username (undefined if header parsing failed).
+   *   (output parameter) Non-empty username (undefined if header parsing
+   *   failed).
    * @param string $password
-   *   Password (undefined if header parsing failed).
+   *   (output parameter) Password (undefined if header parsing failed).
    *
    * @return bool
    *   Returns TRUE if the username and password were successfully parsed;

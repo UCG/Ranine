@@ -29,7 +29,7 @@ final class CollectionHelpers {
    *   Ranges of integers, where the keys represent the inclusive start values
    *   of the ranges, and the values represent the inclusive end values.
    *
-   * @return \Ranine\Iteration\ExtendableIterable|iterable<int, int>
+   * @return iterable<int, int>
    *   A collection whose keys are the starting values in inclusive ranges of
    *   integers, and whose values are the ending values in these ranges. The
    *   array is sorted from smallest starting value to largest starting value,
@@ -38,18 +38,20 @@ final class CollectionHelpers {
    *   every range in the output array can be found in a range in $ranges.
    *
    * @throws \InvalidArgumentException
-   *   Thrown if a key or value in $ranges is non-integral.
+   *   Thrown in the returned generator if a key or value in $ranges is
+   *   non-integral.
    * @throws \InvalidArgumentException
-   *   Thrown if a key in $ranges is greater than its value.
+   *   Thrown in the returned generator if a key in $ranges is greater than its
+   *   value.
    */
-  public static function condenseAndSortRanges(array $ranges) {
+  public static function condenseAndSortRanges(array $ranges) : iterable {
     if (empty($ranges)) {
-      return ExtendableIterable::empty();
+      return [];
     }
 
     ksort($ranges, SORT_NUMERIC);
 
-    return ExtendableIterable::from((function () use ($ranges) {
+    return (function () use ($ranges) {
       $isFirstIteration = TRUE;
       $currentOutputStartValue = 0;
       $currentOutputEndValue = 0;
@@ -91,7 +93,7 @@ final class CollectionHelpers {
 
       // Yield the last interval.
       yield $currentOutputStartValue => $currentOutputEndValue;
-    })());
+    })();
   }
 
   /**
@@ -103,7 +105,7 @@ final class CollectionHelpers {
    * @param iterable<int> $integers
    *   Collection whose values are integers.
    *
-   * @return \Ranine\Iteration\ExtendableIterable|iterable<int, int>
+   * @return iterable<int, int>
    *   A collection whose keys are the starting values in inclusive ranges of
    *   integers, and whose values are the ending values in these ranges. The
    *   array is sorted from smallest starting value to largest starting value,
@@ -114,7 +116,7 @@ final class CollectionHelpers {
    * @throws \InvalidArgumentException
    *   Thrown if a value in $integers was not an integer.
    */
-  public static function getSortedRanges(iterable $integers) {
+  public static function getSortedRanges(iterable $integers) : iterable {
     /** @var array<int, null> */
     $integersAsKeys = [];
     foreach ($integers as $value) {
@@ -124,12 +126,12 @@ final class CollectionHelpers {
       $integersAsKeys[$value] = NULL;
     }
     if ($integersAsKeys === []) {
-      return ExtendableIterable::empty();
+      return [];
     }
 
     ksort($integersAsKeys, SORT_NUMERIC);
 
-    return ExtendableIterable::from((function () use ($integersAsKeys) {
+    return (function () use ($integersAsKeys) {
       $isFirstIteration = TRUE;
       $currentStartValue = 0;
       $currentEndValue = 0;
@@ -154,13 +156,13 @@ final class CollectionHelpers {
 
       // Yield the last interval.
       yield $currentStartValue => $currentEndValue;
-    })());
+    })();
   }
 
   /**
    * Removes duplicate values from $arr, assuming $arr is sorted.
    *
-   * @param array &$arr
+   * @param array $arr
    *   Array, sorted such that identical values appear next to each other.
    */
   public static function removeDuplicatesFromSortedArray(array &$arr) {

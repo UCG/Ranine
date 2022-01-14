@@ -46,22 +46,18 @@ trait StackTrait {
 
   /**
    * Returns (but does not remove) the top element of the stack.
-   *
-   * @return mixed
    */
-  private function peekInternal() {
+  private function peekInternal() : mixed {
     return end($this->arr);
   }
 
   /**
    * Returns and removes the top element of the stack.
    *
-   * @return mixed
-   *
    * @throws \Ranine\Exception\InvalidOperationException
    *   Thrown if the stack is empty.
    */
-  private function popInternal() {
+  private function popInternal() : mixed {
     if ($this->isEmpty()) {
       throw new InvalidOperationException('Cannot pop from an empty stack.');
     }
@@ -71,8 +67,6 @@ trait StackTrait {
 
   /**
    * Pushes $element onto the stack.
-   *
-   * @param mixed $element
    */
   private function pushInternal($element) : void {
     array_push($this->arr, $element);

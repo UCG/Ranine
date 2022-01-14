@@ -53,7 +53,6 @@ final class IterationHelpers {
    *   level, and the return value indicates whether iteration should be
    *   continued (TRUE to continue, FALSE to halt). If NULL is passed for this
    *   parameter, the function ($c) => TRUE is used.
-   *
    * @param mixed $initialContext
    *   The context information to be stored at the root level.
    *
@@ -62,15 +61,11 @@ final class IterationHelpers {
    *   otherwise returns TRUE.
    */
   public static function walkRecursiveIterator(\RecursiveIterator $iterator, callable $operation, ?callable $drillDown = NULL, ?callable $levelFinish = NULL, $initialContext = NULL) : bool {
-    if ($drillDown === NULL) {
-      $drillDown = function($k, $v, &$c) {
-        $c = NULL;
-        return TRUE;
-      };
-    }
-    if ($levelFinish === NULL) {
-      $levelFinish = fn() => TRUE;
-    }
+    $drillDown ??= function($k, $v, &$c) {
+      $c = NULL;
+      return TRUE;
+    };
+    $levelFinish ??= fn() => TRUE;
 
     // Prepare the iterator.
     $iterator->rewind();

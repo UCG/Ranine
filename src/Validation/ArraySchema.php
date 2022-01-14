@@ -9,7 +9,6 @@ use Ranine\Exception\InvalidOperationException;
 use Ranine\Exception\InvalidTypeArraySchemaException;
 use Ranine\Exception\MissingElementArraySchemaException;
 use Ranine\Helper\IterationHelpers;
-use RecursiveIterator;
 
 /**
  * Represents a schema (specification) for an array.
@@ -24,7 +23,7 @@ class ArraySchema {
    *
    * @var \Ranine\Validation\ArraySchemaRule[]
    */
-  private array $rules = [];
+  private readonly array $rules;
 
   /**
    * Creates a new \Ranine\Validation\ArraySchema object.
@@ -69,7 +68,7 @@ class ArraySchema {
     // very deep.
 
     // Create a recursive iterator for iterating through the validation tree.
-    $iterator = new class($this->rules) implements RecursiveIterator {
+    $iterator = new class($this->rules) implements \RecursiveIterator {
       /** @var string|int */
       private $key;
       /** @var \Ranine\Validation\ArraySchemaRule[] */
@@ -93,10 +92,7 @@ class ArraySchema {
         return $this->value;
       }
 
-      /**
-       * @return self
-       */
-      public function getChildren() {
+      public function getChildren() : self {
         if (!$this->valid()) {
           throw new InvalidOperationException();
         }
@@ -110,10 +106,7 @@ class ArraySchema {
         return ($this->value->shouldValidateChildren() && count($this->value->getChildren()) > 0) ? TRUE : FALSE;
       }
 
-      /**
-       * @return string|int
-       */
-      public function key() {
+      public function key() : string|int {
         if (!$this->valid()) {
           throw new InvalidOperationException();
         }
@@ -155,12 +148,7 @@ class ArraySchema {
         return $this->numRuleAssociatedElements;
       }
 
-      /**
-       * @param string|int $key
-       *
-       * @return self
-       */
-      public function getSubContext($key) {
+      public function getSubContext(string|int $key) : self {
         return new self($this->data[$key]);
       }
 
@@ -170,7 +158,7 @@ class ArraySchema {
 
     };
 
-    IterationHelpers::walkRecursiveIterator($iterator, function($key, ArraySchemaRule $rule, $context) : bool {
+    IterationHelpers::walkRecursiveIterator($iterator, function(string|int $key, ArraySchemaRule $rule, $context) : bool {
       /** @var array */
       $data = $context->getData();
 
@@ -198,7 +186,7 @@ class ArraySchema {
         $context->incrementNumRuleAssociatedElements();
       }
       return TRUE;
-    }, function ($key, $value, &$context) : bool {
+    }, function (string|int $key, $value, &$context) : bool {
       /** @var array */
       $data = $context->getData();
       if (array_key_exists($key, $data)) {

@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Ranine\Testing\Traits;
+namespace Ranine\Testing\Drupal\Traits;
 
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Promise\Promise;
@@ -10,7 +10,9 @@ use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Ranine\Testing\Traits\MockObjectCreationTrait;
 
 /**
  * For mocking \GuzzleHttp\ClientInterface objects.
@@ -44,22 +46,16 @@ trait MockGuzzleClientCreationTrait {
    *   result in an empty 200 response (with appropriate default headers) being
    *   returned.
    *
-   * @return \PHPUnit\Framework\MockObject\MockObject|\GuzzleHttp\ClientInterface
-   *
    * @throws \LogicException
    *   Thrown if current object is not a \PHPUnit\Framework\TestCase object.
    */
-  private function getMockGuzzleHttpClient(?callable $preProcessing = NULL, ?callable $responseProduction = NULL) {
+  private function getMockGuzzleHttpClient(?callable $preProcessing = NULL, ?callable $responseProduction = NULL) : MockObject&ClientInterface {
     if (!($this instanceof TestCase)) {
       throw new \LogicException('The object this method is called upon must be a \\PHPUnit\\Framework\\TestCase instance.');
     }
 
-    if ($preProcessing === NULL) {
-      $preProcessing = function () {};
-    }
-    if ($responseProduction === NULL) {
-      $responseProduction = fn() => new Response();
-    }
+    $preProcessing ??= function () { };
+    $responseProduction ??= fn() => new Response();
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|\GuzzleHttp\ClientInterface */
     $mockClient = $this->createMockNoAutoMethodConfig('\\GuzzleHttp\\ClientInterface');

@@ -16,12 +16,12 @@ class ArraySchemaRule {
    *
    * @var \Ranine\Validation\ArraySchemaRule[]|null
    */
-  private ?array $children;
+  private readonly ?array $children;
 
   /**
    * Whether the element corresponding to this rule is required.
    */
-  private bool $isElementRequired;
+  private readonly bool $isElementRequired;
 
   /**
    * The callable representing the actual validation.
@@ -67,6 +67,8 @@ class ArraySchemaRule {
 
   /**
    * Gets all the child validation rules.
+   *
+   * @return \Ranine\Validation\ArraySchemaRule[]
    */
   public function getChildren() : array {
     return $this->children ?? [];
@@ -88,8 +90,6 @@ class ArraySchemaRule {
 
   /**
    * Validates $element.
-   *
-   * @param mixed $element
    *
    * @throws \Ranine\Exception\InvalidArraySchemaException
    *   Thrown if validation fails.

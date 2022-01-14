@@ -62,10 +62,12 @@ class StringPart {
   /**
    * Appends $str to the end of this string part and returns this object.
    *
+   * @return $this
+   *
    * @param string $str
    *   String to append.
    */
-  public function append(string $str) : StringPart {
+  public function append(string $str) : static {
     if ($str === '') {
       return $this;
     }
@@ -93,7 +95,7 @@ class StringPart {
    * This method makes the backing string of this object into a substring of
    * itself of the smallest possible length.
    */
-  public function clean() : StringPart {
+  public function clean() : static {
     $this->backingString = (string) $this;
     if ($this->backingString !== '') {
       $this->startPositionInclusive = 0;
@@ -106,7 +108,7 @@ class StringPart {
   /**
    * Renders this string part empty and returns this object.
    */
-  public function clear() : StringPart {
+  public function clear() : static {
     $this->backingString = '';
     $this->startPositionInclusive = -1;
     $this->endPositionExclusive = 0;
@@ -224,8 +226,7 @@ class StringPart {
    *   Inclusive end position, relative to the backing string. Must be -1 if the
    *   backing string is empty.
    *
-   * @return static
-   *   Current object.
+   * @return $this
    *
    * @throws \InvalidArgumentException
    *   If $startPosition is -1, thrown if $endPosition is not -1.
@@ -238,7 +239,7 @@ class StringPart {
    *   Thrown if $endPosition is greater than or equal to the length of the
    *   backing string.
    */
-  public function recut(int $startPosition, int $endPosition) : StringPart {
+  public function recut(int $startPosition, int $endPosition) : static {
     static::validateStartAndEndPosition($startPosition, $endPosition, $this->backingString);
     $this->startPositionInclusive = $startPosition;
     $this->endPositionExclusive = $endPosition + 1;
@@ -273,7 +274,7 @@ class StringPart {
    *   Thrown if $endPosition is greater than or equal to the length of the
    *   backing string.
    */
-  public function withNewEndpoints(int $startPosition, int $endPosition) : StringPart {
+  public function withNewEndpoints(int $startPosition, int $endPosition) : static {
     static::validateStartAndEndPosition($startPosition, $endPosition, $this->backingString);
     return new static($this->backingString, $startPosition, $endPosition + 1);
   }
@@ -304,7 +305,7 @@ class StringPart {
    *   Thrown if $endPosition is greater than or equal to the length of
    *   $backingString.
    */
-  public static function create(string $backingString = '', int $startPosition = -1, int $endPosition = -1) : StringPart {
+  public static function create(string $backingString = '', int $startPosition = -1, int $endPosition = -1) : static {
     static::validateStartAndEndPosition($startPosition, $endPosition, $backingString);
     return new static($backingString, $startPosition, $endPosition + 1);
   }

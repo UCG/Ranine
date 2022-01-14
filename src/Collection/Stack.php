@@ -13,29 +13,23 @@ class Stack implements \IteratorAggregate {
 
   /**
    * Returns (but does not remove) the top element of the stack.
-   *
-   * @return mixed
    */
-  public function peek() {
+  public function peek() : mixed {
     return $this->peekInternal();
   }
 
   /**
    * Returns and removes the top element of the stack.
    *
-   * @return mixed
-   *
    * @throws \Ranine\Exception\InvalidOperationException
    *   Thrown if the stack is empty.
    */
-  public function pop() {
+  public function pop() : mixed {
     return $this->popInternal();
   }
 
   /**
    * Pushes $element onto the stack.
-   *
-   * @param mixed $element
    */
   public function push($element) : void {
     $this->pushInternal($element);

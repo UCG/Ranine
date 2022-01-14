@@ -2,11 +2,14 @@
 
 declare(strict_types = 1);
 
-namespace Ranine\Testing\Traits;
+namespace Ranine\Testing\Drupal\Traits;
 
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Ranine\Testing\Traits\MockObjectCreationTrait;
 
 /**
  * For mocking entity type manager objects.
@@ -25,7 +28,7 @@ trait MockEntityTypeManagerCreationTrait {
    * entity type manager will have only its getStorage() method properly
    * defined.
    *
-   * @param array<string, array> $entitiesAndTypes
+   * @param array[] $entitiesAndTypes
    *   This array should have the following structure. The mock entity objects
    *   should all define a working toArray() method. Type names are in round
    *   brackets (), and placeholders are in curly brackets {}:
@@ -41,12 +44,10 @@ trait MockEntityTypeManagerCreationTrait {
    *     ], {...},
    *   ]
    *
-   * @return \PHPUnit\Framework\MockObject\MockObject|\Drupal\Core\Entity\EntityTypeManagerInterface
-   *
    * @throws \LogicException
    *   Thrown if current object is not a \PHPUnit\Framework\TestCase object.
    */
-  private function getMockEntityTypeManager(array $entitiesAndTypes) {
+  private function getMockEntityTypeManager(array $entitiesAndTypes) : MockObject&EntityTypeManagerInterface {
     if (!($this instanceof TestCase)) {
       throw new \LogicException('The object this method is called upon must be a \\PHPUnit\\Framework\\TestCase instance.');
     }

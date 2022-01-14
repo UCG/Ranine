@@ -2,10 +2,12 @@
 
 declare(strict_types = 1);
 
-namespace Ranine\Testing\Traits;
+namespace Ranine\Testing\Drupal\Traits;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Ranine\Testing\Traits\MockObjectCreationTrait;
 
 /**
  * For mocking ConfigFactoryInterface objects.
@@ -29,12 +31,10 @@ trait MockConfigFactoryCreationTrait {
    * @param array $settings
    *   Settings array.
    *
-   * @return \PHPUnit\Framework\MockObject\MockObject|\Drupal\Core\Config\ConfigFactoryInterface
-   *
    * @throws \LogicException
    *   Thrown if current object is not a \PHPUnit\Framework\TestCase object.
    */
-  private function getMockConfigFactory(string $configObjectName, array $settings) : ConfigFactoryInterface {
+  private function getMockConfigFactory(string $configObjectName, array $settings) : MockObject&ConfigFactoryInterface {
     if (!($this instanceof TestCase)) {
       throw new \LogicException('The object this method is called upon must be a \\PHPUnit\\Framework\\TestCase instance.');
     }

@@ -79,7 +79,7 @@ class ExtendableIterable implements \IteratorAggregate {
    *   Appended output -- the order of elements in this iterator and $source is
    *   preserved.
    */
-  public function append(iterable $other) : ExtendableIterable {
+  public function append(iterable $other) : static {
     return new static((function () use ($other) {
       yield from $this->source;
       yield from $other;
@@ -97,7 +97,7 @@ class ExtendableIterable implements \IteratorAggregate {
    * @return static
    *   Resulting iterable.
    */
-  public function appendKeyAndValue($key, $value) : ExtendableIterable {
+  public function appendKeyAndValue($key, $value) : static {
     return new static((function () use ($key, $value) {
       yield from $this->source;
       yield $key => $value;
@@ -115,7 +115,7 @@ class ExtendableIterable implements \IteratorAggregate {
    * @return static
    *   Resulting iterable.
    */
-  public function appendValue($value) : ExtendableIterable {
+  public function appendValue($value) : static {
     return new static((function () use ($value) {
       yield from $this->source;
       yield $value;
@@ -134,7 +134,7 @@ class ExtendableIterable implements \IteratorAggregate {
    * @return static
    *   Resulting iterable.
    */
-  public function apply(callable $processing) : ExtendableIterable {
+  public function apply(callable $processing) : static {
     return new static((function () use ($processing) {
       foreach ($this->source as $key => $value) {
         $processing($key, $value);
@@ -175,7 +175,7 @@ class ExtendableIterable implements \IteratorAggregate {
    *   that were not expanded, and through the expansion of any sub-iterables,
    *   as they are encountered.
    */
-  public function expand(callable $expansion) : ExtendableIterable {
+  public function expand(callable $expansion) : static {
     return new static((function () use ($expansion) {
       foreach ($this->source as $key => $value) {
         $subElements = $expansion($key, $value);
@@ -200,7 +200,7 @@ class ExtendableIterable implements \IteratorAggregate {
    * @return static
    *   Filtered output -- the order of elements in this iterator is preserved.
    */
-  public function filter(callable $filter) : ExtendableIterable {
+  public function filter(callable $filter) : static {
     return new static((function () use ($filter) {
       foreach ($this->source as $key => $value) {
         if ($filter($key, $value)) {
@@ -219,7 +219,7 @@ class ExtendableIterable implements \IteratorAggregate {
    * @throws \Ranine\Exception\InvalidOperationException
    *   Thrown if the collection if empty.
    */
-  public function first() {
+  public function first() : mixed {
     foreach ($this->source as $value) {
       return $value;
     }
@@ -235,7 +235,7 @@ class ExtendableIterable implements \IteratorAggregate {
    * @throws \Ranine\Exception\InvalidOperationException
    *   Thrown if the collection if empty.
    */
-  public function firstKey() {
+  public function firstKey() : mixed {
     foreach ($this->source as $key => $value) {
       return $key;
     }
@@ -269,10 +269,8 @@ class ExtendableIterable implements \IteratorAggregate {
 
   /**
    * Gets a collection that can iterate the keys from this iterable.
-   *
-   * @return static
    */
-  public function getKeys() : ExtendableIterable {
+  public function getKeys() : static {
     return new static((function () {
       foreach ($this->source as $key => $value) {
         yield $key;
@@ -309,7 +307,7 @@ class ExtendableIterable implements \IteratorAggregate {
    * @return static
    *   Output iterable. The order of elements is preserved.
    */
-  public function map(?callable $valueMap, ?callable $keyMap = NULL) : ExtendableIterable {
+  public function map(?callable $valueMap, ?callable $keyMap = NULL) : static {
     if ($valueMap === NULL) {
       $valueMap = fn($k, $v) => $v;
     }
@@ -336,9 +334,9 @@ class ExtendableIterable implements \IteratorAggregate {
    *   value map ($k, $v) => $v is used.
    *
    * @return static
-   *   Output generator. The order of elements is preserved.
+   *   Output iterable. The order of elements is preserved.
    */
-  public function mapSequentialKeys(?callable $valueMap) : ExtendableIterable {
+  public function mapSequentialKeys(?callable $valueMap) : static {
     if ($valueMap === NULL) {
       $valueMap = fn($k, $v) => $v;
     }
@@ -368,7 +366,7 @@ class ExtendableIterable implements \IteratorAggregate {
    * @return mixed
    *   Value of the aggregate object returned from the last call to $reduction.
    */
-  public function reduce(callable $reduction, $initialValue) {
+  public function reduce(callable $reduction, $initialValue) : mixed {
     $aggregate = $initialValue;
     foreach ($this->source as $key => $value) {
       $aggregate = $reduction($key, $value, $aggregate);
@@ -388,7 +386,7 @@ class ExtendableIterable implements \IteratorAggregate {
    * @throws \InvalidArgumentException
    *   Thrown if $num is less than zero.
    */
-  public function take(int $num) : ExtendableIterable {
+  public function take(int $num) : static {
     ThrowHelpers::throwIfLessThanZero($num, 'num');
     if ($num === 0) {
       return static::empty();
@@ -420,7 +418,7 @@ class ExtendableIterable implements \IteratorAggregate {
    * @throws \InvalidArgumentException
    *   Thrown if $max is an integer less than zero.
    */
-  public function takeWhile(callable $predicate, ?int $max = NULL) : ExtendableIterable {
+  public function takeWhile(callable $predicate, ?int $max = NULL) : static {
     if ($max === NULL) {
       return new static((function () use ($predicate) {
         foreach ($this->source as $key => $value) {
@@ -533,7 +531,8 @@ class ExtendableIterable implements \IteratorAggregate {
     ?callable $keyMapCurrent = NULL,
     ?callable $valueMapCurrent = NULL,
     ?callable $keyMapOther = NULL,
-    ?callable $valueMapOther = NULL) : ExtendableIterable {
+    ?callable $valueMapOther = NULL,
+    ) : static {
     if ($keyMapCurrent === NULL) {
       $keyMapCurrent = fn($k) => $k;
     }
@@ -576,10 +575,8 @@ class ExtendableIterable implements \IteratorAggregate {
 
   /**
    * Creates an returns a new empty extendable iterable.
-   *
-   * @return static
    */
-  public static function empty() : ExtendableIterable {
+  public static function empty() : static {
     return new static([]);
   }
 
@@ -588,10 +585,8 @@ class ExtendableIterable implements \IteratorAggregate {
    *
    * @param iterable $source
    *   Source object over which we are iterating.
-   *
-   * @return static
    */
-  public static function from(iterable $source) : ExtendableIterable {
+  public static function from(iterable $source) : static {
     return new static($source);
   }
 
@@ -602,10 +597,8 @@ class ExtendableIterable implements \IteratorAggregate {
    *   Key.
    * @param mixed $value
    *   Value.
-   *
-   * @return static
    */
-  public static function fromKeyAndValue($key, $value) : ExtendableIterable {
+  public static function fromKeyAndValue($key, $value) : static {
     return new static((function () use ($key, $value) {
       yield $key => $value;
     })());
@@ -618,10 +611,8 @@ class ExtendableIterable implements \IteratorAggregate {
    *   Inclusive start value for range.
    * @param int $end
    *   Inclusive end value for range.
-   *
-   * @return static
    */
-  public static function fromRange(int $start, int $end) : ExtendableIterable {
+  public static function fromRange(int $start, int $end) : static {
     return new static((function () use ($start, $end) {
       for ($i = $start; $i <= $end; $i++) {
         yield $i;
@@ -634,7 +625,7 @@ class ExtendableIterable implements \IteratorAggregate {
    *
    * @throws \Ranine\Exception\InvalidOperationException
    */
-  private static function throwEmptyCollectionException() : void {
+  private static function throwEmptyCollectionException() : never {
     throw new InvalidOperationException('The collection is empty.');
   }
 

@@ -27,8 +27,6 @@ final class ParseHelpers {
    * the method used in parseIntFromString($number) is used to parse $number. If
    * it is neither, the parse operation fails.
    *
-   * @param mixed $number
-   *
    * @return int
    *   Result of parse operation.
    *
@@ -75,7 +73,7 @@ final class ParseHelpers {
    * @param string $divider
    *   The string dividing the two halves of the range.
    *
-   * @return \Ranine\Iteration\ExtendableIterable|iterable<int>
+   * @return iterable<int>
    *   Sorted collection, whose values are the values in the range.
    *
    * @throws \InvalidArgumentException
@@ -83,7 +81,7 @@ final class ParseHelpers {
    * @throws \Ranine\Exception\ParseException
    *   Thrown if the parsing failed.
    */
-  public static function parseIntRange(string $range, string $divider = '-') {
+  public static function parseIntRange(string $range, string $divider = '-') : iterable {
     $result = NULL;
     if (!static::tryParseIntRange($range, $result, $divider)) {
       throw new ParseException('Could not parse integer range.');
@@ -99,9 +97,9 @@ final class ParseHelpers {
    *   and [end] are string representations of integers which form the start and
    *   end of the range, respectively.
    * @param int &start
-   *   Start of range.
+   *   (output parameter) Start of range.
    * @param int &end
-   *   End of range.
+   *   (output parameter) End of range.
    * @param string $divider
    *   The string dividing the two halves of the range.
    *
@@ -125,9 +123,9 @@ final class ParseHelpers {
    * string, tryParseIntFromString($number, $result) is used to parse $number.
    * If it is neither, the parse operation fails.
    *
-   * @param mixed $number
    * @param int &$result
-   *   Result of parse operation (undefined if operation failed).
+   *   (output parameter) Result of parse operation (undefined if operation
+   *   failed).
    *
    * @return bool
    *   Returns TRUE if the parse succeeded; else returns FALSE.
@@ -155,7 +153,8 @@ final class ParseHelpers {
    * fails, this function returns FALSE.
    *
    * @param int &$result
-   *   Result of parse operation (undefined if operation failed).
+   *   (output parameter) Result of parse operation (undefined if operation
+   *   failed).
    *
    * @return bool
    *   Returns TRUE if parse operation succeeds; else returns FALSE.
@@ -172,9 +171,9 @@ final class ParseHelpers {
    *   Range, which should be in the form "[start]$divider[end]", where [start]
    *   and [end] are string representations of integers which form the inclusive
    *   lower and upper bounds of the range, respectively.
-   * @param \Ranine\Iteration\ExtendableIterable|iterable<int>|null &$output
-   *   Collection, whose values are sorted from lowest to highest and are the
-   *   values in the range, or NULL if the parsing failed.
+   * @param iterable<int>|null &$output
+   *   (output parameter) Collection, whose values are sorted from lowest to
+   *   highest and are the values in the range, or NULL if the parsing failed.
    * @param string $divider
    *   The string dividing the two halves of the range.
    *
@@ -184,7 +183,7 @@ final class ParseHelpers {
    * @throws \InvalidArgumentException
    *   Thrown if $divider is empty.
    */
-  public static function tryParseIntRange(string $range, ?ExtendableIterable &$output, string $divider = '-') : bool {
+  public static function tryParseIntRange(string $range, ?iterable &$output, string $divider = '-') : bool {
     $start = 0;
     $end = 0;
 
@@ -206,9 +205,9 @@ final class ParseHelpers {
    *   and [end] are string representations of integers which form the start and
    *   end of the range, respectively.
    * @param int &start
-   *   Start of range.
+   *   (output parameter) Start of range.
    * @param int &end
-   *   End of range.
+   *   (output parameter) End of range.
    * @param string $divider
    *   The string dividing the two halves of the range.
    *

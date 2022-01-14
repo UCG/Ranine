@@ -26,7 +26,7 @@ final class ExceptionHelpers {
    * @param \Exception $e
    *   Exception for which to chain messages.
    * @param string $separator
-   *   (optional) Separator to place between exception messages.
+   *   Separator to place between exception messages.
    *
    * @return string
    *   Exception messages of $e and its previous exceptions, separated by

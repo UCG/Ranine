@@ -19,9 +19,9 @@ class BinaryStream {
    *
    * Cannot yield an empty string.
    *
-   * @var \Iterator|iterable<string>
+   * @var \Iterator&iterable<string>
    */
-  private $input;
+  private \Iterator $input;
 
   /**
    * Creates a new binary stream.
