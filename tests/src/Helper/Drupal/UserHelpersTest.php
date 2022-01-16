@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Ranine\Exception\InvalidOperationException;
 use Ranine\Helper\Drupal\UserHelpers;
 use Ranine\Iteration\ExtendableIterable;
-use Ranine\Testing\Traits\MockEntityTypeManagerCreationTrait;
+use Ranine\Testing\Drupal\Traits\MockEntityTypeManagerCreationTrait;
 
 /**
  * Tests the UserHelpers class.
