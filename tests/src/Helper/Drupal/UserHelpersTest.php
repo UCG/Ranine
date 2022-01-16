@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Ranine\Tests\Helper\Drupal;
 
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Ranine\Exception\InvalidOperationException;
 use Ranine\Helper\Drupal\UserHelpers;
@@ -29,20 +30,13 @@ class UserHelpersTest extends TestCase {
   public function testGetAttributeHash() : void {
     // Create a binary representation retrieval that handles the email, user
     // status, and user timezone attributes.
-    $binaryRepresentationRetrieval = function (UserInterface $user, string $attributeType) {
-      if ($attributeType === 'email') {
-        return $user->getEmail() ?? '\0';
-      }
-      elseif ($attributeType === 'status') {
-        return $user->isActive() ? 'A' : 'B';
-      }
-      elseif ($attributeType === 'timezone') {
-        return $user->getTimeZone();
-      }
-      else {
-        throw new \InvalidArgumentException('Invalid attribute type requested.');
-      }
-    };
+    $binaryRepresentationRetrieval = fn (UserInterface $user, string $attributeType) =>
+      match ($attributeType) {
+        'email' => $user->getEmail() ?? '\0',
+        'status' => $user->isActive() ? 'A' : 'B',
+        'timezone' => $user->getTimeZone(),
+        default => throw new \InvalidArgumentException('Invalid attribute type requested.'),
+      };
 
     // Create a few mock users.
     $users = new \SplFixedArray(3);
@@ -61,7 +55,7 @@ class UserHelpersTest extends TestCase {
     // handle static caching stuff.
     $mockEntityType = $this->createMock('\\Drupal\\Core\\Entity\\EntityTypeInterface');
     $mockEntityType->method('isStaticallyCacheable')->willReturn(TRUE);
-    /** @var \PHPUnit\Framework\MockObject\MockObject|\Drupal\user\UserStorageInterface */
+    /** @var \PHPUnit\Framework\MockObject\MockObject&\Drupal\user\UserStorageInterface */
     $mockStorage = $mockEntityTypeManager->getStorage('user');
     $mockStorage->method('getEntityType')->willReturn($mockEntityType);
     $mockStorage->method('resetCache')->willReturnCallback(function () : void {});
@@ -86,7 +80,7 @@ class UserHelpersTest extends TestCase {
   }
 
   /**
-   * Creates a mock \Drupal\user\UserInterface object.
+   * Creates and returns a mock \Drupal\user\UserInterface object.
    *
    * The returned object defins the following methods:
    * - id() -- returns $uid
@@ -117,9 +111,6 @@ class UserHelpersTest extends TestCase {
    *   Preferred langcode.
    * @param string $preferredAdminLangcode
    *   Preferred admin langcode.
-   *
-   * @return \PHPUnit\Framework\MockObject\MockObject|\Drupal\user\UserInterface
-   *   Mock user.
    */
   private function getMockUser(int $uid,
     ?string $email = NULL,
@@ -128,8 +119,8 @@ class UserHelpersTest extends TestCase {
     string $uuid = '',
     string $displayName = '',
     string $preferredLangcode = '',
-    string $preferredAdminLangcode = '') {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|\Drupal\user\UserInterface */
+    string $preferredAdminLangcode = '') : MockObject&UserInterface {
+    /** @var \PHPUnit\Framework\MockObject\MockObject&\Drupal\user\UserInterface */
     $mockUser = $this->createMockNoAutoMethodConfig('\\Drupal\\user\\UserInterface');
     $mockUser->method('id')->willReturn($uid);
     $mockUser->method('getEmail')->willReturn($email);
