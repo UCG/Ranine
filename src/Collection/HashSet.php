@@ -9,6 +9,11 @@ use Ranine\Helper\IterationHelpers;
 /**
  * Represents set of objects which are stored in buckets indexed by hash code.
  *
+ * Note: Using this class to, e.g., store a set of strings, is much less
+ * efficient (by about ~5x w/ JIT enabled, by our measurements) than using a
+ * native PHP array. Hence, use of this class should be restricted to special
+ * cases.
+ *
  * @todo Test out (possibly more efficient) custom implemention using
  * \SplFixedArray.
  */

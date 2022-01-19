@@ -11,6 +11,10 @@ use Ranine\Exception\KeyExistsException;
  *
  * Hash codes based on keys are used to store the key/value pairs. No duplicate
  * keys are allowed.
+ *
+ * Note: Using this class to, e.g., store values indexed by strings, is much
+ * less efficient than using a native PHP array. Hence, use of this class should
+ * be restricted to special cases.
  */
 class HashMap implements \IteratorAggregate {
 
