@@ -62,7 +62,7 @@ class HashSetTest extends TestCase {
    *
    * @covers ::add
    * @covers ::has
-   * @dataProvider provideItemsToAdd
+   * @dataProvider provideTestAddArguments
    *
    * @param array $items
    *   Items to add.
