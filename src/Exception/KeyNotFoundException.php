@@ -7,12 +7,12 @@ namespace Ranine\Exception;
 use Ranine\Helper\StringHelpers;
 
 /**
- * Indicates that a key already exists in a collection.
+ * Indicates that a key was not found in a collection.
  */
-class KeyExistsException extends \Exception {
+class KeyNotFoundException extends \Exception {
 
   /**
-   * Creates a new KeyExistsException object.
+   * Creates a new KeyNotFoundException object.
    *
    * @param string|null $message
    *   Message pertaining to exception; can be NULL or an empty string, in which
@@ -26,7 +26,7 @@ class KeyExistsException extends \Exception {
   public function __construct(?string $message = NULL, int $code = 0, ?\Throwable $previous = NULL) {
     // Call the parent constructor with the message (either $message, or, if
     // $message is null or empty, a default message) and other parameters.
-    parent::__construct(StringHelpers::getValueOrDefault($message, 'The key already exists in the collection.'), $code, $previous);
+    parent::__construct(StringHelpers::getValueOrDefault($message, 'The key was not found in the collection.'), $code, $previous);
   }
 
 }
