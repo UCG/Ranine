@@ -12,16 +12,16 @@ use Ranine\Helper\IterationHelpers;
  * @todo Test out (possibly more efficient) custom implemention using
  * \SplFixedArray.
  */
-class HashSet {
+class HashSet implements \IteratorAggregate {
 
   /**
-   * Backing array.
+   * Buckets.
    *
    * The keys are the hash codes, and the values are the buckets.
    *
    * @var array<int, array>
    */
-  private array $back = [];
+  private array $buckets = [];
 
   /**
    * Number of items currently in this hash set.
@@ -94,15 +94,15 @@ class HashSet {
    */
   public function add($item) : bool {
     $hash = ($this->hashing)($item);
-    if (array_key_exists($hash, $this->back)) {
-      $bucket =& $this->back[$hash];
+    if (array_key_exists($hash, $this->buckets)) {
+      $bucket =& $this->buckets[$hash];
       if ($this->isItemInBucket($bucket, $item)) {
         return FALSE;
       }
       $bucket[] = $item;
     }
     else {
-      $this->back[$hash][] = $item;
+      $this->buckets[$hash][] = $item;
     }
     $this->count++;
     return TRUE;
@@ -116,6 +116,17 @@ class HashSet {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function getIterator() : \Iterator {
+    foreach ($this->buckets as $bucket) {
+      foreach ($bucket as $value) {
+        yield $value;
+      }
+    }
+  }
+
+  /**
    * Tell whether $item exists in this hash set.
    */
   public function has($item) : bool {
@@ -124,7 +135,7 @@ class HashSet {
     }
 
     $hash = ($this->hashing)($item);
-    return array_key_exists($hash, $this->back) && $this->isItemInBucket($this->back[$hash], $item);
+    return array_key_exists($hash, $this->buckets) && $this->isItemInBucket($this->buckets[$hash], $item);
   }
 
   /**
@@ -136,9 +147,9 @@ class HashSet {
    */
   public function remove($item) : bool {
     $hash = ($this->hashing)($item);
-    if (array_key_exists($hash, $this->back)) {
+    if (array_key_exists($hash, $this->buckets)) {
       // Find and remove the item from the bucket.
-      $bucket =& $this->back[$hash];
+      $bucket =& $this->buckets[$hash];
       $foundItem = FALSE;
       foreach ($bucket as $key => $value) {
         if (($this->equalityComparison)($value, $item)) {
