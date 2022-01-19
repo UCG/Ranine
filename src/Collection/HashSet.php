@@ -339,6 +339,8 @@ class HashSet implements \IteratorAggregate {
       $hash <<= 5;
       $hash ^= ord($str[$i]);
     }
+
+    return $hash;
   }
 
 }
