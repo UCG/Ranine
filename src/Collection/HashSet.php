@@ -75,14 +75,8 @@ class HashSet implements \IteratorAggregate {
    *   throw an exception if an unexpected item is passed to it.
    */
   public function __construct(?callable $equalityComparison = NULL, ?callable $hashing = NULL) {
-    if ($equalityComparison === NULL) {
-      $this->equalityComparison = static::compareEqualityStrictly(...);
-      $this->hashing = static::computeHashCode(...);
-    }
-    else {
-      $this->equalityComparison = $equalityComparison;
-      $this->hashing = $hashing;
-    }
+    $this->equalityComparison = $equalityComparison ?? static::compareEqualityStrictly(...);
+    $this->hashing = $hashing ?? static::computeHashCode(...);
   }
 
   /**
