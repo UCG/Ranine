@@ -78,10 +78,15 @@ class HashSet implements \IteratorAggregate {
    *   static::computeHashCode() default hashing is used. In order to avoid
    *   unexpected behavior, you may want to design $hashing in such a way as to
    *   throw an exception if an unexpected item is passed to it.
+   * @param iterable $initialItems
+   *   Initial items to populate hash set. Duplicate items are ignored.
    */
-  public function __construct(?callable $equalityComparison = NULL, ?callable $hashing = NULL) {
+  public function __construct(?callable $equalityComparison = NULL, ?callable $hashing = NULL, iterable $initialItems = []) {
     $this->equalityComparison = $equalityComparison ?? static::compareEqualityStrictly(...);
     $this->hashing = $hashing ?? static::computeHashCode(...);
+    foreach ($initialItems as $item) {
+      $this->add($item);
+    }
   }
 
   /**

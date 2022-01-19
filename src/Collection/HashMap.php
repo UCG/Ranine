@@ -5,6 +5,7 @@ declare (strict_types = 1);
 namespace Ranine\Collection;
 
 use Ranine\Exception\KeyExistsException;
+use Ranine\Iteration\ExtendableIterable;
 
 /**
  * Represents unordered set of key/value pairs with hashed lookup.
@@ -55,13 +56,28 @@ class HashMap implements \IteratorAggregate {
    *   HashSet::computeHashCode() default hashing is used. In order to avoid
    *   unexpected behavior, you may want to design $hashing in such a way as to
    *   throw an exception if an unexpected item is passed to it.
+   * @param iterable $initialKeys
+   *   Initial keys with which to populate hash map.
+   * @param iterable $initialValues
+   *   Initial values with which to populate hash map. The nth initial value
+   *   corresponds to the nth initial key.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown if $initialKeys and $initialValues do not have the same number of
+   *   elements.
+   * @throws \Ranine\Exception\KeyExistsException
+   *   Thrown if there are duplicate keys in $initialKeys.
    */
-  public function __construct(?callable $keyEqualityComparison = NULL, ?callable $keyHashing = NULL) {
+  public function __construct(?callable $keyEqualityComparison = NULL, ?callable $keyHashing = NULL, iterable $initialKeys = [], iterable $initialValues = []) {
     $keyEqualityComparison ??= HashSet::compareEqualityStrictly(...);
     $keyHashing ??= HashSet::computeHashCode(...);
     $this->pairs = new HashSet(
       fn(array $pair1, array $pair2) => $keyEqualityComparison($pair1[static::PAIR_KEY_INDEX], $pair2[static::PAIR_KEY_INDEX]),
       fn(array $pair) => $keyHashing($pair[static::PAIR_KEY_INDEX]));
+    ExtendableIterable::from($initialKeys)->applyWith($initialValues,
+      function ($k1, $initialKey, $k2, $initialValue) : void { $this->add($initialKey, $initialValue); },
+      fn() => throw new \InvalidArgumentException('There are more $initialKeys than $initialValues.'),
+      fn() => throw new \InvalidArgumentException('There are more $initialValues than $initialKeys.'));
   }
 
   /**

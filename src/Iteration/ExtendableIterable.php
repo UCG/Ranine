@@ -144,6 +144,52 @@ class ExtendableIterable implements \IteratorAggregate {
   }
 
   /**
+   * Applies function sequentially to elements of this and another collection.
+   *
+   * The two iterables are iterated through simultaneously, and $processingBoth
+   * is called on each iteration step when both iterables are valid.
+   * $processingCurrent is called when the current iterable (but not $other) is
+   * valid. $processingOther is called when $other is valid, but $current has no
+   * more elements. When one iterable terminates, iteration continues through
+   * the other iterable if it is still valid.
+   *
+   * @param iterable $other
+   *   Other iterable.
+   * @param callable $processingBoth
+   *   Of form ($keyFromThisObject, $valueFromThisObject, $keyFromOtherIterable,
+   *   $valueFromOtherIterable) : void. Called when both iterators are valid.
+   * @param callable $processingCurrent
+   *   Of form ($keyFromThisObject, $valueFromThisObject) : void. Called when
+   *   only this iterator is valid.
+   * @param callable $processingOther
+   *   Of form ($keyFromOtherObject, $valueFromOtherObject) : void. Called when
+   *   only other iterator is valid.
+   */
+  public function applyWith(iterable $other, callable $processingBoth, callable $processingCurrent, callable $processingOther) : void {
+    // Wrap $other in a generator in order to ensure we can iterate through it
+    // manually.
+    $otherGenerator = (function () use ($other) { yield from $other; })();
+    $otherGenerator->rewind();
+    foreach ($this->source as $key1 => $value1) {
+      if ($otherGenerator->valid()) {
+        $key2 = $otherGenerator->key();
+        $value2 = $otherGenerator->current();
+        $processingBoth($key1, $value1, $key2, $value2);
+        $otherGenerator->next();
+      }
+      else {
+        $processingCurrent($key1, $value1);
+      }
+    }
+    while ($otherGenerator->valid()) {
+      $key2 = $otherGenerator->key();
+      $value2 = $otherGenerator->current();
+      $processingOther($key2, $value2);
+      $otherGenerator->next();
+    }
+  }
+
+  /**
    * Counts the elements in this iterable.
    *
    * NOTE: This function will advance through the source collection for this
