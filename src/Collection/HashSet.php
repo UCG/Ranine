@@ -283,6 +283,9 @@ class HashSet implements \IteratorAggregate {
     elseif (is_string($item)) {
       return static::computeStringHashCode($item);
     }
+    elseif (is_array($item)) {
+      return static::computeArrayHashCode($item);
+    }
     else {
       throw new \RuntimeException('An unexpected type was encountered.');
     }

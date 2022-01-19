@@ -51,7 +51,7 @@ class HashSetTest extends TestCase {
         ['a', 'b', 'c', 'd'],
         ['a', 'b'],
         ['a', 'c'],
-      ]]
+      ]],
     ];
   }
 
