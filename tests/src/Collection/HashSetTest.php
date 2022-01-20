@@ -11,7 +11,7 @@ use Ranine\Iteration\ExtendableIterable;
 /**
  * Tests the HashSet class.
  *
- * @coversDefaultClass \Ranine\HashSet
+ * @coversDefaultClass \Ranine\Collection\HashSet
  * @group ranine
  */
 class HashSetTest extends TestCase {
