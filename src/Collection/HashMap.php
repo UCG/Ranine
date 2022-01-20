@@ -247,12 +247,14 @@ class HashMap implements \IteratorAggregate {
           return FALSE;
         }
       }
-      if (!$createIfKeyNotInMap) throw new KeyNotFoundException('The key does not exist in the hash map.');
-      $bucket[] = static::generatePair($key, $value);
     }
     else {
-      $this->buckets[$hash][] = static::generatePair($key, $value);
+      $this->buckets[$hash] = [];
+      $bucket =& $this->buckets[$hash];
     }
+
+    if (!$createIfKeyNotInMap) throw new KeyNotFoundException('The key does not exist in the hash map.');
+    $bucket[] = static::generatePair($key, $value);
     $this->count++;
     return TRUE;
   }

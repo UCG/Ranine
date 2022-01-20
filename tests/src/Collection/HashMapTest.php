@@ -71,7 +71,6 @@ class HashMapTest extends TestCase {
    */
   public function testAdd(callable $pairsGeneration) : void {
     $map = new HashMap();
-    $oneIterationCompleted = FALSE;
     foreach ($pairsGeneration() as $key => $value) {
       $map->add($key, $value);
     }
