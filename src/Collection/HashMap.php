@@ -7,7 +7,6 @@ namespace Ranine\Collection;
 use Ranine\Exception\KeyExistsException;
 use Ranine\Exception\KeyNotFoundException;
 use Ranine\Helper\HashCodeHelpers;
-use Ranine\Iteration\ExtendableIterable;
 
 /**
  * Represents unordered set of key/value pairs with hashed lookup.
@@ -96,22 +95,17 @@ class HashMap implements \IteratorAggregate {
    * @param iterable $initialKeys
    *   Initial keys with which to populate hash map.
    * @param iterable $initialValues
-   *   Initial values with which to populate hash map. The nth initial value
-   *   must correspond to the nth initial key.
+   *   Initial key/value pairs with which to populate hash map.
    *
-   * @throws \InvalidArgumentException
-   *   Thrown if $initialKeys and $initialValues do not have the same number of
-   *   elements.
    * @throws \Ranine\Exception\KeyExistsException
    *   Thrown if there are duplicate keys in $initialKeys.
    */
-  public function __construct(?callable $keyEqualityComparison = NULL, ?callable $keyHashing = NULL, iterable $initialKeys = [], iterable $initialValues = []) {
+  public function __construct(?callable $keyEqualityComparison = NULL, ?callable $keyHashing = NULL, iterable $initialPairs = []) {
     $this->keyEqualityComparison = $keyEqualityComparison ?? HashCodeHelpers::compareEqualityStrictly(...);
     $this->keyHashing = $keyHashing ?? HashCodeHelpers::computeHashCode(...);
-    ExtendableIterable::from($initialKeys)->applyWith($initialValues,
-      function ($k1, $initialKey, $k2, $initialValue) : void { $this->add($initialKey, $initialValue); },
-      fn() => throw new \InvalidArgumentException('There are more $initialKeys than $initialValues.'),
-      fn() => throw new \InvalidArgumentException('There are more $initialValues than $initialKeys.'));
+    foreach ($initialPairs as $key => $value) {
+      $this->add($key, $value);
+    }
   }
 
   /**

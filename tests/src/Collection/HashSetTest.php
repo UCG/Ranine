@@ -67,7 +67,7 @@ class HashSetTest extends TestCase {
    * @param array $items
    *   Items to add.
    */
-  public function testAdd($items) : void {
+  public function testAdd(array $items) : void {
     $set = new HashSet();
     $oneIterationCompleted = FALSE;
     foreach ($items as $item) {
