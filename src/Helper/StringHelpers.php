@@ -98,6 +98,32 @@ final class StringHelpers {
   }
 
   /**
+   * Gets the part of $source after the last occurrence of $separator.
+   *
+   * @param string $source
+   *   Source string.
+   * @param string $separator
+   *   Separator after which we wish to retrieve a substring of $source.
+   *
+   * @return string
+   *   The part of $source strictly after the last occurrence of $separator in
+   *   $source, if $separator is found in $source, or $source otherwise.
+   *
+   * @throws \InvalidArgumentException
+   *   Thrown if $separator is not of length one.
+   */
+  public static function getAfter(string $source, string $separator) : string {
+    if (strlen($separator) !== 1) throw new \InvalidArgumentException('$separator must be of unit length.');
+
+    $endIndex = strlen($source) - 1;
+    if ($source[$endIndex] === $separator) return '';
+    for ($i = ($endIndex - 1); $i >= 0; $i--) {
+      if ($source[$i] === $separator) return substr($source, $i + 1);
+    }
+    return $source;
+  }
+
+  /**
    * Gets $str, or returns $defaultMessage if $str is NULL or empty.
    */
   public static function getValueOrDefault(?string $str, ?string $defaultMessage) : ?string {
