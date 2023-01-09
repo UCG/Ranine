@@ -8,6 +8,9 @@ use Ranine\Exception\InvalidOperationException;
 
 /**
  * Represents a stack (FILO collection).
+ *
+ * @template T
+ * @implements \IteratorAggregate<T>
  */
 class Stack implements \IteratorAggregate {
 
@@ -16,11 +19,15 @@ class Stack implements \IteratorAggregate {
    *
    * Could also be implemented with a linked list, which might be useful for
    * large stacks.
+   *
+   * @var T[]
    */
   private array $arr = [];
 
   /**
    * Returns (but does not remove) the top element of the stack.
+   *
+   * @return T
    */
   public function peek() : mixed {
     return end($this->arr);
@@ -28,6 +35,8 @@ class Stack implements \IteratorAggregate {
 
   /**
    * Returns and removes the top element of the stack.
+   *
+   * @return T
    *
    * @throws \Ranine\Exception\InvalidOperationException
    *   Thrown if the stack is empty.
@@ -42,6 +51,8 @@ class Stack implements \IteratorAggregate {
 
   /**
    * Pushes $element onto the stack.
+   *
+   * @param T $element
    */
   public function push($element) : void {
     array_push($this->arr, $element);
@@ -52,7 +63,7 @@ class Stack implements \IteratorAggregate {
    *
    * Iteration proceeds from the first element pushed to the last.
    *
-   * @return \Traversable
+   * @return \Traversable<T>
    *   Iterator.
    */
   public function getIterator() : \Traversable {
