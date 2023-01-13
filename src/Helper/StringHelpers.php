@@ -55,7 +55,7 @@ final class StringHelpers {
       if (!$isFirstIteration) {
         $output .= $separator;
       }
-      $output .= static::escape($item, [$separator], "\e");
+      $output .= self::escape($item, [$separator], "\e");
       $isFirstIteration = FALSE;
     }
 
@@ -77,7 +77,7 @@ final class StringHelpers {
    *   Thrown if $escapeCharacter is not of unit length, or if an element in
    *   $otherSpecialCharacters is not a string of length one.
    */
-  public static function escape(string $str, array $otherSpecialCharacters, string $escapeCharacter = "\e") {
+  public static function escape(string $str, array $otherSpecialCharacters, string $escapeCharacter = "\e") : string {
     if (strlen($escapeCharacter) !== 1) {
       throw new \InvalidArgumentException('$escapeCharacter is not of unit length.');
     }
@@ -126,8 +126,8 @@ final class StringHelpers {
   /**
    * Gets $str, or returns $defaultMessage if $str is NULL or empty.
    */
-  public static function getValueOrDefault(?string $str, ?string $defaultMessage) : ?string {
-    return static::isNullOrEmpty($str) ? $defaultMessage : $str;
+  public static function getValueOrDefault(?string $str, string $defaultMessage) : string {
+    return self::isNullOrEmpty($str) ? $defaultMessage : $str;
   }
 
   /**
@@ -142,6 +142,10 @@ final class StringHelpers {
 
   /**
    * Tells whether $value is a non-empty string.
+   *
+   * @param mixed $value
+   *
+   * @phpstan-assert-if-true non-empty-string $value
    */
   public static function isNonEmptyString($value) : bool {
     return (is_string($value) && $value !== '') ? TRUE : FALSE;
@@ -149,6 +153,8 @@ final class StringHelpers {
 
   /**
    * Tells whether $str is either NULL or an empty string.
+   *
+   * @phpstan-assert-if-false non-empty-string $str
    */
   public static function isNullOrEmpty(?string $str) : bool {
     return ($str === NULL || $str === '') ? TRUE : FALSE;

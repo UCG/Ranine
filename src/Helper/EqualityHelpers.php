@@ -98,6 +98,7 @@ final class EqualityHelpers {
         }
       }
       if ($foundValue) {
+        assert(isset($key2));
         $usedKeys[$key2] = NULL;
       }
       else {

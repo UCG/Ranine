@@ -36,16 +36,16 @@ final class DatabaseHelpers {
    * the caller can force re-execution (if the maximum repeat count hasn't been
    * reached) manually by returning FALSE from $transactionExecution().
    *
-   * @param callable $transactionExecution
-   *   Function executing transaction statements, of form () : bool. Should
-   *   return TRUE if transaction was executed successfully, and FALSE if
-   *   transaction failed (for a non-deadlock, non-lock timeout reason) and
-   *   should be re-tried if possible. Otherwise, this function should throw an
-   *   exception.
+   * @param callable() : bool $transactionExecution
+   *   Function executing transaction statements. Should return TRUE if
+   *   transaction was executed successfully, and FALSE if transaction failed
+   *   (for a non-deadlock, non-lock timeout reason) and should be re-tried if 
+   *   possible. Otherwise, this function should throw an exception.
    * @param \Drupal\Core\Database\Connection $databaseConnection
    *   Database connection with which to execute the transaction.
    * @param int $numberOfRetryAttempts
    *   Maximum number of times to retry the transaction.
+   * @phpstan-param int<0, max> $numberOfRetryAttempts
    *
    * @return bool
    *   Returns TRUE if the transaction was completed successfully; returns FALSE
@@ -77,6 +77,7 @@ final class DatabaseHelpers {
         }
         else {
           // Transaction execution failed. Rollback.
+          /** @phpstan-ignore-next-line */
           if (isset($transaction)) {
             $transaction->rollBack();
           }
@@ -86,6 +87,7 @@ final class DatabaseHelpers {
         // Rollback transaction (should happen automatically for a detected
         // deadlock error code, but we do it here no matter what just to be
         // safe).
+        /** @phpstan-ignore-next-line */
         if (isset($transaction)) {
           $transaction->rollBack();
         }
@@ -94,8 +96,8 @@ final class DatabaseHelpers {
         // deadlock state, or a lock acquire timeout, let the transaction be
         // retried, as both those codes could be caused by deadlocks. Otherwise,
         // rethrow the exception.
-        $mysqlErrorCode = static::getMySqlErrorCode($e);
-        if ($mysqlErrorCode === static::MYSQL_ERROR_CODE_DEADLOCK_DETECTED || $mysqlErrorCode === static::MYSQL_ERROR_LOCK_TIMEOUT) {
+        $mysqlErrorCode = self::getMySqlErrorCode($e);
+        if ($mysqlErrorCode === self::MYSQL_ERROR_CODE_DEADLOCK_DETECTED || $mysqlErrorCode === self::MYSQL_ERROR_LOCK_TIMEOUT) {
           $wasLockError = TRUE;
         }
         else {
@@ -104,6 +106,7 @@ final class DatabaseHelpers {
       }
       catch (\Throwable $e) {
         // Rollback and rethrow.
+        /** @phpstan-ignore-next-line */
         if (isset($transaction)) {
           $transaction->rollBack();
         }
@@ -124,13 +127,13 @@ final class DatabaseHelpers {
   }
 
   /**
-   * Gets the MySQL error code from the given exception.
+   * Gets MySQL error code from the given exception, or NULL if code not found.
    */
-  public static function getMySqlErrorCode(DatabaseExceptionWrapper $exception) : string {
+  public static function getMySqlErrorCode(DatabaseExceptionWrapper $exception) : ?string {
     // Grab the inner PDO exception.
     $pdoException = $exception->getPrevious();
     assert(isset($pdoException) && is_object($pdoException) && $pdoException instanceof \PDOException);
-    return (string) $pdoException->errorInfo[1];
+    return $pdoException->errorInfo ? (string) $pdoException->errorInfo[1] : NULL;
   }
 
 }

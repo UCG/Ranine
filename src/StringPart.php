@@ -37,6 +37,8 @@ class StringPart {
    *   Start position (inclusive). Should be -1 to specify an empty string.
    * @param int $endPositionExclusive
    *   End position (exclusive). Should be 0 to specify an empty string.
+   * @phpstan-param int<-1, max> $startPositionInclusive
+   * @phpstan-param int<0, max> $endPositionExclusive
    */
   protected function __construct(string $backingString = '', int $startPositionInclusive = -1, int $endPositionExclusive = 0) {
     $this->backingString = $backingString;
@@ -66,6 +68,8 @@ class StringPart {
    *
    * @param string $str
    *   String to append.
+   *
+   * @phpstan-impure
    */
   public function append(string $str) : static {
     if ($str === '') {
@@ -94,6 +98,8 @@ class StringPart {
    *
    * This method makes the backing string of this object into a substring of
    * itself of the smallest possible length.
+   *
+   * @phpstan-impure
    */
   public function clean() : static {
     $this->backingString = (string) $this;
@@ -107,6 +113,8 @@ class StringPart {
 
   /**
    * Renders this string part empty and returns this object.
+   *
+   * @phpstan-impure
    */
   public function clear() : static {
     $this->backingString = '';
@@ -122,7 +130,7 @@ class StringPart {
    * Equality is determined by comparing the part of the backing string
    * corresponding to this string part with $other.
    *
-   * @param string $str
+   * @param string $other
    *   Other string.
    */
   public function equals(string $other) : bool {
@@ -142,7 +150,7 @@ class StringPart {
    * corresponding to this string part with the part of $other's backing string
    * corresponding to it.
    *
-   * @param StringPart $other
+   * @param \Ranine\StringPart $other
    *   Other string.
    */
   public function equalsStringPart(StringPart $other) : bool {
@@ -154,10 +162,10 @@ class StringPart {
       return FALSE;
     }
     elseif ($this->startPositionInclusive === 0) {
-      return substr_compare($other->backingString, $this->backingString, $other->startPositionInclusive, $length);
+      return substr_compare($other->backingString, $this->backingString, $other->startPositionInclusive, $length) === 0;
     }
     elseif ($other->startPositionInclusive === 0) {
-      return substr_compare($this->backingString, $other->backingString, $this->startPositionInclusive, $length);
+      return substr_compare($this->backingString, $other->backingString, $this->startPositionInclusive, $length) === 0;
     }
     else {
       for ($i = $this->startPositionInclusive, $j = $other->startPositionInclusive;
@@ -238,6 +246,8 @@ class StringPart {
    * @throws \InvalidArgumentException
    *   Thrown if $endPosition is greater than or equal to the length of the
    *   backing string.
+   *
+   * @phpstan-impure
    */
   public function recut(int $startPosition, int $endPosition) : static {
     static::validateStartAndEndPosition($startPosition, $endPosition, $this->backingString);
@@ -260,7 +270,7 @@ class StringPart {
    *   Inclusive end position of new string part, relative to the backing
    *   string. Must be -1 if the backing string is empty.
    *
-   * @return static
+   * @return self
    *   The resulting new string part (the current object is not modified).
    *
    * @throws \InvalidArgumentException
@@ -274,9 +284,9 @@ class StringPart {
    *   Thrown if $endPosition is greater than or equal to the length of the
    *   backing string.
    */
-  public function withNewEndpoints(int $startPosition, int $endPosition) : static {
+  public function withNewEndpoints(int $startPosition, int $endPosition) : self {
     static::validateStartAndEndPosition($startPosition, $endPosition, $this->backingString);
-    return new static($this->backingString, $startPosition, $endPosition + 1);
+    return new self($this->backingString, $startPosition, $endPosition + 1);
   }
 
   /**
@@ -293,6 +303,8 @@ class StringPart {
    *   Start position (inclusive). Should be -1 to specify an empty string.
    * @param int $endPosition
    *   End position (inclusive). Should be -1 to specify an empty string.
+   * @phpstan-param int<-1, max> $startPosition
+   * @phpstan-param int<-1, max> $endPosition
    *
    * @throws \InvalidArgumentException
    *   If $startPosition is -1, thrown if $endPosition is not -1.
@@ -305,9 +317,9 @@ class StringPart {
    *   Thrown if $endPosition is greater than or equal to the length of
    *   $backingString.
    */
-  public static function create(string $backingString = '', int $startPosition = -1, int $endPosition = -1) : static {
+  public static function create(string $backingString = '', int $startPosition = -1, int $endPosition = -1) : self {
     static::validateStartAndEndPosition($startPosition, $endPosition, $backingString);
-    return new static($backingString, $startPosition, $endPosition + 1);
+    return new self($backingString, $startPosition, $endPosition + 1);
   }
 
   /**
@@ -315,9 +327,9 @@ class StringPart {
    *
    * Throws exception on validation failure.
    *
-   * @param int $inclusiveStartPosition
+   * @param int $startPosition
    *   Inclusive start position, relative to the backing string.
-   * @param int $inclusiveEndPosition
+   * @param int $endPosition
    *   Inclusive end position, relative to the backing string.
    * @param string $backingString
    *   Backing string.
@@ -332,6 +344,9 @@ class StringPart {
    * @throws \InvalidArgumentException
    *   Thrown if $endPosition is greater than or equal to the length of
    *   $backingString.
+   *
+   * @phpstan-assert int<-1, max> $startPosition
+   * @phpstan-assert int<-1, max> $endPosition
    */
   protected static function validateStartAndEndPosition(int $startPosition, int $endPosition, string $backingString) : void {
     if ($startPosition === -1) {

@@ -20,9 +20,9 @@ final class HashCodeHelpers {
   /**
    * Returns $item1 === $item2.
    *
-   * This equality comparison is consistent with static::computeHashCode().
+   * This equality comparison is consistent with self::computeHashCode().
    */
-  public static function compareEqualityStrictly($item1, $item2) : bool {
+  public static function compareEqualityStrictly(mixed $item1, mixed $item2) : bool {
     return ($item1 === $item2) ? TRUE : FALSE;
   }
 
@@ -34,10 +34,14 @@ final class HashCodeHelpers {
    * and non-array values (separator hashes between keys and values, array
    * items, and array depths are also "XORed into" the hash).
    *
-   * This function is compatible with static::compareEqualityStrictly().
+   * This function is compatible with self::compareEqualityStrictly().
    */
   public static function computeArrayHashCode(array $arr) : int {
-    $iterator = new class($arr) extends \RecursiveArrayIterator {
+    $iterator = new
+    /**
+     * @extends \RecursiveArrayIterator<string|int, mixed>
+     */
+    class($arr) extends \RecursiveArrayIterator {
       public function hasChildren() : bool {
         // Only try to recurse into arrays (otherwise will try to recurse into
         // anything -- array objects, etc.).
@@ -52,18 +56,19 @@ final class HashCodeHelpers {
     $itemSeparator = (~-23) >> 5;
     $levelSeparator = 2243 << 5;
     IterationHelpers::walkRecursiveIterator($iterator,
-      function (string|int $key, $value) use (&$hash, $keyValueSeparator, $itemSeparator) : bool {
+      function (string|int $key, $value, $c) use (&$hash, $keyValueSeparator, $itemSeparator) : bool {
         if (is_string($key)) {
-          $keyHash = static::computeStringHashCode($key);
+          $keyHash = self::computeStringHashCode($key);
         }
         elseif (is_int($key)) {
-          $keyHash = static::computeIntegerHashCode($key);
+          $keyHash = self::computeIntegerHashCode($key);
         }
+        assert(isset($keyHash));
         $hash ^= $keyHash ^ $keyValueSeparator;
         // If $value is an array, the value hash will be computed as we iterate
         // over the children.
         if (!is_array($value)) {
-          $valueHash = static::computeHashCode($value);
+          $valueHash = self::computeHashCode($value);
           $hash ^= $keyHash ^ $keyValueSeparator ^ $valueHash ^ $itemSeparator;
         }
         return TRUE;
@@ -81,7 +86,7 @@ final class HashCodeHelpers {
   /**
    * Gets a hash code for boolean $value.
    *
-   * This function is compatible with static::compareEqualityStrictly().
+   * This function is compatible with self::compareEqualityStrictly().
    */
   public static function computeBooleanHashCode(bool $value) : int {
     return $value ? 1 : 0;
@@ -90,48 +95,48 @@ final class HashCodeHelpers {
   /**
    * Gets a hash code for float $value.
    *
-   * This function is compatible with static::compareEqualityStrictly().
+   * This function is compatible with self::compareEqualityStrictly().
    */
   public static function computeFloatHashCode(float $value) : int {
     // Use a bitwise representation of $value.
-    return static::computeStringHashCode(pack('d', $value));
+    return self::computeStringHashCode(pack('d', $value));
   }
 
   /**
    * Gets a hash code for $item.
    *
-   * The static::compute*HashCode() function corresponding to the type of $item
+   * The self::compute*HashCode() function corresponding to the type of $item
    * is used. There is a significant possibility of hash collisions between
    * items of different types if this function is used; hence, it may not be the
    * best choice if you are expecting a lot of type variation within your hash
    * set.
    *
-   * This function is compatible with static::compareEqualityStrictly().
+   * This function is compatible with self::compareEqualityStrictly().
    */
-  public static function computeHashCode($item) : int {
+  public static function computeHashCode(mixed $item) : int {
     if (is_object($item)) {
-      return static::computeObjectHashCode($item);
+      return self::computeObjectHashCode($item);
     }
     elseif (is_resource($item)) {
-      return static::computeResourceHashCode($item);
+      return self::computeResourceHashCode($item);
     }
     elseif (is_float($item)) {
-      return static::computeFloatHashCode($item);
+      return self::computeFloatHashCode($item);
     }
     elseif (is_null($item)) {
-      return static::computeNullHashCode();
+      return self::computeNullHashCode();
     }
     elseif (is_bool($item)) {
-      return static::computeBooleanHashCode($item);
+      return self::computeBooleanHashCode($item);
     }
     elseif (is_int($item)) {
-      return static::computeIntegerHashCode($item);
+      return self::computeIntegerHashCode($item);
     }
     elseif (is_string($item)) {
-      return static::computeStringHashCode($item);
+      return self::computeStringHashCode($item);
     }
     elseif (is_array($item)) {
-      return static::computeArrayHashCode($item);
+      return self::computeArrayHashCode($item);
     }
     else {
       throw new \RuntimeException('An unexpected type was encountered.');
@@ -155,7 +160,7 @@ final class HashCodeHelpers {
   /**
    * Gets a hash code for object $obj.
    *
-   * This function is compatible with static::compareEqualityStrictly().
+   * This function is compatible with self::compareEqualityStrictly().
    */
   public static function computeObjectHashCode(object $obj) : int {
     return spl_object_id($obj);
@@ -164,10 +169,10 @@ final class HashCodeHelpers {
   /**
    * Gets a hash code for resource $resource.
    *
-   * @var resource $resource
+   * @param resource $resource
    *   Resource. If this is not a resource, a fatal error will occur.
    *
-   * This function is compatible with static::compareEqualityStrictly().
+   * This function is compatible with self::compareEqualityStrictly().
    */
   public static function computeResourceHashCode($resource) : int {
     return get_resource_id($resource);
@@ -176,7 +181,7 @@ final class HashCodeHelpers {
   /**
    * Gets a hash code for string $str.
    *
-   * This function is compatible with static::compareEqualityStrictly().
+   * This function is compatible with self::compareEqualityStrictly().
    */
   public static function computeStringHashCode(string $str) : int {
     // See, e.g., https://stackoverflow.com/a/7666668.

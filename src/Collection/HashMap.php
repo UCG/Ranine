@@ -17,6 +17,10 @@ use Ranine\Helper\HashCodeHelpers;
  * Note: Using this class to, e.g., store values indexed by strings, is much
  * less efficient than using a native PHP array. Hence, use of this class should
  * be restricted to special cases.
+ *
+ * @template TKey
+ * @template TValue
+ * @implements \IteratorAggregate<TKey, TValue>
  */
 class HashMap implements \IteratorAggregate {
 
@@ -34,29 +38,32 @@ class HashMap implements \IteratorAggregate {
    * Buckets. The keys are hash codes, and the values are the buckets.
    *
    * Each bucket is an array of key/value pairs, each having the form
-   * [static::PAIR_KEY_INDEX => $key, static::PAIR_VALUE_INDEX => $value].
+   * [self::PAIR_KEY_INDEX => $key, self::PAIR_VALUE_INDEX => $value].
    *
-   * @var array<int, array<int, mixed>[]>
+   * @var array<int, array<int, TKey|TValue>[]>
+   * @phpstan-var array<int, array{0: TKey, 1: TValue}[]>
    */
   private array $buckets = [];
 
   /**
    * Number of key/value pairs currently in this hash map.
+   *
+   * @phpstan-var int<0, max>
    */
   private int $count = 0;
 
   /**
-   * Key equality comparison, of form ($key1, $key2) : bool.
+   * Key equality comparison.
    *
    * Returns TRUE if $key1 and $key2 are to be considered equal within this
    * hash map; else returns FALSE.
    *
-   * @var callable
+   * @var callable(TKey $key1, TKey $key2) : bool
    */
   private $keyEqualityComparison;
 
   /**
-   * Key hash code function, of form ($key) : int.
+   * Key hash code function.
    *
    * Returns the hash code of $key, which must satisfy the property that
    * $hashing($key1) === $hashing($key2) if $key1 and $key2 are considered equal
@@ -64,38 +71,34 @@ class HashMap implements \IteratorAggregate {
    * such that the hash codes of a set of typical objects are spread fairly
    * evenly and randomly throughout the bit space of integers.
    *
-   * @var callable
+   * @var callable(TKey $key) : int
    */
   private $keyHashing;
 
   /**
    * Creates a new hash map.
    *
-   * @param callable|null $keyEqualityComparison
-   *   If not NULL, this is the key equality comparison, of the form
-   *   ($key1, $key2) : bool. Should return TRUE if $key1 and $key2 are to be
-   *   considered equal within this hash set; else should return FALSE. If NULL
-   *   If NULL is passed, the
+   * @param ?callable(TKey $key1, TKey $key2) : bool $keyEqualityComparison
+   *   If not NULL, this is the key equality comparison. Should return TRUE if
+   *   $key1 and $key2 are to be considered equal within this hash set; else
+   *   should return FALSE. If NULL is passed, the
    *   \Ranine\Helper\HashCodeHelpers::compareEqualityStrictly() default
    *   comparison is used. In order to avoid unexpected behavior, you may want
    *   to design $keyEqualityComparison in such a way as to throw an exception
    *   if an unexpected item is passed to it.
-   * @param callable|null $keyHashing
-   *   If not NULL, this is the hash code generation function, of form
-   *   ($key) : int. Should return the hash code of $item, which must satisfy
-   *   the property that $hashing($key1) === $hashing($key2) if $key1 and
-   *   $key2 are considered equal within this hash set. For good performance,
-   *   the hashing function should be such that the hash codes of a set of
-   *   typical objects are spread fairly evenly and randomly throughout the bit
-   *   space of integers. If NULL is passed, the
-   *   \Ranine\Helper\HashCodeHelpers::computeHashCode() default hashing is
-   *   used. In order to avoid unexpected behavior, you may want to design
-   *   $keyHashing in such a way as to throw an exception if an unexpected item
-   *   is passed to it.
-   * @param iterable $initialKeys
-   *   Initial keys with which to populate hash map.
-   * @param iterable $initialValues
-   *   Initial key/value pairs with which to populate hash map.
+   * @param ?callable(TKey $key) : int $keyHashing
+   *   If not NULL, this is the hash code generation function. Should return the
+   *   hash code of $item, which must satisfy the property that
+   *   $hashing($key1) === $hashing($key2) if $key1 and $key2 are considered
+   *   equal within this hash set. For good performance, the hashing function
+   *   should be such that the hash codes of a set of typical objects are spread
+   *   fairly evenly and randomly throughout the bit space of integers. If NULL
+   *   is passed, the \Ranine\Helper\HashCodeHelpers::computeHashCode() default
+   *   hashing is used. In order to avoid unexpected behavior, you may want to
+   *   design $keyHashing in such a way as to throw an exception if an
+   *   unexpected item is passed to it.
+   * @param iterable<TKey, TValue> $initialPairs
+   *   Initial keys and corresponding values with which to populate hash map.
    *
    * @throws \Ranine\Exception\KeyExistsException
    *   Thrown if there are duplicate keys in $initialKeys.
@@ -111,9 +114,9 @@ class HashMap implements \IteratorAggregate {
   /**
    * Adds a key/value pair to the map.
    *
-   * @param mixed $key
+   * @param TKey $key
    *   Key to add.
-   * @param mixed $value
+   * @param TValue $value
    *   Corresponding value to add.
    *
    * @throws \Ranine\Exception\KeyExistsException
@@ -126,16 +129,20 @@ class HashMap implements \IteratorAggregate {
       if ($this->isKeyInBucket($bucket, $key)) {
         throw new KeyExistsException('The key already exists in the hash table.');
       }
-      $bucket[] = static::generatePair($key, $value);
+      $bucket[] = self::generatePair($key, $value);
     }
     else {
-      $this->buckets[$hash][] = static::generatePair($key, $value);
+      $this->buckets[$hash][] = self::generatePair($key, $value);
     }
     $this->count++;
   }
 
   /**
    * Gets the value associated with the given $key.
+   *
+   * @param TKey $key
+   *
+   * @return TValue
    *
    * @throws \Ranine\Exception\KeyNotFoundException
    *   Thrown if $key was not found in the collection.
@@ -144,9 +151,9 @@ class HashMap implements \IteratorAggregate {
     $hash = ($this->keyHashing)($key);
     if (array_key_exists($hash, $this->buckets)) {
       foreach ($this->buckets[$hash] as $pair) {
-        $bucketItemKey = $pair[static::PAIR_KEY_INDEX];
+        $bucketItemKey = $pair[self::PAIR_KEY_INDEX];
         if (($this->keyEqualityComparison)($key, $bucketItemKey)) {
-          return $pair[static::PAIR_VALUE_INDEX];
+          return $pair[self::PAIR_VALUE_INDEX];
         }
       }
     }
@@ -156,6 +163,8 @@ class HashMap implements \IteratorAggregate {
 
   /**
    * Gets the number of key/value pairs in the collection.
+   *
+   * @phpstan-return int<0, max>
    */
   public function getCount() : int {
     return $this->count;
@@ -164,16 +173,18 @@ class HashMap implements \IteratorAggregate {
   /**
    * {@inheritdoc}
    */
-  public function getIterator(): \Iterator {
+  public function getIterator() : \Iterator {
     foreach ($this->buckets as $bucket) {
       foreach ($bucket as $pair) {
-        yield $pair[static::PAIR_KEY_INDEX] => $pair[static::PAIR_VALUE_INDEX];
+        yield $pair[self::PAIR_KEY_INDEX] => $pair[self::PAIR_VALUE_INDEX];
       }
     }
   }
 
   /**
    * Tells whether key $key exists in the collection.
+   *
+   * @param TKey $key
    */
   public function hasKey($key) : bool {
     if ($this->count === 0) {
@@ -187,12 +198,14 @@ class HashMap implements \IteratorAggregate {
   /**
    * Removes the key/value pair corresponding to the given key.
    *
-   * @param mixed $key
+   * @param TKey $key
    *   Key whose pair should be removed.
    *
    * @return bool
    *   TRUE if the key/value pair was found and successfully removed; FALSE if
    *   the key did not exist in the collection.
+   *
+   * @phpstan-impure
    */
   public function remove($key) : bool {
     $hash = ($this->keyHashing)($key);
@@ -201,13 +214,15 @@ class HashMap implements \IteratorAggregate {
       $bucket =& $this->buckets[$hash];
       $foundItem = FALSE;
       foreach ($bucket as $bucketKey => $pair) {
-        if (($this->keyEqualityComparison)($key, $pair[static::PAIR_KEY_INDEX])) {
+        if (($this->keyEqualityComparison)($key, $pair[self::PAIR_KEY_INDEX])) {
           $foundItem = TRUE;
           break;
         }
       }
       if ($foundItem) {
+        assert($this->count > 0);
         $this->count--;
+        assert(isset($bucketKey));
         unset($bucket[$bucketKey]);
         if (count($bucket) === 0) {
           unset($this->buckets[$hash]);
@@ -221,9 +236,9 @@ class HashMap implements \IteratorAggregate {
   /**
    * Sets the given key to the given value.
    *
-   * @param mixed $key
+   * @param TKey $key
    *   Key.
-   * @param mixed $value
+   * @param TValue $value
    *   Value.
    * @param bool $createIfKeyNotInMap
    *   TRUE to create a new key/value pair if the key does not exist in the map;
@@ -235,15 +250,17 @@ class HashMap implements \IteratorAggregate {
    * @throws \Ranine\Exception\KeyNotFoundException
    *   Thrown if $key does not exist in this hash map, and $createIfKeyNotInMap
    *   is FALSE.
+   *
+   * @phpstan-impure
    */
   public function set($key, $value, bool $createIfKeyNotInMap = FALSE) : bool {
     $hash = ($this->keyHashing)($key);
     if (array_key_exists($hash, $this->buckets)) {
       $bucket =& $this->buckets[$hash];
       foreach ($bucket as &$pair) {
-        $bucketItemKey = $pair[static::PAIR_KEY_INDEX];
+        $bucketItemKey = $pair[self::PAIR_KEY_INDEX];
         if (($this->keyEqualityComparison)($key, $bucketItemKey)) {
-          $pair[static::PAIR_VALUE_INDEX] = $value;
+          $pair[self::PAIR_VALUE_INDEX] = $value;
           return FALSE;
         }
       }
@@ -254,17 +271,21 @@ class HashMap implements \IteratorAggregate {
     }
 
     if (!$createIfKeyNotInMap) throw new KeyNotFoundException('The key does not exist in the hash map.');
-    $bucket[] = static::generatePair($key, $value);
+    $bucket[] = self::generatePair($key, $value);
     $this->count++;
     return TRUE;
   }
 
   /**
    * Tells whether pair key $key is in bucket $bucket.
+   *
+   * @param array<int, TKey|TValue>[] $bucket
+   * @phpstan-param array{0: TKey, 1: TValue}[] $bucket
+   * @param TKey $key
    */
   private function isKeyInBucket(array $bucket, $key) : bool {
     foreach ($bucket as $pair) {
-      if (($this->keyEqualityComparison)($key, $pair[static::PAIR_KEY_INDEX])) {
+      if (($this->keyEqualityComparison)($key, $pair[self::PAIR_KEY_INDEX])) {
         return TRUE;
       }
     }
@@ -274,13 +295,16 @@ class HashMap implements \IteratorAggregate {
   /**
    * Makes and returns a pair array from the given key and value.
    *
-   * @param mixed $key
+   * @param TKey $key
    *   Key.
-   * @param mixed $value
+   * @param TValue $value
    *   Value.
+   *
+   * @return array<int, TKey|TValue>
+   * @phpstan-return array{0: TKey, 1: TValue}
    */
   private static function generatePair($key, $value) : array {
-    return [static::PAIR_KEY_INDEX => $key, static::PAIR_VALUE_INDEX => $value];
+    return [self::PAIR_KEY_INDEX => $key, self::PAIR_VALUE_INDEX => $value];
   }
 
 }

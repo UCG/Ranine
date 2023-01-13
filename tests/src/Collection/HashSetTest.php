@@ -19,7 +19,7 @@ class HashSetTest extends TestCase {
   /**
    * Provides arguments for testAdd().
    *
-   * @return array
+   * @return mixed[][][]
    *   Arguments.
    */
   public function provideTestAddArguments() : array {
@@ -71,11 +71,10 @@ class HashSetTest extends TestCase {
     $set = new HashSet();
     $oneIterationCompleted = FALSE;
     foreach ($items as $item) {
-      if (!$oneIterationCompleted) {
-        $this->assertTrue($set->add($item));
-      }
-      $set->add($item);
+      if (!$oneIterationCompleted) $this->assertTrue($set->add($item));
+      else $set->add($item);
       $this->assertFalse($set->add($item));
+      $oneIterationCompleted = TRUE;
     }
     
     $this->assertTrue(ExtendableIterable::from($items)->all(fn($k, $item) => $set->has($item)));
@@ -89,6 +88,7 @@ class HashSetTest extends TestCase {
    * @covers ::getCount
    */
   public function testGetCount() : void {
+    /** @var \Ranine\Collection\HashSet<int> */
     $set = new HashSet();
     $this->assertTrue($set->getCount() === 0);
     $set->add(2);
@@ -105,6 +105,7 @@ class HashSetTest extends TestCase {
    * @covers ::has
    */
   public function testRemove() : void {
+    /** @var \Ranine\Collection\HashSet<int> */
     $set = new HashSet();
     $this->assertFalse($set->remove(0));
     $set->add(3);

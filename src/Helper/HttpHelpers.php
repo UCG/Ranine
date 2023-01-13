@@ -51,10 +51,8 @@ final class HttpHelpers {
    */
   public static function checkJsonContentTypeHeader(string $contentTypeHeader) : ContentTypeJsonCheckResult {
     $contentTypeParts = explode(';', $contentTypeHeader);
-    assert(is_array($contentTypeParts));
-    if (empty($contentTypeParts)) {
-      return ContentTypeJsonCheckResult::Malformed;
-    }
+    /** @phpstan-ignore-next-line */
+    assert(is_array($contentTypeParts) && $contentTypeParts !== []);
     $numContentTypeParts = count($contentTypeParts);
     if ($numContentTypeParts > 2) {
       return ContentTypeJsonCheckResult::Malformed;
@@ -66,19 +64,19 @@ final class HttpHelpers {
       $secondContentTypePart = trim($contentTypeParts[1]);
       if ($secondContentTypePart !== '') {
         $charsetParts = explode('=', $secondContentTypePart);
-        if (!empty($charsetParts)) {
-          // In this case, this parameter should indicate a UTF-8 or US-ASCII
-          // character set.
-          if (count($charsetParts) !== 2) {
-            return ContentTypeJsonCheckResult::Malformed;
-          }
-          if (strcasecmp(trim($charsetParts[0]), 'charset') !== 0) {
-            return ContentTypeJsonCheckResult::Malformed;
-          }
-          $characterSet = trim($charsetParts[1]);
-          if (strcasecmp($characterSet, 'utf-8') !== 0 && strcasecmp($characterSet, 'us-ascii') !== 0) {
-            return ContentTypeJsonCheckResult::NonJson;
-          }
+        /** @phpstan-ignore-next-line */
+        assert(is_array($charsetParts) && $charsetParts !== []);
+        // In this case, this parameter should indicate a UTF-8 or US-ASCII
+        // character set.
+        if (count($charsetParts) !== 2) {
+          return ContentTypeJsonCheckResult::Malformed;
+        }
+        if (strcasecmp(trim($charsetParts[0]), 'charset') !== 0) {
+          return ContentTypeJsonCheckResult::Malformed;
+        }
+        $characterSet = trim($charsetParts[1]);
+        if (strcasecmp($characterSet, 'utf-8') !== 0 && strcasecmp($characterSet, 'us-ascii') !== 0) {
+          return ContentTypeJsonCheckResult::NonJson;
         }
       }
     }
@@ -93,10 +91,11 @@ final class HttpHelpers {
    *   The contents of the "Authorization" header.
    *
    * @param string $username
-   *   (output parameter) Non-empty username (undefined if header parsing
+   *   (output) Non-empty username (undefined if header parsing
    *   failed).
    * @param string $password
-   *   (output parameter) Password (undefined if header parsing failed).
+   *   (output) Password (undefined if header parsing failed).
+   * @phpstan-param non-empty-string $username
    *
    * @return bool
    *   Returns TRUE if the username and password were successfully parsed;

@@ -1,0 +1,8 @@
+parameters:
+  phpVersion: 80100
+  level: max
+  checkMissingIterableValueType: false
+  checkGenericClassInNonGenericObjectType: false
+  paths:
+    - src
+    - tests

@@ -28,8 +28,15 @@ class Stack implements \IteratorAggregate {
    * Returns (but does not remove) the top element of the stack.
    *
    * @return T
+   *
+   * @throws \Ranine\Exception\InvalidOperationException
+   *   Thrown if the stack is empty.
    */
   public function peek() : mixed {
+    if ($this->isEmpty()) {
+      throw new InvalidOperationException('The stack is empty.');
+    }
+
     return end($this->arr);
   }
 
@@ -40,6 +47,8 @@ class Stack implements \IteratorAggregate {
    *
    * @throws \Ranine\Exception\InvalidOperationException
    *   Thrown if the stack is empty.
+   *
+   * @phpstan-impure
    */
   public function pop() : mixed {
     if ($this->isEmpty()) {
@@ -76,9 +85,11 @@ class Stack implements \IteratorAggregate {
 
   /**
    * Tells whether the stack is empty.
+   *
+   * @phpstan-assert-if-false !empty $this->arr
    */
   public function isEmpty() : bool {
-    return empty($this->arr);
+    return ($this->arr === []) ? TRUE : FALSE;
   }
 
 }

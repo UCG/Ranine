@@ -34,7 +34,7 @@ class ArraySchemaTest extends TestCase {
   /**
    * Provides valid arrays for testValidateValidSchema().
    *
-   * @return array
+   * @return mixed[][]
    *   Arrays.
    */
   public function provideValidArrays() : array {
@@ -106,7 +106,7 @@ class ArraySchemaTest extends TestCase {
     ];
 
     $this->expectException(InvalidArraySchemaException::class);
-    $this->expectExceptionMessage(static::BAD_SCHEMA_MESSAGE_1_1_1);
+    $this->expectExceptionMessage(self::BAD_SCHEMA_MESSAGE_1_1_1);
     $this->schema->validate($arr);
   }
 
@@ -156,7 +156,7 @@ class ArraySchemaTest extends TestCase {
     ];
 
     $this->expectException(InvalidArraySchemaException::class);
-    $this->expectExceptionMessage(static::BAD_SCHEMA_MESSAGE_1_3);
+    $this->expectExceptionMessage(self::BAD_SCHEMA_MESSAGE_1_3);
     $this->schema->validate($arr);
   }
 
@@ -184,15 +184,15 @@ class ArraySchemaTest extends TestCase {
     $this->schema = new ArraySchema([
       '1' => new ArraySchemaRule(fn() => NULL, TRUE, [
         '1_1' => new ArraySchemaRule(fn() => NULL, FALSE, [
-          '1_1_1' => new ArraySchemaRule(fn($x) => $x === 2 ? NULL : new InvalidArraySchemaException(static::BAD_SCHEMA_MESSAGE_1_1_1), TRUE),
+          '1_1_1' => new ArraySchemaRule(fn($x) => $x === 2 ? NULL : new InvalidArraySchemaException(self::BAD_SCHEMA_MESSAGE_1_1_1), TRUE),
         ]),
         '1_2' => new ArraySchemaRule(fn() => NULL, TRUE, [
-          '1_2_1' => new ArraySchemaRule(fn($x) => $x === 3 ? NULL : new InvalidArraySchemaException(static::BAD_SCHEMA_MESSAGE_1_2_1)),
-          '1_2_2' => new ArraySchemaRule(fn($x) => $x === 'c' ? NULL : new InvalidArraySchemaException(static::BAD_SCHEMA_MESSAGE_1_2_2)),
+          '1_2_1' => new ArraySchemaRule(fn($x) => $x === 3 ? NULL : new InvalidArraySchemaException(self::BAD_SCHEMA_MESSAGE_1_2_1)),
+          '1_2_2' => new ArraySchemaRule(fn($x) => $x === 'c' ? NULL : new InvalidArraySchemaException(self::BAD_SCHEMA_MESSAGE_1_2_2)),
         ]),
-        '1_3' => new ArraySchemaRule(fn($x) => $x === 'a' ? NULL : new InvalidArraySchemaException(static::BAD_SCHEMA_MESSAGE_1_3)),
+        '1_3' => new ArraySchemaRule(fn($x) => $x === 'a' ? NULL : new InvalidArraySchemaException(self::BAD_SCHEMA_MESSAGE_1_3)),
       ]),
-      '2' => new ArraySchemaRule(fn($x) => is_bool($x) ? NULL : new InvalidTypeArraySchemaException(static::BAD_SCHEMA_MESSAGE_2)),
+      '2' => new ArraySchemaRule(fn($x) => is_bool($x) ? NULL : new InvalidTypeArraySchemaException(self::BAD_SCHEMA_MESSAGE_2)),
     ]);
   }
 

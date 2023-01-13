@@ -4,8 +4,6 @@ declare(strict_types = 1);
 
 namespace Ranine\Helper;
 
-use Ranine\Iteration\ExtendableIterable;
-
 /**
  * Collection-related static helper methods.
  *
@@ -56,6 +54,7 @@ final class CollectionHelpers {
       $currentOutputStartValue = 0;
       $currentOutputEndValue = 0;
       foreach ($ranges as $start => $end) {
+        /** @phpstan-ignore-next-line */
         if (!is_int($start) || !is_int($end)) {
           throw new \InvalidArgumentException('A key or value in $ranges is non-integral.');
         }
@@ -165,7 +164,7 @@ final class CollectionHelpers {
    * @param array $arr
    *   Array, sorted such that identical values appear next to each other.
    */
-  public static function removeDuplicatesFromSortedArray(array &$arr) {
+  public static function removeDuplicatesFromSortedArray(array &$arr) : void {
     /** @var (string|int)[] */
     $keysOfDuplicateElements = [];
     $isPastFirstIteration = FALSE;

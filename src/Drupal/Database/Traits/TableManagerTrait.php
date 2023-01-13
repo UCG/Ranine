@@ -19,11 +19,15 @@ trait TableManagerTrait {
 
   /**
    * Name of the underlying database table.
+   *
+   * @phpstan-var non-empty-string
    */
   private string $tableName;
 
   /**
-   * Gets the table name for this object wrapped (in {}) and escaped.
+   * Gets the table name for this object wrapped (in {}) and escaped
+   *
+   * @phpstan-return non-empty-string
    */
   private function getCurrentWrappedEscapedTableName() : string {
     return $this->getWrappedEscapedTableName($this->tableName);
@@ -34,6 +38,7 @@ trait TableManagerTrait {
    *
    * @param string $rawTableName
    *   Raw (un-escaped and non-wrapped) table name.
+   * @phpstan-param non-empty-string $rawTableName
    */
   private function getWrappedEscapedTableName(string $rawTableName) : string {
     return '{' . $this->databaseConnection->escapeTable($rawTableName) . '}';
@@ -49,6 +54,8 @@ trait TableManagerTrait {
    * @param string $tableNameVariableNameOnException
    *   Variable name to use when throwing an exception when $tableName is
    *   invalid.
+   * @phpstan-param non-empty-string $tableName
+   * @phpstan-param non-empty-string $tableNameVariableNameOnException
    *
    * @throws \InvalidArgumentException
    *   Thrown if $tableName is empty.

@@ -25,6 +25,8 @@ final class ThrowHelpers {
    *   leading "$".
    *
    * @throws \InvalidArgumentException
+   *
+   * phpstan-assert non-empty-string $value
    */
   public static function throwIfEmptyString(string $value, string $variableName) : void {
     if ($value === '') {
@@ -40,6 +42,8 @@ final class ThrowHelpers {
    *   leading "$".
    *
    * @throws \InvalidArgumentException
+   *
+   * phpstan-assert positive-int $value
    */
   public static function throwIfLessThanOrEqualToZero(int $value, string $variableName) : void {
     if ($value <= 0) {
@@ -50,13 +54,13 @@ final class ThrowHelpers {
   /**
    * Throws an \InvalidArgumentException if $value is less than zero.
    *
-   * @param string $value
-   *   Value to check.
    * @param string $variableName
    *   Variable name to include in the exception message. Should not contain the
    *   leading "$".
    *
    * @throws \InvalidArgumentException
+   *
+   * phpstan-assert int<0, max> $value
    */
   public static function throwIfLessThanZero(int $value, string $variableName) : void {
     if ($value < 0) {

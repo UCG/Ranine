@@ -28,7 +28,7 @@ trait MockEntityTypeManagerCreationTrait {
    * entity type manager will have only its getStorage() method properly
    * defined.
    *
-   * @param array[] $entitiesAndTypes
+   * @param array<string, (string|\Drupal\Core\Entity\EntityInterface[])>[] $entitiesAndTypes
    *   This array should have the following structure. The mock entity objects
    *   should all define a working toArray() method. Type names are in round
    *   brackets (), and placeholders are in curly brackets {}:
@@ -43,6 +43,7 @@ trait MockEntityTypeManagerCreationTrait {
    *       ]
    *     ], {...},
    *   ]
+   * @phpstan-param array<string, array{storage_interface: class-string<\Drupal\Core\Entity\EntityStorageInterface>, entities: \Drupal\Core\Entity\EntityInterface[]}> $entitiesAndTypes
    *
    * @throws \LogicException
    *   Thrown if current object is not a \PHPUnit\Framework\TestCase object.
@@ -56,11 +57,8 @@ trait MockEntityTypeManagerCreationTrait {
     /** @var \Drupal\Core\Entity\EntityStorageInterface[] */
     $entityStorageObjects = [];
     foreach ($entitiesAndTypes as $entityTypeId => $storageDefinition) {
-      /** @var string */
       $storageInterfaceName = $storageDefinition['storage_interface'];
-      /** @var \Drupal\Core\Entity\EntityInterface[] */
       $entities = $storageDefinition['entities'];
-      /** @var \PHPUnit\Framework\MockObject\MockObject|\Drupal\Core\Entity\EntityStorageInterface */
       $storage = $this->createMockNoAutoMethodConfig($storageInterfaceName);
       $storage->method('load')->willReturnCallback(fn($id) => $entities[$id] ?? NULL);
       $storage->method('loadMultiple')->willReturnCallback(function (?array $ids) use ($entities) : array {

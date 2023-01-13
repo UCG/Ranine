@@ -17,8 +17,14 @@ trait MockObjectCreationTrait {
   /**
    * Returns a mock object which will fail on calling an unconfigured method.
    *
+   * @template T of object
+   *
    * @param string $type
    *   Fully qualified name of class or interface we are mocking.
+   *
+   * @phpstan-param class-string<T> $type
+   *
+   * @return \PHPUnit\Framework\MockObject\MockObject&T
    *
    * @throws \Exception
    *   Thrown under circumstances found in PHPUnit documentation for
@@ -31,13 +37,15 @@ trait MockObjectCreationTrait {
       throw new \LogicException('The object this method is called upon must be a \\PHPUnit\\Framework\\TestCase instance.');
     }
 
-    return $this->getMockBuilder($type)
+    $mock = $this->getMockBuilder($type)
       ->disableOriginalConstructor()
       ->disableOriginalClone()
       ->disableArgumentCloning()
       ->disallowMockingUnknownTypes()
       ->disableAutoReturnValueGeneration()
       ->getMock();
+    assert($mock instanceof $type);
+    return $mock;
   }
 
 }

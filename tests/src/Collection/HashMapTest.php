@@ -19,8 +19,9 @@ class HashMapTest extends TestCase {
   /**
    * Provides arguments for testAdd().
    *
-   * @return array
+   * @return array<callable() : iterable>[]
    *   Arguments.
+   * @phpstan-return array<array{0: callable() : iterable}>
    */
   public function provideTestAddArguments() : array {
     return [
@@ -63,11 +64,10 @@ class HashMapTest extends TestCase {
    * @covers ::add
    * @covers ::get
    * @covers ::hasKey
-   * @dataProvider provideTestAddArguments
+   * @dataProvider provideTestAddArgument
    *
-   * @param callable $pairsGeneration
-   *   Of form () : iterable. Returns key/value pairs to add. Should be
-   *   idempotent.
+   * @param callable() : iterable $pairsGeneration
+   *   Returns key/value pairs to add. Should be idempotent.
    */
   public function testAdd(callable $pairsGeneration) : void {
     $map = new HashMap();
@@ -76,6 +76,7 @@ class HashMapTest extends TestCase {
     }
     foreach ($pairsGeneration() as $key => $value) {
       $this->assertTrue($map->hasKey($key));
+      /** @phpstan-ignore-next-line */
       $this->assertTrue($map->get($key) === $value);
     }
   }

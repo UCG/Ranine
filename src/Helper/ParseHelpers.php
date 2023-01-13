@@ -33,9 +33,9 @@ final class ParseHelpers {
    * @throws \Ranine\Exception\ParseException
    *   Thrown if the parse operation fails.
    */
-  public static function parseInt($number) : int {
+  public static function parseInt(mixed $number) : int {
     $result = 0;
-    if (!static::tryParseInt($number, $result)) {
+    if (!self::tryParseInt($number, $result)) {
       throw new ParseException('Could not parse as integer.');
     }
     return $result;
@@ -57,7 +57,7 @@ final class ParseHelpers {
    */
   public static function parseIntFromString(string $number) : int {
     $result = 0;
-    if (!static::tryParseIntFromString($number, $result)) {
+    if (!self::tryParseIntFromString($number, $result)) {
       throw new ParseException('Could not parse as integer.');
     }
     return $result;
@@ -72,6 +72,7 @@ final class ParseHelpers {
    *   lower and upper bounds of the range, respectively.
    * @param string $divider
    *   The string dividing the two halves of the range.
+   * @phpstan-param non-empty-string $divider
    *
    * @return iterable<int>
    *   Sorted collection, whose values are the values in the range.
@@ -83,7 +84,7 @@ final class ParseHelpers {
    */
   public static function parseIntRange(string $range, string $divider = '-') : iterable {
     $result = NULL;
-    if (!static::tryParseIntRange($range, $result, $divider)) {
+    if (!self::tryParseIntRange($range, $result, $divider)) {
       throw new ParseException('Could not parse integer range.');
     }
     return $result;
@@ -96,12 +97,13 @@ final class ParseHelpers {
    *   Range, which should be in the form "[start]$divider[end]", where [start]
    *   and [end] are string representations of integers which form the start and
    *   end of the range, respectively.
-   * @param int &start
-   *   (output parameter) Start of range.
-   * @param int &end
-   *   (output parameter) End of range.
+   * @param int $start
+   *   (output) Start of range.
+   * @param int $end
+   *   (output) End of range.
    * @param string $divider
    *   The string dividing the two halves of the range.
+   * @phpstan-param non-empty-string $divider
    *
    * @throws \InvalidArgumentException
    *   Thrown if $divider is empty.
@@ -111,7 +113,7 @@ final class ParseHelpers {
   public static function parseIntRangeEndpoints(string $range, int &$start, int &$end, string $divider = '-') : void {
     $start = 0;
     $end = 0;
-    if (!static::tryParseIntRangeEndpoints($range, $start, $end, $divider)) {
+    if (!self::tryParseIntRangeEndpoints($range, $start, $end, $divider)) {
       throw new ParseException('Could not parse integer range.');
     }
   }
@@ -124,19 +126,19 @@ final class ParseHelpers {
    * If it is neither, the parse operation fails.
    *
    * @param int &$result
-   *   (output parameter) Result of parse operation (undefined if operation
+   *   (output) Result of parse operation (undefined if operation
    *   failed).
    *
    * @return bool
    *   Returns TRUE if the parse succeeded; else returns FALSE.
    */
-  public static function tryParseInt($number, int &$result) : bool {
+  public static function tryParseInt(mixed $number, int &$result) : bool {
     if (is_int($number)) {
       $result = $number;
       return TRUE;
     }
     elseif (is_string($number)) {
-      return static::tryParseIntFromString($number, $result);
+      return self::tryParseIntFromString($number, $result);
     }
     else {
       return FALSE;
@@ -153,7 +155,7 @@ final class ParseHelpers {
    * fails, this function returns FALSE.
    *
    * @param int &$result
-   *   (output parameter) Result of parse operation (undefined if operation
+   *   (output) Result of parse operation (undefined if operation
    *   failed).
    *
    * @return bool
@@ -172,10 +174,11 @@ final class ParseHelpers {
    *   and [end] are string representations of integers which form the inclusive
    *   lower and upper bounds of the range, respectively.
    * @param iterable<int>|null &$output
-   *   (output parameter) Collection, whose values are sorted from lowest to
+   *   (output) Collection, whose values are sorted from lowest to
    *   highest and are the values in the range, or NULL if the parsing failed.
    * @param string $divider
    *   The string dividing the two halves of the range.
+   * @phpstan-param non-empty-string $divider
    *
    * @return bool
    *   Returns TRUE if the parse succeeded; else returns FALSE.
@@ -187,7 +190,7 @@ final class ParseHelpers {
     $start = 0;
     $end = 0;
 
-    if (static::tryParseIntRangeEndpoints($range, $start, $end, $divider)) {
+    if (self::tryParseIntRangeEndpoints($range, $start, $end, $divider)) {
       $output = ExtendableIterable::fromRange($start, $end);
       return TRUE;
     }
@@ -204,12 +207,13 @@ final class ParseHelpers {
    *   Range, which should be in the form "[start]$divider[end]", where [start]
    *   and [end] are string representations of integers which form the start and
    *   end of the range, respectively.
-   * @param int &start
-   *   (output parameter) Start of range.
-   * @param int &end
-   *   (output parameter) End of range.
+   * @param int $start
+   *   (output) Start of range.
+   * @param int $end
+   *   (output) End of range.
    * @param string $divider
    *   The string dividing the two halves of the range.
+   * @phpstan-param non-empty-string $divider
    *
    * @return bool
    *   Returns TRUE if the parse succeeded; else returns FALSE.
@@ -227,11 +231,10 @@ final class ParseHelpers {
     if (!is_array($rangeParts) || count($rangeParts) !== 2) {
       return FALSE;
     }
-    /** @var string[] $rangeParts */
-    if (!static::tryParseIntFromString($rangeParts[0], $start)) {
+    if (!self::tryParseIntFromString($rangeParts[0], $start)) {
       return FALSE;
     }
-    if (!static::tryParseIntFromString($rangeParts[1], $end)) {
+    if (!self::tryParseIntFromString($rangeParts[1], $end)) {
       return FALSE;
     }
     if ($end < $start) {

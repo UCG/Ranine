@@ -29,17 +29,16 @@ final class UserHelpers {
    *   UIDs in sorted (low to high) order with no duplicates.
    * @param string[] $sortedAttributeTypes
    *   Attribute types in sorted (low to high) binary order with no duplicates.
-   * @param callable $binaryAttributeRepresentationRetrieval
-   *   Gets the binary attribute representation for a given user. Is of the form
-   *   (\Drupal\user\UserInterface $user, string $attributeType) : string.
-   * @param callable $userFilter
-   *   Filters users out of the hash. Of the form
-   *   (\Drupal\user\UserInterface) : bool, this method returns TRUE if a user
-   *   should be included in the normal hash computation, or FALSE if the user's
-   *   binary representation should just be the empty string.
+   * @param callable(\Drupal\user\UserInterface $user, string $attributeType) : string $binaryAttributeRepresentationRetrieval
+   *   Gets the binary attribute representation for a given user.
+   * @param callable(\Drupal\user\UserInterface) : bool $userFilter
+   *   Filters users out of the hash. Returns TRUE if a user should be included
+   *   in the normal hash computation, or FALSE if the user's binary
+   *   representation should just be the empty string.
    * @param int $userLoadPageSize
    *   The maximum number of users to try to load at once. Can be used to ease
    *   memory burdens.
+   * @phpstan-param positive-int $userLoadPageSize
    *
    * @return string
    *   SHA-1 hash of a string of the following form:
@@ -87,10 +86,11 @@ final class UserHelpers {
       if ($lastAttributeType !== NULL && strcmp($lastAttributeType, $attributeType) >= 0) {
         throw new \InvalidArgumentException('$sortedAttributeTypes is not in sorted ascending order without duplicates.');
       }
+      $lastAttributeType = $attributeType;
     }
 
     // Collect "pages" of UIDs to be loaded at once.
-    /** @var iterable<int[]>|\Ranine\Iteration\ExtendableIterable */
+    /** @var \Ranine\Iteration\ExtendableIterable<int, int[]> */
     $pages = ExtendableIterable::from((function () use ($sortedUids, $userLoadPageSize) {
       $pageId = 0;
       $page = [];
@@ -107,7 +107,6 @@ final class UserHelpers {
 
     // Create the hash context, used to compute a hash of a long string
     // without first loading the entire string into memory.
-    /** @var \HashContext|resource */
     $hashContext = hash_init('sha1');
     // We use the record and group separator to divide attributes and users,
     // respectively, so we want to escape these from attribute serializations.
@@ -117,7 +116,6 @@ final class UserHelpers {
     // Loop through all the users and form the hash.
     $isFirstUser = TRUE;
     foreach ($pages as $page) {
-      /** @var int[] $page */
       // Load all entities for this page.
       /** @var \Drupal\user\UserInterface[] */
       $users = $userStorage->loadMultiple($page);

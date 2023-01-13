@@ -26,19 +26,18 @@ class ArraySchemaRule {
   /**
    * The callable representing the actual validation.
    *
-   * @var callable
+   * @var callable(mixed $value) : ?\Ranine\Exception\InvalidArraySchemaException
    */
   private $validation;
 
   /**
    * Creates a new array schema validation rule.
    *
-   * @param callable $validation
-   *   Validation rule, of the form
-   *   (mixed $value) : ?\Ranine\Exception\InvalidArraySchemaException. $value
-   *   is the array value being validated. On validation failure, this function
-   *   should return a \Ranine\Exception\InvalidArraySchemaException exception
-   *   to be thrown. If validation succeeds, it should return NULL.
+   * @param callable(mixed $value) : ?\Ranine\Exception\InvalidArraySchemaException $validation
+   *   Validation rule. $value is the array value being validated. On validation
+   *   failure, this function should return a
+   *   \Ranine\Exception\InvalidArraySchemaException exception to be thrown. If
+   *   validation succeeds, it should return NULL.
    * @param bool $isElementRequired
    *   Whether the element corresponding to this rule is required as part of the
    *   schema definition.
@@ -94,7 +93,7 @@ class ArraySchemaRule {
    * @throws \Ranine\Exception\InvalidArraySchemaException
    *   Thrown if validation fails.
    */
-  public function validate($element) : void {
+  public function validate(mixed $element) : void {
     $exception = ($this->validation)($element);
     if ($exception !== NULL) {
       if (!($exception instanceof InvalidArraySchemaException)) {

@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Ranine\Tests\Helper\Drupal;
 
+use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -30,25 +31,28 @@ class UserHelpersTest extends TestCase {
   public function testGetAttributeHash() : void {
     // Create a binary representation retrieval that handles the email, user
     // status, and user timezone attributes.
-    $binaryRepresentationRetrieval = fn (UserInterface $user, string $attributeType) =>
-      match ($attributeType) {
+    $binaryRepresentationRetrieval = function (UserInterface $user, string $attributeType) {
+      assert($user instanceof User);
+      return match ($attributeType) {
         'email' => $user->getEmail() ?? '\0',
         'status' => $user->isActive() ? 'A' : 'B',
         'timezone' => $user->getTimeZone(),
         default => throw new \InvalidArgumentException('Invalid attribute type requested.'),
       };
+    };
 
     // Create a few mock users.
     $users = new \SplFixedArray(3);
     $users[0] = $this->getMockUser(2, 'eve@example.com', TRUE, "\eE\x1Dv\x1E\e\ee");
     $users[1] = $this->getMockUser(3, 'cain@example.com', FALSE, 'pst');
     $users[2] = $this->getMockUser(5, 'abel@example.com', FALSE, 'pst');
+    /** @var \ArrayAccess<int, \Drupal\user\Entity\User>&iterable<int, \Drupal\user\Entity\User> $users */
 
     // Create a mock entity type manager for the three users.
     $mockEntityTypeManager = $this->getMockEntityTypeManager(['user' => [
       'storage_interface' => '\\Drupal\\user\\UserStorageInterface',
       'entities' => ExtendableIterable::from($users)
-        ->map(fn($i, $u) => $u, fn($i, UserInterface $u) => (int) $u->id())
+        ->map(fn($i, $u) => $u, fn($i, User $u) => (int) $u->id())
         ->toArray(),
     ]]);
     // We also want to define the getEntityType() method on the mock storage to
@@ -80,7 +84,7 @@ class UserHelpersTest extends TestCase {
   }
 
   /**
-   * Creates and returns a mock \Drupal\user\UserInterface object.
+   * Creates and returns a mock \Drupal\user\Entity\User object.
    *
    * The returned object defins the following methods:
    * - id() -- returns $uid
@@ -119,9 +123,8 @@ class UserHelpersTest extends TestCase {
     string $uuid = '',
     string $displayName = '',
     string $preferredLangcode = '',
-    string $preferredAdminLangcode = '') : MockObject&UserInterface {
-    /** @var \PHPUnit\Framework\MockObject\MockObject&\Drupal\user\UserInterface */
-    $mockUser = $this->createMockNoAutoMethodConfig('\\Drupal\\user\\UserInterface');
+    string $preferredAdminLangcode = '') : MockObject&User {
+    $mockUser = $this->createMockNoAutoMethodConfig('\\Drupal\\user\\Entity\\User');
     $mockUser->method('id')->willReturn($uid);
     $mockUser->method('getEmail')->willReturn($email);
     $mockUser->method('isActive')->willReturn($isActive);

@@ -28,7 +28,7 @@ class ArraySchema {
   /**
    * Creates a new \Ranine\Validation\ArraySchema object.
    *
-   * @param array $rules
+   * @param \Ranine\Validation\ArraySchemaRule[] $rules
    *   The rules of the schema. Each value must be a validation rule (a
    *   \Ranine\Validation\ArraySchemaRule object), and the corresponding
    *   key is the array key for the rule.
@@ -54,6 +54,8 @@ class ArraySchema {
    *
    * @throws \Ranine\Exception\InvalidArraySchemaException
    *   Thrown if $data has an invalid schema.
+   *
+   * @phpstan-pure
    */
   public function validate(array $data) : void {
     // Ensure the top-level array doesn't clearly have too many items (every
@@ -68,71 +70,78 @@ class ArraySchema {
     // very deep.
 
     // Create a recursive iterator for iterating through the validation tree.
-    $iterator = new class($this->rules) implements \RecursiveIterator {
-      /** @var string|int */
-      private $key;
-      /** @var \Ranine\Validation\ArraySchemaRule[] */
-      private array $rules;
-      /** @var \Ranine\Validation\ArraySchemaRule|bool */
-      private $value;
-
+    $iterator = new
       /**
-       * @param \Ranine\Validation\ArraySchemaRule[] $rules
+       * @implements \RecursiveIterator<string|int, \Ranine\Validation\ArraySchemaRule>
        */
-      public function __construct(array $rules) {
-        $this->rules = $rules;
-        $this->key = key($rules);
-        $this->value = current($rules);
-      }
+      class($this->rules) implements \RecursiveIterator {
+        private string|int|null $key;
+        /** @var \Ranine\Validation\ArraySchemaRule[] */
+        private array $rules;
+        private ArraySchemaRule|bool $value;
 
-      public function current() : ArraySchemaRule {
-        if (!$this->valid()) {
-          throw new InvalidOperationException();
+        /**
+         * @param \Ranine\Validation\ArraySchemaRule[] $rules
+         */
+        public function __construct(array $rules) {
+          $this->rules = $rules;
+          $this->key = key($rules);
+          $this->value = current($rules);
         }
-        return $this->value;
-      }
 
-      public function getChildren() : self {
-        if (!$this->valid()) {
-          throw new InvalidOperationException();
+        public function current() : ArraySchemaRule {
+          if (!$this->valid()) {
+            throw new InvalidOperationException();
+          }
+          return $this->value;
         }
-        return new self($this->value->getChildren());
-      }
 
-      public function hasChildren() : bool {
-        if (!$this->valid()) {
-          throw new InvalidOperationException();
+        public function getChildren() : self {
+          if (!$this->valid()) {
+            throw new InvalidOperationException();
+          }
+          return new self($this->value->getChildren());
         }
-        return ($this->value->shouldValidateChildren() && count($this->value->getChildren()) > 0) ? TRUE : FALSE;
-      }
 
-      public function key() : string|int {
-        if (!$this->valid()) {
-          throw new InvalidOperationException();
+        public function hasChildren() : bool {
+          if (!$this->valid()) {
+            throw new InvalidOperationException();
+          }
+          return ($this->value->shouldValidateChildren() && count($this->value->getChildren()) > 0) ? TRUE : FALSE;
         }
-        return $this->key;
-      }
 
-      public function next() : void {
-        $this->value = next($this->rules);
-        $this->key = key($this->rules);
-      }
+        public function key() : string|int {
+          if (!$this->valid()) {
+            throw new InvalidOperationException();
+          }
+          return $this->key;
+        }
 
-      public function rewind() : void {
-        $this->value = reset($this->rules);
-        $this->key = key($this->rules);
-      }
+        public function next() : void {
+          $this->value = next($this->rules);
+          $this->key = key($this->rules);
+        }
 
-      public function valid() : bool {
-        return $this->key === NULL ? FALSE : TRUE;
-      }
-    };
+        public function rewind() : void {
+          $this->value = reset($this->rules);
+          $this->key = key($this->rules);
+        }
+
+        /**
+         * @phpstan-assert-if-true !bool $this->value
+         * @phpstan-assert-if-true !null $this->key
+         */
+        public function valid() : bool {
+          return $this->key === NULL ? FALSE : TRUE;
+        }
+      };
 
     // Validate the descendents. As a context for each level, store the parent
     // data array and current number of data elements found associated with a
     // rule.
     $context = new class($data) {
       private array $data;
+      /** @phpstan-var int<0, max> */
       private int $numRuleAssociatedElements;
 
       public function __construct(array $data) {
@@ -149,17 +158,16 @@ class ArraySchema {
       }
 
       public function getSubContext(string|int $key) : self {
+        assert(is_array($this->data[$key]));
         return new self($this->data[$key]);
       }
 
       public function incrementNumRuleAssociatedElements() : void {
         $this->numRuleAssociatedElements++;
       }
-
     };
 
-    IterationHelpers::walkRecursiveIterator($iterator, function(string|int $key, ArraySchemaRule $rule, $context) : bool {
-      /** @var array */
+    IterationHelpers::walkRecursiveIterator($iterator, function(string|int $key, ArraySchemaRule $rule, object $context) : bool {
       $data = $context->getData();
 
       $keyExistsInData = array_key_exists($key, $data);
@@ -187,7 +195,6 @@ class ArraySchema {
       }
       return TRUE;
     }, function (string|int $key, $value, &$context) : bool {
-      /** @var array */
       $data = $context->getData();
       if (array_key_exists($key, $data)) {
         $context = $context->getSubContext($key);

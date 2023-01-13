@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace Ranine;
 
+use Ranine\Helper\ThrowHelpers;
+
 /**
  * Represents a binary stream.
  */
@@ -19,9 +21,9 @@ class BinaryStream {
    *
    * Cannot yield an empty string.
    *
-   * @var \Iterator&iterable<string>
+   * @var \Iterator<string>
    */
-  private \Iterator $input;
+  private readonly \Iterator $input;
 
   /**
    * Creates a new binary stream.
@@ -42,18 +44,19 @@ class BinaryStream {
    *
    * @param int $numBytes
    *   Number of bytes to read from the stream.
+   * @phpstan-param positive-int $numBytes
    *
    * @throws \InvalidArgumentException
-   *   Thrown if $numBytes is less than one.
+   *   Thrown if $numBytes is less than or equal to zero.
    *
    * @return \Ranine\StringPart
    *   The given number of bytes (or the remainder of the stream if the end of
    *   the stream was encountered before reading the requested number of bytes).
+   *
+   * @phpstan-impure
    */
   public function readBytes(int $numBytes) : StringPart {
-    if ($numBytes < 1) {
-      throw new \InvalidArgumentException('$numBytes is less than one.');
-    }
+    ThrowHelpers::throwIfLessThanOrEqualToZero($numBytes, 'numBytes');
 
     $chunk = NULL;
 
@@ -76,6 +79,8 @@ class BinaryStream {
    *
    * @return int|null
    *   Result, or NULL if the stream did not contain such an integer.
+   *
+   * @phpstan-impure
    */
   public function readUInt8() : ?int {
     $byte = $this->readBytes(1);
@@ -95,6 +100,8 @@ class BinaryStream {
    *
    * @return int|null
    *   Result, or NULL if the stream did not contain such an integer.
+   *
+   * @phpstan-impure
    */
   public function readUInt16BE() : ?int {
     $bytes = $this->readBytes(2);
@@ -114,6 +121,8 @@ class BinaryStream {
    *
    * @return int|null
    *   Result, or NULL if the stream did not contain such an integer.
+   *
+   * @phpstan-impure
    */
   public function readUInt16LE() : ?int {
     $bytes = $this->readBytes(2);
@@ -133,6 +142,8 @@ class BinaryStream {
    *
    * @return int|null
    *   Result, or NULL if the stream did not contain such an integer.
+   *
+   * @phpstan-impure
    */
   public function readUInt32BE() : ?int {
     $bytes = $this->readBytes(4);
@@ -152,6 +163,8 @@ class BinaryStream {
    *
    * @return int|null
    *   Result, or NULL if the stream did not contain such an integer.
+   *
+   * @phpstan-impure
    */
   public function readUInt32LE() : ?int {
     $bytes = $this->readBytes(4);
@@ -171,6 +184,8 @@ class BinaryStream {
    *
    * @return int|null
    *   Result, or NULL if the stream did not contain such an integer.
+   *
+   * @phpstan-impure
    */
   public function readUInt64BE() : ?int {
     $bytes = $this->readBytes(8);
@@ -190,6 +205,8 @@ class BinaryStream {
    *
    * @return int|null
    *   Result, or NULL if the stream did not contain such an integer.
+   *
+   * @phpstan-impure
    */
   public function readUInt64LE() : ?int {
     $bytes = $this->readBytes(8);
@@ -234,6 +251,8 @@ class BinaryStream {
    * @throws \LogicException
    *   Thrown if $positionIdentification() returns an index that is not within
    *   the string portion passed to it.
+   *
+   * @phpstan-impure
    */
   public function readUntil(callable $positionIdentification) : ?StringPart {
     if ($this->buffer->isEmpty()) {
@@ -282,6 +301,8 @@ class BinaryStream {
    *
    * @return \Ranine\StringPart
    *   First cut of buffer.
+   *
+   * @phpstan-impure
    */
   protected function cutOffBuffer(int $stopPosition, ?string $lastChunk) : StringPart {
     $firstCut = $this->buffer->withNewEndpoints($this->buffer->getStartPosition(), $stopPosition);
@@ -315,6 +336,8 @@ class BinaryStream {
    * @return string
    *   Returns the chunk read if not at the end of stream; else returns an empty
    *   string.
+   *
+   * @phpstan-impure
    */
   protected function readChunk() : string {
     if (!$this->input->valid()) {
