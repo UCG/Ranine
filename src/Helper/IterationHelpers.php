@@ -110,7 +110,6 @@ final class IterationHelpers {
 
       // Move 1:
       if (($childIterator = self::prepareChildIterator($currentIterator)) !== NULL) {
-        $childIterator->next();
         // Decide whether or not to move to the lower level, and set the context
         // for that level.
         $lowerLevelContext = $currentContext;
