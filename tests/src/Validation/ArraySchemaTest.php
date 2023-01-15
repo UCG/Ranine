@@ -34,7 +34,7 @@ class ArraySchemaTest extends TestCase {
   /**
    * Provides valid arrays for testValidateValidSchema().
    *
-   * @return mixed[][]
+   * @return mixed[][][]
    *   Arrays.
    */
   public function provideValidArrays() : array {

@@ -23,7 +23,7 @@ class HashMapTest extends TestCase {
    *   Arguments.
    * @phpstan-return array<array{0: callable() : iterable}>
    */
-  public function provideTestAddArguments() : array {
+  public function provideTestAddArgument() : array {
     return [
       [function () : iterable {
         yield 'jkuu' => 2;
