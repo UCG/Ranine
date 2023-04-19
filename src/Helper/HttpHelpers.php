@@ -86,7 +86,6 @@ final class HttpHelpers {
    *
    * @param string $authorizationHeader
    *   The contents of the "Authorization" header.
-   *
    * @param string $username
    *   (output parameter) Non-empty username (undefined if header parsing
    *   failed).
