@@ -1,5 +1,5 @@
 {
-  "name": "ucg/ranine-php-8-0",
+  "name": "ucg/ranine",
   "description": "Contains useful PHP 8.0 helper methods, classes, and traits. Some are Drupal-specific.",
   "type": "library",
   "authors": [
