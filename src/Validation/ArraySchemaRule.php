@@ -16,12 +16,12 @@ class ArraySchemaRule {
    *
    * @var \Ranine\Validation\ArraySchemaRule[]|null
    */
-  private readonly ?array $children;
+  private ?array $children;
 
   /**
    * Whether the element corresponding to this rule is required.
    */
-  private readonly bool $isElementRequired;
+  private bool $isElementRequired;
 
   /**
    * The callable representing the actual validation.

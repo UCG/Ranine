@@ -23,7 +23,7 @@ class ArraySchema {
    *
    * @var \Ranine\Validation\ArraySchemaRule[]
    */
-  private readonly array $rules;
+  private array $rules;
 
   /**
    * Creates a new \Ranine\Validation\ArraySchema object.

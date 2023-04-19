@@ -101,8 +101,8 @@ class HashMap implements \IteratorAggregate {
    *   Thrown if there are duplicate keys in $initialKeys.
    */
   public function __construct(?callable $keyEqualityComparison = NULL, ?callable $keyHashing = NULL, iterable $initialPairs = []) {
-    $this->keyEqualityComparison = $keyEqualityComparison ?? HashCodeHelpers::compareEqualityStrictly(...);
-    $this->keyHashing = $keyHashing ?? HashCodeHelpers::computeHashCode(...);
+    $this->keyEqualityComparison = $keyEqualityComparison ?? fn($key1, $key2) : bool => HashCodeHelpers::compareEqualityStrictly($key1, $key2);
+    $this->keyHashing = $keyHashing ?? fn($key) : int => HashCodeHelpers::computeHashCode($key);
     foreach ($initialPairs as $key => $value) {
       $this->add($key, $value);
     }

@@ -85,8 +85,8 @@ class HashSet implements \IteratorAggregate {
    *   Initial items to populate hash set. Duplicate items are ignored.
    */
   public function __construct(?callable $equalityComparison = NULL, ?callable $hashing = NULL, iterable $initialItems = []) {
-    $this->equalityComparison = $equalityComparison ?? HashCodeHelpers::compareEqualityStrictly(...);
-    $this->hashing = $hashing ?? HashCodeHelpers::computeHashCode(...);
+    $this->equalityComparison = $equalityComparison ?? fn($item1, $item2) : bool => HashCodeHelpers::compareEqualityStrictly($item1, $item2);
+    $this->hashing = $hashing ?? fn($item) : int => HashCodeHelpers::computeHashCode($item);
     foreach ($initialItems as $item) {
       $this->add($item);
     }

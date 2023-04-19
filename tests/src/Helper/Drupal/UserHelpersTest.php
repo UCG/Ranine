@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace Ranine\Tests\Helper\Drupal;
 
 use Drupal\user\UserInterface;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Ranine\Exception\InvalidOperationException;
 use Ranine\Helper\Drupal\UserHelpers;
@@ -111,6 +110,8 @@ class UserHelpersTest extends TestCase {
    *   Preferred langcode.
    * @param string $preferredAdminLangcode
    *   Preferred admin langcode.
+   *
+   * @return \PHPUnit\Framework\MockObject\MockObject&\Drupal\user\UserInterface
    */
   private function getMockUser(int $uid,
     ?string $email = NULL,
@@ -119,7 +120,7 @@ class UserHelpersTest extends TestCase {
     string $uuid = '',
     string $displayName = '',
     string $preferredLangcode = '',
-    string $preferredAdminLangcode = '') : MockObject&UserInterface {
+    string $preferredAdminLangcode = '') : UserInterface {
     /** @var \PHPUnit\Framework\MockObject\MockObject&\Drupal\user\UserInterface */
     $mockUser = $this->createMockNoAutoMethodConfig('\\Drupal\\user\\UserInterface');
     $mockUser->method('id')->willReturn($uid);

@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace Ranine\Testing\Drupal\Traits;
 
 use Drupal\Component\Datetime\TimeInterface;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Ranine\Testing\Traits\MockObjectCreationTrait;
 
@@ -24,10 +23,12 @@ trait MockTimeServiceCreationTrait {
    * @return \PHPUnit\Framework\MockObject\MockObject&\Drupal\Component\Datetime\TimeInterface
    *   Mock time interface.
    *
+   * @return \PHPUnit\Framework\MockObject\MockObject&\Drupal\Component\Datetime\TimeInterface
+   *
    * @throws \LogicException
    *   Thrown if current object is not a \PHPUnit\Framework\TestCase object.
    */
-  private function getMockTimeServiceObject() : MockObject&TimeInterface {
+  private function getMockTimeServiceObject() : TimeInterface {
     if (!($this instanceof TestCase)) {
       throw new \LogicException('The object this method is called upon must be a \\PHPUnit\\Framework\\TestCase instance.');
     }

@@ -671,7 +671,7 @@ class ExtendableIterable implements \IteratorAggregate {
    *
    * @throws \Ranine\Exception\InvalidOperationException
    */
-  private static function throwEmptyCollectionException() : never {
+  private static function throwEmptyCollectionException() : void {
     throw new InvalidOperationException('The collection is empty.');
   }
 

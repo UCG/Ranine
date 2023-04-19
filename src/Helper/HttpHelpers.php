@@ -5,33 +5,26 @@ declare(strict_types = 1);
 namespace Ranine\Helper;
 
 /**
- * Indicates the result of checking if a Content-Type header indicates JSON.
- */
-enum ContentTypeJsonCheckResult {
-
-  /**
-   * Indicates a valid Content-Type header indicating JSON content.
-   */
-  case Json;
-
-  /**
-   * Indicates a malformed Content-Type header.
-   */
-  case Malformed;
-
-  /**
-   * Indicates a Content-Type header indicating non-JSON data.
-   */
-  case NonJson;
-
-}
-
-/**
  * Static helper methods to deal with HTTP stuff.
  *
  * @static
  */
 final class HttpHelpers {
+
+  /**
+   * Indicates a malformed Content-Type header.
+   */
+  public const CONTENT_TYPE_HEADER_MALFORMED = 1;
+
+  /**
+   * Indicates a Content-Type header indicating non-JSON data.
+   */
+  public const CONTENT_TYPE_HEADER_NON_JSON = 2;
+
+  /**
+   * Indicates a valid Content-Type header.
+   */
+  public const CONTENT_TYPE_HEADER_VALID = 3;
 
   /**
    * Empty private constructor to ensure no one instantiates this class.
@@ -45,22 +38,24 @@ final class HttpHelpers {
    * @param string $contentTypeHeader
    *   Content type header value to check.
    *
-   * @return \Ranine\Helper\ContentTypeJsonCheckResult
-   *   Whether header indicates JSON data, is malformed, or does not indicate
-   *   JSON data.
+   * @return int
+   *   Status code; one of static::CONTENT_TYPE_HEADER_MALFORMED,
+   *   static::CONTENT_TYPE_HEADER_NOT_JSON, or
+   *   static::CONTENT_TYPE_HEADER_VALID. The meanings of the codes should be
+   *   self-evident :)
    */
-  public static function checkJsonContentTypeHeader(string $contentTypeHeader) : ContentTypeJsonCheckResult {
+  public static function checkJsonContentTypeHeader(string $contentTypeHeader) : int {
     $contentTypeParts = explode(';', $contentTypeHeader);
     assert(is_array($contentTypeParts));
     if (empty($contentTypeParts)) {
-      return ContentTypeJsonCheckResult::Malformed;
+      return static::CONTENT_TYPE_HEADER_MALFORMED;
     }
     $numContentTypeParts = count($contentTypeParts);
     if ($numContentTypeParts > 2) {
-      return ContentTypeJsonCheckResult::Malformed;
+      return static::CONTENT_TYPE_HEADER_MALFORMED;
     }
     if (strcasecmp(trim($contentTypeParts[0]), 'application/json') !== 0) {
-      return ContentTypeJsonCheckResult::NonJson;
+      return static::CONTENT_TYPE_HEADER_NON_JSON;
     }
     if ($numContentTypeParts > 1) {
       $secondContentTypePart = trim($contentTypeParts[1]);
@@ -70,20 +65,20 @@ final class HttpHelpers {
           // In this case, this parameter should indicate a UTF-8 or US-ASCII
           // character set.
           if (count($charsetParts) !== 2) {
-            return ContentTypeJsonCheckResult::Malformed;
+            return static::CONTENT_TYPE_HEADER_MALFORMED;
           }
           if (strcasecmp(trim($charsetParts[0]), 'charset') !== 0) {
-            return ContentTypeJsonCheckResult::Malformed;
+            return static::CONTENT_TYPE_HEADER_MALFORMED;
           }
           $characterSet = trim($charsetParts[1]);
           if (strcasecmp($characterSet, 'utf-8') !== 0 && strcasecmp($characterSet, 'us-ascii') !== 0) {
-            return ContentTypeJsonCheckResult::NonJson;
+            return static::CONTENT_TYPE_HEADER_NON_JSON;
           }
         }
       }
     }
 
-    return ContentTypeJsonCheckResult::Json;
+    return static::CONTENT_TYPE_HEADER_VALID;
   }
 
   /**
