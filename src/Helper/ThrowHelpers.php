@@ -41,7 +41,7 @@ final class ThrowHelpers {
    *
    * @throws \InvalidArgumentException
    */
-  public static function throwIfLessThanOrEqualToZero(int $value, string $variableName) : void {
+  public static function throwIfLessThanOrEqualToZero(int|float $value, string $variableName) : void {
     if ($value <= 0) {
       throw new \InvalidArgumentException('$' . $variableName . ' is less than or equal to zero.');
     }
@@ -58,7 +58,7 @@ final class ThrowHelpers {
    *
    * @throws \InvalidArgumentException
    */
-  public static function throwIfLessThanZero(int $value, string $variableName) : void {
+  public static function throwIfLessThanZero(int|float $value, string $variableName) : void {
     if ($value < 0) {
       throw new \InvalidArgumentException('$' . $variableName . ' is less than zero.');
     }
