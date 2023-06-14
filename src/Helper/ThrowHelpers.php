@@ -28,7 +28,7 @@ final class ThrowHelpers {
    *
    * phpstan-assert non-empty-string $value
    */
-  public static function throwIfEmptyString(string $value, string $variableName) : void {
+  public static function throwIfEmptyString(?string $value, string $variableName) : void {
     if ($value === '') {
       throw new \InvalidArgumentException('$' . $variableName . ' is empty.');
     }
@@ -45,8 +45,8 @@ final class ThrowHelpers {
    *
    * phpstan-assert positive-int $value
    */
-  public static function throwIfLessThanOrEqualToZero(int|float $value, string $variableName) : void {
-    if ($value <= 0) {
+  public static function throwIfLessThanOrEqualToZero(int|float|null $value, string $variableName) : void {
+    if ($value !== NULL && $value <= 0) {
       throw new \InvalidArgumentException('$' . $variableName . ' is less than or equal to zero.');
     }
   }
@@ -62,7 +62,7 @@ final class ThrowHelpers {
    *
    * phpstan-assert int<0, max> $value
    */
-  public static function throwIfLessThanZero(int|float $value, string $variableName) : void {
+  public static function throwIfLessThanZero(int|float|null $value, string $variableName) : void {
     if ($value < 0) {
       throw new \InvalidArgumentException('$' . $variableName . ' is less than zero.');
     }
