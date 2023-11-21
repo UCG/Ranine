@@ -126,7 +126,7 @@ final class UserHelpers {
         }
 
         if (!isset($users[$uid])) {
-          goto next_user;            
+          goto next_user;
         }
         $user = $users[$uid];
         if (!$userFilter($user)) {
