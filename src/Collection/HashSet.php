@@ -110,7 +110,7 @@ class HashSet implements \IteratorAggregate {
    */
   public function add($item) : bool {
     $hash = ($this->hashing)($item);
-    if (array_key_exists($hash, $this->buckets)) {
+    if (isset($this->buckets[$hash])) {
       $bucket =& $this->buckets[$hash];
       if ($this->isItemInBucket($bucket, $item)) {
         return FALSE;
@@ -155,7 +155,7 @@ class HashSet implements \IteratorAggregate {
     }
 
     $hash = ($this->hashing)($item);
-    return array_key_exists($hash, $this->buckets) && $this->isItemInBucket($this->buckets[$hash], $item);
+    return isset($this->buckets[$hash]) && $this->isItemInBucket($this->buckets[$hash], $item);
   }
 
   /**
@@ -171,7 +171,7 @@ class HashSet implements \IteratorAggregate {
    */
   public function remove($item) : bool {
     $hash = ($this->hashing)($item);
-    if (array_key_exists($hash, $this->buckets)) {
+    if (isset($this->buckets[$hash])) {
       // Find and remove the item from the bucket.
       $bucket =& $this->buckets[$hash];
       $foundItem = FALSE;

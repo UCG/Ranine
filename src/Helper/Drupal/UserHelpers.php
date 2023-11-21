@@ -125,7 +125,7 @@ final class UserHelpers {
           hash_update($hashContext, StringHelpers::ASCII_GROUP_SEPARATOR);
         }
 
-        if (!array_key_exists($uid, $users)) {
+        if (!isset($users[$uid])) {
           goto next_user;            
         }
         $user = $users[$uid];
