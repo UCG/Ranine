@@ -101,7 +101,7 @@ class HashMapTest extends TestCase {
    */
   public function testGetReference() : void {
     $map = new HashMap(NULL, NULL, [2 => 1, 4 => 2]);
-    $ref &= $map->getReference(4);
+    $ref =& $map->getReference(4);
     $ref = 5;
     $this->assertTrue($map->get(4) === 5);
   }
