@@ -171,11 +171,35 @@ class HashMap implements \IteratorAggregate {
   }
 
   /**
+   * Gets a reference to the value associated with the given $key.
+   *
+   * @param TKey $key
+   *
+   * @return TValue
+   *
+   * @throws \Ranine\Exception\KeyNotFoundException
+   *   Thrown if $key was not found in the collection.
+   */
+  public function &getReference($key) : mixed {
+    $hash = ($this->keyHashing)($key);
+    if (array_key_exists($hash, $this->buckets)) {
+      foreach ($this->buckets[$hash] as &$pair) {
+        $bucketItemKey = $pair[self::PAIR_KEY_INDEX];
+        if (($this->keyEqualityComparison)($key, $bucketItemKey)) {
+          return $pair[self::PAIR_VALUE_INDEX];
+        }
+      }
+    }
+
+    throw new KeyNotFoundException('The key was not found in the hash table.');
+  }
+
+  /**
    * {@inheritdoc}
    */
-  public function getIterator() : \Iterator {
-    foreach ($this->buckets as $bucket) {
-      foreach ($bucket as $pair) {
+  public function &getIterator() : \Iterator {
+    foreach ($this->buckets as &$bucket) {
+      foreach ($bucket as &$pair) {
         yield $pair[self::PAIR_KEY_INDEX] => $pair[self::PAIR_VALUE_INDEX];
       }
     }

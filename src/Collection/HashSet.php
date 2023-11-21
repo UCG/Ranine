@@ -136,9 +136,9 @@ class HashSet implements \IteratorAggregate {
   /**
    * {@inheritdoc}
    */
-  public function getIterator() : \Iterator {
-    foreach ($this->buckets as $bucket) {
-      foreach ($bucket as $value) {
+  public function &getIterator() : \Iterator {
+    foreach ($this->buckets as &$bucket) {
+      foreach ($bucket as &$value) {
         yield $value;
       }
     }

@@ -94,6 +94,20 @@ class HashMapTest extends TestCase {
   }
 
   /**
+   * Tests the getReference() method.
+   *
+   * Uses the default hashing / comparison.
+   *
+   * @covers ::getReference
+   */
+  public function testGetReference() : void {
+    $map = new HashMap(NULL, NULL, [2 => 1, 4 => 2]);
+    $ref &= $map->getReference(4);
+    $ref = 5;
+    $this->assertTrue($map->get(4) === 5);
+  }
+
+  /**
    * Tests the remove() and has() method.
    *
    * Uses the default hashing / comparison.

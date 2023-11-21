@@ -68,19 +68,12 @@ class Stack implements \IteratorAggregate {
   }
 
   /**
-   * Gets an iterator to iterate through the elements of this stack.
-   *
-   * Iteration proceeds from the first element pushed to the last.
-   *
-   * @return \Traversable<T>
-   *   Iterator.
+   * {@inheritdoc}
    */
-  public function getIterator() : \Traversable {
-    return (function () {
-      foreach ($this->arr as $element) {
-        yield $element;
-      }
-    })();
+  public function &getIterator() : \Iterator {
+    foreach ($this->arr as &$element) {
+      yield $element;
+    }
   }
 
   /**
