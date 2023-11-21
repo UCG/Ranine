@@ -121,7 +121,7 @@ class HashMap implements \IteratorAggregate {
    */
   public function add($key, $value) : void {
     $hash = ($this->keyHashing)($key);
-    if (array_key_exists($hash, $this->buckets)) {
+    if (isset($this->buckets[$hash])) {
       $bucket =& $this->buckets[$hash];
       if ($this->isKeyInBucket($bucket, $key)) {
         throw new KeyExistsException('The key already exists in the hash table.');
@@ -142,7 +142,7 @@ class HashMap implements \IteratorAggregate {
    */
   public function get($key) : mixed {
     $hash = ($this->keyHashing)($key);
-    if (array_key_exists($hash, $this->buckets)) {
+    if (isset($this->buckets[$hash])) {
       foreach ($this->buckets[$hash] as $pair) {
         $bucketItemKey = $pair[static::PAIR_KEY_INDEX];
         if (($this->keyEqualityComparison)($key, $bucketItemKey)) {
@@ -169,7 +169,7 @@ class HashMap implements \IteratorAggregate {
    */
   public function &getReference($key) : mixed {
     $hash = ($this->keyHashing)($key);
-    if (array_key_exists($hash, $this->buckets)) {
+    if (isset($this->buckets[$hash])) {
       foreach ($this->buckets[$hash] as &$pair) {
         $bucketItemKey = $pair[static::PAIR_KEY_INDEX];
         if (($this->keyEqualityComparison)($key, $bucketItemKey)) {
@@ -201,7 +201,7 @@ class HashMap implements \IteratorAggregate {
     }
 
     $hash = ($this->keyHashing)($key);
-    return array_key_exists($hash, $this->buckets) && $this->isKeyInBucket($this->buckets[$hash], $key);
+    return isset($this->buckets[$hash]) && $this->isKeyInBucket($this->buckets[$hash], $key);
   }
 
   /**
@@ -216,7 +216,7 @@ class HashMap implements \IteratorAggregate {
    */
   public function remove($key) : bool {
     $hash = ($this->keyHashing)($key);
-    if (array_key_exists($hash, $this->buckets)) {
+    if (isset($this->buckets[$hash])) {
       // Find and remove the item from the bucket.
       $bucket =& $this->buckets[$hash];
       $foundItem = FALSE;
@@ -258,7 +258,7 @@ class HashMap implements \IteratorAggregate {
    */
   public function set($key, $value, bool $createIfKeyNotInMap = FALSE) : bool {
     $hash = ($this->keyHashing)($key);
-    if (array_key_exists($hash, $this->buckets)) {
+    if (isset($this->buckets[$hash])) {
       $bucket =& $this->buckets[$hash];
       foreach ($bucket as &$pair) {
         $bucketItemKey = $pair[static::PAIR_KEY_INDEX];

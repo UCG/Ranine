@@ -83,7 +83,7 @@ class BinaryStream {
       return NULL;
     }
     $result = unpack('C', $byte->getBackingString(), $byte->getStartPosition());
-    if (!is_array($result) || !array_key_exists(1, $result)) {
+    if (!is_array($result) || !isset($result[1])) {
       return NULL;
     }
     assert(is_int($result[1]));
@@ -102,7 +102,7 @@ class BinaryStream {
       return NULL;
     }
     $result = unpack('n', $bytes->getBackingString(), $bytes->getStartPosition());
-    if (!is_array($result) || !array_key_exists(1, $result)) {
+    if (!is_array($result) || !isset($result[1])) {
       return NULL;
     }
     assert(is_int($result[1]));
@@ -121,7 +121,7 @@ class BinaryStream {
       return NULL;
     }
     $result = unpack('v', $bytes->getBackingString(), $bytes->getStartPosition());
-    if (!is_array($result) || !array_key_exists(1, $result)) {
+    if (!is_array($result) || !isset($result[1])) {
       return NULL;
     }
     assert(is_int($result[1]));
@@ -140,7 +140,7 @@ class BinaryStream {
       return NULL;
     }
     $result = unpack('N', $bytes->getBackingString(), $bytes->getStartPosition());
-    if (!is_array($result) || !array_key_exists(1, $result)) {
+    if (!is_array($result) || !isset($result[1])) {
       return NULL;
     }
     assert(is_int($result[1]));
@@ -159,7 +159,7 @@ class BinaryStream {
       return NULL;
     }
     $result = unpack('V', $bytes->getBackingString(), $bytes->getStartPosition());
-    if (!is_array($result) || !array_key_exists(1, $result)) {
+    if (!is_array($result) || !isset($result[1])) {
       return NULL;
     }
     assert(is_int($result[1]));
@@ -178,7 +178,7 @@ class BinaryStream {
       return NULL;
     }
     $result = unpack('J', $bytes->getBackingString(), $bytes->getStartPosition());
-    if (!is_array($result) || !array_key_exists(1, $result)) {
+    if (!is_array($result) || !isset($result[1])) {
       return NULL;
     }
     assert(is_int($result[1]));
@@ -197,7 +197,7 @@ class BinaryStream {
       return NULL;
     }
     $result = unpack('P', $bytes->getBackingString(), $bytes->getStartPosition());
-    if (!is_array($result) || !array_key_exists(1, $result)) {
+    if (!is_array($result) || !isset($result[1])) {
       return NULL;
     }
     assert(is_int($result[1]));

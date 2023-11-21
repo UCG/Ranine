@@ -71,7 +71,7 @@ trait MockEntityTypeManagerCreationTrait {
         else {
           $entitiesFound = [];
           foreach ($ids as $id) {
-            if (array_key_exists($id, $entities)) {
+            if (isset($entities[$id])) {
               $entitiesFound[$id] = $entities[$id];
             }
           }
@@ -98,7 +98,7 @@ trait MockEntityTypeManagerCreationTrait {
     // Create the mock entity type manager.
     $mockEntityTypeManager = $this->createMockNoAutoMethodConfig('\\Drupal\\Core\\Entity\\EntityTypeManagerInterface');
     $mockEntityTypeManager->method('getStorage')->willReturnCallback(function (string $entity_type_id) use ($entityStorageObjects) : EntityStorageInterface {
-      if (array_key_exists($entity_type_id, $entityStorageObjects)) {
+      if (isset($entityStorageObjects[$entity_type_id])) {
         return $entityStorageObjects[$entity_type_id];
       }
       else {
