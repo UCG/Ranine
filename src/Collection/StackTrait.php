@@ -26,15 +26,13 @@ trait StackTrait {
    *
    * Iteration proceeds from the first element pushed to the last.
    *
-   * @return \Traversable
+   * @return \Iterator
    *   Iterator.
    */
-  public function getIterator() : \Traversable {
-    return (function () {
-      foreach ($this->arr as $element) {
-        yield $element;
-      }
-    })();
+  public function &getIterator() : \Iterator {
+    foreach ($this->arr as &$element) {
+      yield $element;
+    }
   }
 
   /**
