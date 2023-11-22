@@ -63,7 +63,6 @@ final class HashCodeHelpers {
         elseif (is_int($key)) {
           $keyHash = self::computeIntegerHashCode($key);
         }
-        assert(isset($keyHash));
         $hash ^= $keyHash ^ $keyValueSeparator;
         // If $value is an array, the value hash will be computed as we iterate
         // over the children.
