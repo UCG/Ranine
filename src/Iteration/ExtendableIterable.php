@@ -359,6 +359,7 @@ class ExtendableIterable implements \IteratorAggregate {
    *
    * @return self<TKeyOut, TValueOut>
    *   Output iterable. The order of elements is preserved.
+   * @phpstan-return ($keyMap is null ? self<TKey, TValueOut> : self<TKeyOut, TValueOut>)
    */
   public function map(?callable $valueMap, ?callable $keyMap = NULL) : self {
     if ($valueMap === NULL) {
