@@ -76,7 +76,7 @@ final class DatabaseHelpers {
           // can lead to out-of-order destruction during shutdown later. See
           // https://bugs.xdebug.org/view.php?id=2222 and https://www.drupal.org/project/drupal/issues/3405976.
           // This does raise a potential issue: will there be problems when the
-          // destructor is later called? Fortunately, popTransacation() appears
+          // destructor is later called? Fortunately, popTransaction() appears
           // to be idempotent, but this is certainly not optimal.
           $databaseConnection->popTransaction($transaction->name());
           // Return to caller -- transaction is finished.
