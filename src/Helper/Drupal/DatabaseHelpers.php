@@ -69,9 +69,16 @@ final class DatabaseHelpers {
       try {
         // Execute transaction code.
         if ($transactionExecution()) {
-          // Transaction execution was successful -- unset transaction
-          // explicitly to force commit.
-          unset($transaction);
+          // Transaction execution was successful -- pop (and potentially
+          // commit) the transaction. Normally this is done by unsetting the
+          // object to invoke the destructor, but, if XDebug is enabled, this
+          // might not work properly: the destructor might not be called, which
+          // can lead to out-of-order destruction during shutdown later. See
+          // https://bugs.xdebug.org/view.php?id=2222 and https://www.drupal.org/project/drupal/issues/3405976.
+          // This does raise a potential issue: will there be problems when the
+          // destructor is later called? Fortunately, popTransacation() appears
+          // to be idempotent, but this is certainly not optimal.
+          $databaseConnection->popTransaction($transaction->name());
           // Return to caller -- transaction is finished.
           return TRUE;
         }
