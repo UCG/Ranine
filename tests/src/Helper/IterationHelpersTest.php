@@ -29,7 +29,7 @@ class IterationHelpersTest extends TestCase {
 
     $currentSum = 0;
     $this->assertTrue(IterationHelpers::walkRecursiveIterator(new \RecursiveArrayIterator($arr),
-      function ($key, $value, ?int $context) use (&$currentSum) : bool {
+      function ($key, $value, ?int &$context) use (&$currentSum) : bool {
         if (is_array($value)) {
           return TRUE;
         }
@@ -58,8 +58,8 @@ class IterationHelpersTest extends TestCase {
             return FALSE;
         }
       },
-      function(int $key, $value, ?int &$context) {
-        $context = $key;
+      function(int $key, $value, ?int &$context, ?int &$newContext) {
+        $newContext = $key;
         return TRUE;
       }, function (?int $context) use (&$currentSum, $sumOfValues) : bool {
         switch ($context) {
@@ -82,7 +82,31 @@ class IterationHelpersTest extends TestCase {
             return FALSE;
         }
       }, NULL));
+
     $this->assertTrue($currentSum === $sumOfValues);
+  }
+
+  /**
+   * Tests context modification (by reference) for walkRecursiveIterator().
+   *
+   * @covers ::walkRecursiveIterator
+   */
+  public function testWalkRecursiveIteratorContextModification() : void {
+    $arr = [4 => [2, 3], 6 => 3];
+    // At each level, store a reference to the actual array as the context.
+    $this->assertTrue(IterationHelpers::walkRecursiveIterator(new \RecursiveArrayIterator($arr),
+      function (int $key, int|array $value, array &$context) : bool {
+        if ($key === 6) $context[$key] = 11;
+        elseif ($value === 3) $context[$key] = 13;
+        return TRUE;
+      }, function (int $key, $value, array &$context, ?array &$newContext) {
+        $newContext =& $context[$key];
+      }, NULL, $arr));
+    $this->assertArrayHasKey($arr, 6);
+    $this->assertEquals(11, $arr[6]);
+    $this->assertArrayHasKey(4, $arr);
+    $this->assertArrayHasKey(1, $arr[4]);
+    $this->assertEquals(13, $arr[4][1]);
   }
 
 }

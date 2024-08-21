@@ -167,7 +167,7 @@ class ArraySchema {
       }
     };
 
-    IterationHelpers::walkRecursiveIterator($iterator, function(string|int $key, ArraySchemaRule $rule, object $context) : bool {
+    IterationHelpers::walkRecursiveIterator($iterator, function(string|int $key, ArraySchemaRule $rule, object &$context) : bool {
       $data = $context->getData();
 
       $keyExistsInData = array_key_exists($key, $data);
@@ -194,10 +194,10 @@ class ArraySchema {
         $context->incrementNumRuleAssociatedElements();
       }
       return TRUE;
-    }, function (string|int $key, $value, &$context) : bool {
+    }, function (string|int $key, $value, &$context, &$newContext) : bool {
       $data = $context->getData();
       if (array_key_exists($key, $data)) {
-        $context = $context->getSubContext($key);
+        $newContext = $context->getSubContext($key);
         return TRUE;
       }
       else {

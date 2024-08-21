@@ -39,7 +39,7 @@ final class EqualityHelpers {
     if ($recursive) {
       $iterator = new \RecursiveArrayIterator($arr1);
       return IterationHelpers::walkRecursiveIterator($iterator,
-        function ($key, $value, array $context) : bool {
+        function ($key, $value, array &$context) : bool {
           // Check to ensure the other array has a corresponding key.
           if (!array_key_exists($key, $context)) {
             return FALSE;
@@ -55,8 +55,8 @@ final class EqualityHelpers {
             return $value === $context[$key];
           }
         },
-        function ($key, $value, array &$context) : bool {
-          $context = $context[$key];
+        function ($key, $value, array &$context, ?array &$newContext) : bool {
+          $newContext = $context[$key];
           return TRUE;
         }, NULL,
         $arr2);

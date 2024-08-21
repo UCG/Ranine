@@ -56,7 +56,7 @@ final class HashCodeHelpers {
     $itemSeparator = (~-23) >> 5;
     $levelSeparator = 2243 << 5;
     IterationHelpers::walkRecursiveIterator($iterator,
-      function (string|int $key, $value, $c) use (&$hash, $keyValueSeparator, $itemSeparator) : bool {
+      function (string|int $key, $value) use (&$hash, $keyValueSeparator, $itemSeparator) : bool {
         if (is_string($key)) {
           $keyHash = self::computeStringHashCode($key);
         }
