@@ -81,7 +81,7 @@ class IterationHelpersTest extends TestCase {
           default:
             return FALSE;
         }
-      }, NULL));
+      }));
 
     $this->assertTrue($currentSum === $sumOfValues);
   }
@@ -93,16 +93,19 @@ class IterationHelpersTest extends TestCase {
    */
   public function testWalkRecursiveIteratorContextModification() : void {
     $arr = [4 => [2, 3], 6 => 3];
+    /** @var \RecursiveArrayIterator<int, int[]|int> */
+    $iterator = new \RecursiveArrayIterator($arr);
     // At each level, store a reference to the actual array as the context.
-    $this->assertTrue(IterationHelpers::walkRecursiveIterator(new \RecursiveArrayIterator($arr),
+    $this->assertTrue(IterationHelpers::walkRecursiveIterator($iterator,
       function (int $key, int|array $value, array &$context) : bool {
         if ($key === 6) $context[$key] = 11;
         elseif ($value === 3) $context[$key] = 13;
         return TRUE;
-      }, function (int $key, $value, array &$context, ?array &$newContext) {
+      }, function (int $key, $value, array &$context, ?array &$newContext) : bool {
         $newContext =& $context[$key];
+        return TRUE;
       }, NULL, $arr));
-    $this->assertArrayHasKey($arr, 6);
+    $this->assertArrayHasKey(6, $arr);
     $this->assertEquals(11, $arr[6]);
     $this->assertArrayHasKey(4, $arr);
     $this->assertArrayHasKey(1, $arr[4]);
