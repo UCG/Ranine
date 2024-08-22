@@ -74,8 +74,8 @@ final class IterationHelpers {
    *   otherwise returns TRUE.
    */
   public static function walkRecursiveIterator(\RecursiveIterator $iterator, callable $operation, ?callable $drillDown = NULL, ?callable $levelFinish = NULL, &$initialContext = NULL) : bool {
-    $drillDown ??= fn() => NULL;
-    $levelFinish ??= function &() { $newContext = NULL; return $newContext; };
+    $drillDown ??= function &() { $newContext = NULL; return $newContext; };
+    $levelFinish ??= fn() => TRUE;
 
     // Prepare the iterator.
     $iterator->rewind();
