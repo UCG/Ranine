@@ -29,7 +29,7 @@ class RecursiveReferenceArrayIterator implements \RecursiveIterator {
   /**
    * {@inheritdoc}
    */
-  public function current() {
+  public function current() : mixed {
     self::throwIfNotValid();
     return $this->value;
   }
@@ -83,11 +83,12 @@ class RecursiveReferenceArrayIterator implements \RecursiveIterator {
   }
 
   private function setKeyAndValueFromCurrentPosition() : void {
-    $this->key = key($arr);
-    if (array_key_exists($this->key, $arr)) {
-      $this->value =& $arr[$this->key];
+    $this->key = key($this->arr);
+    if (array_key_exists($this->key, $this->arr)) {
+      $this->value =& $this->arr[$this->key];
     }
     else {
+      unset($this->value);
       $this->value = NULL;
       $this->key = NULL;
     }

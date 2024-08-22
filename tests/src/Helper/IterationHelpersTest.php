@@ -58,11 +58,8 @@ class IterationHelpersTest extends TestCase {
           default:
             return FALSE;
         }
-      },
-      function(int $key, $value, ?int &$context, ?int &$newContext) {
-        $newContext = $key;
-        return TRUE;
-      }, function (?int $context) use (&$currentSum, $sumOfValues) : bool {
+      }, fn(int $key) : int => $key,
+      function (?int $context) use (&$currentSum, $sumOfValues) : bool {
         switch ($context) {
           case NULL:
             return $currentSum === $sumOfValues ? TRUE : FALSE;
@@ -106,9 +103,8 @@ class IterationHelpersTest extends TestCase {
         $sumOfKeys += $key;
         if (is_int($value)) $sumOfValues += $value;
         return TRUE;
-      }, function (int $key, $value, array &$context, ?array &$newContext) : bool {
-        $newContext =& $context[$key];
-        return TRUE;
+      }, function &(int $key, $value, array &$context) : array {
+        return $context[$key];
       }, NULL, $arr));
     $this->assertArrayHasKey(6, $arr);
     $this->assertEquals(11, $arr[6]);

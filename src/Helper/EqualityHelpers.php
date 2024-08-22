@@ -55,9 +55,8 @@ final class EqualityHelpers {
             return $value === $context[$key];
           }
         },
-        function ($key, $value, array &$context, ?array &$newContext) : bool {
-          $newContext = $context[$key];
-          return TRUE;
+        function ($key, $value, array &$context) : array {
+          return $context[$key];
         }, NULL,
         $arr2);
     }

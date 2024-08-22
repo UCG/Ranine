@@ -194,15 +194,15 @@ class ArraySchema {
         $context->incrementNumRuleAssociatedElements();
       }
       return TRUE;
-    }, function (string|int $key, $value, &$context, &$newContext) : bool {
+    }, function (string|int $key, $value, object &$context, bool &$shouldDrill) : object {
       $data = $context->getData();
       if (array_key_exists($key, $data)) {
-        $newContext = $context->getSubContext($key);
-        return TRUE;
+        $shouldDrill = TRUE;
+        return $context->getSubContext($key);
       }
       else {
-        $newContext = $context;
-        return FALSE;
+        $shouldDrill = FALSE;
+        return $context;
       }
      }, function ($context) {
       // Ensure that the level doesn't have too many elements (all elements must

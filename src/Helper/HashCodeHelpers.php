@@ -71,9 +71,9 @@ final class HashCodeHelpers {
           $hash ^= $keyHash ^ $keyValueSeparator ^ $valueHash ^ $itemSeparator;
         }
         return TRUE;
-      }, function () use (&$hash, $levelSeparator) : bool {
+      }, function () use (&$hash, $levelSeparator) {
         $hash ^= $levelSeparator;
-        return TRUE;
+        return NULL;
       }, function () use (&$hash, $levelSeparator) : bool {
         $hash ^= $levelSeparator;
         return TRUE;

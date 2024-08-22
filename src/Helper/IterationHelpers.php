@@ -45,18 +45,18 @@ final class IterationHelpers {
    *   passed by reference so that changes can be made and retained. The return
    *   value indicates whether iteration should be continued (TRUE to continue,
    *   FALSE to halt).
-   * @param ?callable(TKey $key, TValue $value, TContext|null &$context, TContext|null &$newChildLevelContext) : bool $drillDown
+   * @param ?callable&(TKey $key, TValue $value, TContext|null &$context, &$shouldDrill = TRUE) : array $drillDown
    *   This is called before moving down a level, and allows one to prevent the
    *   drill-down operation (by returning FALSE). The context is passed by
-   *   reference, so that it can be changed. $newChildLevelContext (NULL by
-   *   default) should be set to reflect the appropriate context for the child
-   *   level (if a drill-down is desired).
+   *   reference, so that it can be changed. The new context should be returned
+   *   (by reference, if desired), and $shouldDrill should be set to TRUE if a
+   *   drill-down is desired.
    *
    *   Note that if changes are made to keys or values (not the referenced
    *   objects thereof) between $operation() and $drillDown(), $value will not
    *   reflect the changes.
    *
-   *   If NULL is passed for $drillDown, the function ($k, $v, &$c) { return TRUE; }
+   *   If NULL is passed for $drillDown, the function () => return NULL;
    *   is used.
    * @param ?callable(TContext $context) : bool $levelFinish
    *   This is called after there are no more siblings left at a given level.
@@ -64,7 +64,7 @@ final class IterationHelpers {
    *   indicates whether iteration should be continued (TRUE to continue, FALSE
    *   to halt). If NULL is passed for this parameter, the function ($c) => TRUE
    *   is used.
-   * @param TContext $initialContext
+   * @param ?TContext $initialContext
    *   The context information to be stored at the root level. Passed by
    *   reference so that modifications made while walking the iterator are
    *   preserved.
@@ -74,7 +74,7 @@ final class IterationHelpers {
    *   otherwise returns TRUE.
    */
   public static function walkRecursiveIterator(\RecursiveIterator $iterator, callable $operation, ?callable $drillDown = NULL, ?callable $levelFinish = NULL, &$initialContext = NULL) : bool {
-    $drillDown ??= fn() => TRUE;
+    $drillDown ??= fn() => NULL;
     $levelFinish ??= fn() => TRUE;
 
     // Prepare the iterator.
@@ -122,8 +122,9 @@ final class IterationHelpers {
         // (Break the reference so we can set it to something else without it
         // disturbing whatever $currentContext is pointing to:)
         unset($lowerLevelContext);
-        $lowerLevelContext = NULL;
-        if ($drillDown($key, $value, $currentContext, $lowerLevelContext)) {
+        $shouldDrill = TRUE;
+        $lowerLevelContext =& $drillDown($key, $value, $currentContext, $shouldDrill);
+        if ($shouldDrill) {
           // Push the current level onto $parentLevels, and create and store the
           // current level information.
           $parentLevels->push([$parentIterator, &$currentContext]);
