@@ -119,6 +119,9 @@ final class IterationHelpers {
       if (($childIterator = self::prepareChildIterator($currentIterator)) !== NULL) {
         // Decide whether or not to move to the lower level, and set the context
         // for that level.
+        // (Break the reference so we can set it to something else without it
+        // disturbing whatever $currentContext is pointing to:)
+        unset($lowerLevelContext);
         $lowerLevelContext = NULL;
         if ($drillDown($key, $value, $currentContext, $lowerLevelContext)) {
           // Push the current level onto $parentLevels, and create and store the
