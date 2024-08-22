@@ -45,18 +45,18 @@ final class IterationHelpers {
    *   passed by reference so that changes can be made and retained. The return
    *   value indicates whether iteration should be continued (TRUE to continue,
    *   FALSE to halt).
-   * @param ?callable&(TKey $key, TValue $value, TContext|null &$context, &$shouldDrill = TRUE) : array $drillDown
+   * @param ?callable&(TKey $key, TValue $value, TContext|null &$context, &$shouldDrill = TRUE) : ?TContext $drillDown
    *   This is called before moving down a level, and allows one to prevent the
    *   drill-down operation (by returning FALSE). The context is passed by
    *   reference, so that it can be changed. The new context should be returned
-   *   (by reference, if desired), and $shouldDrill should be set to TRUE if a
-   *   drill-down is desired.
+   *   by reference, and $shouldDrill should be set to TRUE if a drill-down is
+   *   desired.
    *
    *   Note that if changes are made to keys or values (not the referenced
    *   objects thereof) between $operation() and $drillDown(), $value will not
    *   reflect the changes.
    *
-   *   If NULL is passed for $drillDown, the function () => return NULL;
+   *   If NULL is passed for $drillDown, the function &() { $newContext = NULL; return $newContext; }
    *   is used.
    * @param ?callable(TContext $context) : bool $levelFinish
    *   This is called after there are no more siblings left at a given level.
@@ -75,7 +75,7 @@ final class IterationHelpers {
    */
   public static function walkRecursiveIterator(\RecursiveIterator $iterator, callable $operation, ?callable $drillDown = NULL, ?callable $levelFinish = NULL, &$initialContext = NULL) : bool {
     $drillDown ??= fn() => NULL;
-    $levelFinish ??= fn() => TRUE;
+    $levelFinish ??= function &() { $newContext = NULL; return $newContext; };
 
     // Prepare the iterator.
     $iterator->rewind();

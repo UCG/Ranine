@@ -58,7 +58,7 @@ class IterationHelpersTest extends TestCase {
           default:
             return FALSE;
         }
-      }, fn(int $key) : int => $key,
+      }, fn&(int $key) : int => $key,
       function (?int $context) use (&$currentSum, $sumOfValues) : bool {
         switch ($context) {
           case NULL:
