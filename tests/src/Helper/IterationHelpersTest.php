@@ -6,6 +6,7 @@ namespace Ranine\Tests\Helper;
 
 use PHPUnit\Framework\TestCase;
 use Ranine\Helper\IterationHelpers;
+use Ranine\Iteration\RecursiveReferenceArrayIterator;
 
 /**
  * Tests the IterationHelpers class.
@@ -93,13 +94,17 @@ class IterationHelpersTest extends TestCase {
    */
   public function testWalkRecursiveIteratorContextModification() : void {
     $arr = [4 => [2, 3], 6 => 3];
-    /** @var \RecursiveArrayIterator<int, int[]|int> */
-    $iterator = new \RecursiveArrayIterator($arr);
+    /** @var \Ranine\Iteration\RecursiveReferenceArrayIterator<int, int[]|int> */
+    $iterator = new RecursiveReferenceArrayIterator($arr);
+    $sumOfValues = 0;
+    $sumOfKeys = 0;
     // At each level, store a reference to the actual array as the context.
     $this->assertTrue(IterationHelpers::walkRecursiveIterator($iterator,
-      function (int $key, int|array $value, array &$context) : bool {
+      function (int $key, int|array $value, array &$context) use(&$sumOfValues, &$sumOfKeys) : bool {
         if ($key === 6) $context[$key] = 11;
         elseif ($value === 3) $context[$key] = 13;
+        $sumOfKeys += $key;
+        if (is_int($value)) $sumOfValues += $value;
         return TRUE;
       }, function (int $key, $value, array &$context, ?array &$newContext) : bool {
         $newContext =& $context[$key];
@@ -110,6 +115,8 @@ class IterationHelpersTest extends TestCase {
     $this->assertArrayHasKey(4, $arr);
     $this->assertArrayHasKey(1, $arr[4]);
     $this->assertEquals(13, $arr[4][1]);
+    $this->assertEquals(11, $sumOfKeys);
+    $this->assertEquals(8, $sumOfValues);
   }
 
 }
