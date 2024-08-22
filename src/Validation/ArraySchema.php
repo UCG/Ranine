@@ -201,6 +201,7 @@ class ArraySchema {
         return TRUE;
       }
       else {
+        $newContext = $context;
         return FALSE;
       }
      }, function ($context) {

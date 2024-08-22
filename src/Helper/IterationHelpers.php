@@ -39,13 +39,13 @@ final class IterationHelpers {
    *
    * @param \RecursiveIterator<TKey, TValue> $iterator
    *   Iterator to walk.
-   * @param callable(TKey $key, TValue $value, TContext &$context) : bool $operation
+   * @param callable(TKey $key, TValue $value, TContext|null &$context) : bool $operation
    *   Operation to apply for every element. The $context object stores
    *   information associated with the current level being traversed, and is
    *   passed by reference so that changes can be made and retained. The return
    *   value indicates whether iteration should be continued (TRUE to continue,
    *   FALSE to halt).
-   * @param ?callable(TKey $key, TValue $value, TContext &$context, TContext|null &$newChildLevelContext) : bool $drillDown
+   * @param ?callable(TKey $key, TValue $value, TContext|null &$context, TContext|null &$newChildLevelContext) : bool $drillDown
    *   This is called before moving down a level, and allows one to prevent the
    *   drill-down operation (by returning FALSE). The context is passed by
    *   reference, so that it can be changed. $newChildLevelContext (NULL by
@@ -88,8 +88,8 @@ final class IterationHelpers {
     // ?\RecursiveIterator object indicating the parent \RecursiveIterator for
     // this level (NULL indicates no parent), and the second is the user
     // context information.
-    /** @var \Ranine\Collection\Stack<array<int, TContext|\RecursiveIterator<TKey, TValue>|null>> */
-    /** @phpstan-var \Ranine\Collection\Stack<array{0: \RecursiveIterator<TKey, TValue>|null, 1: TContext}> */
+    /** @var \Ranine\Collection\Stack<array<int, TContext|null|\RecursiveIterator<TKey, TValue>|null>> */
+    /** @phpstan-var \Ranine\Collection\Stack<array{0: \RecursiveIterator<TKey, TValue>|null, 1: TContext|null}> */
     $parentLevels = new Stack();
 
     // Keep track of the current iterator.

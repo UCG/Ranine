@@ -37,14 +37,14 @@ final class EqualityHelpers {
     }
 
     if ($recursive) {
-      $iterator = new \RecursiveArrayIterator($arr1);
+      $iterator = new \RecursiveArrayIterator($arr1, \RecursiveArrayIterator::CHILD_ARRAYS_ONLY);
       return IterationHelpers::walkRecursiveIterator($iterator,
         function ($key, $value, array &$context) : bool {
           // Check to ensure the other array has a corresponding key.
           if (!array_key_exists($key, $context)) {
             return FALSE;
           }
-          
+
           if (is_array($value)) {
             // If $value is an array, check to ensure the other array is an
             // array with the same number of elements (equality of the elements
