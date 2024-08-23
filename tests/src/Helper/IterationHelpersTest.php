@@ -97,7 +97,7 @@ class IterationHelpersTest extends TestCase {
     $sumOfKeys = 0;
     // At each level, store a reference to the actual array as the context.
     $this->assertTrue(IterationHelpers::walkRecursiveIterator($iterator,
-      function (int $key, int|array $value, array &$context) use(&$sumOfValues, &$sumOfKeys) : bool {
+      function (int|string $key, int|array $value, array &$context) use(&$sumOfValues, &$sumOfKeys) : bool {
         if ($key === 6) $context[$key] = 11;
         elseif ($value === 3) $context[$key] = 13;
         $sumOfKeys += $key;

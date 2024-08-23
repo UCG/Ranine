@@ -168,6 +168,7 @@ class ArraySchema {
     };
 
     IterationHelpers::walkRecursiveIterator($iterator, function(string|int $key, ArraySchemaRule $rule, object &$context) : bool {
+      /** @phpstan-ignore-next-line */
       $data = $context->getData();
 
       $keyExistsInData = array_key_exists($key, $data);
@@ -191,13 +192,16 @@ class ArraySchema {
           }
         }
         $rule->validate($element);
+        /** @phpstan-ignore-next-line */
         $context->incrementNumRuleAssociatedElements();
       }
       return TRUE;
     }, function &(string|int $key, $value, object &$context, bool &$shouldDrill) : object {
+      /** @phpstan-ignore-next-line */
       $data = $context->getData();
       if (array_key_exists($key, $data)) {
         $shouldDrill = TRUE;
+        /** @phpstan-ignore-next-line */
         $newContext = $context->getSubContext($key);
       }
       else {
@@ -209,6 +213,7 @@ class ArraySchema {
       // Ensure that the level doesn't have too many elements (all elements must
       // have associated rules, so it can't have more elements than it did
       // elements that were associated with rules).
+      /** @phpstan-ignore-next-line */
       if (count($context->getData()) > $context->getNumRuleAssociatedElements()) {
         throw new ExtraElementsArraySchemaException();
       }

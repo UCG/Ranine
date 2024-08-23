@@ -8,6 +8,10 @@ use Ranine\Exception\InvalidOperationException;
 
 /**
  * Iterates recursively over (a ref to) an array and (refs to) its sub-arrays.
+ *
+ * @template TKey
+ * @template TValue
+ * @implements \RecursiveIterator<TKey, TValue>
  */
 class RecursiveReferenceArrayIterator implements \RecursiveIterator {
 
@@ -30,23 +34,24 @@ class RecursiveReferenceArrayIterator implements \RecursiveIterator {
    * {@inheritdoc}
    */
   public function current() : mixed {
-    self::throwIfNotValid();
+    $this->throwIfNotValid();
     return $this->value;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getChildren() : self {
-    self::throwIfNotValid();
+  public function getChildren() : ?self {
+    $this->throwIfNotValid();
     if ($this->hasChildren()) return new self($this->value);
+    else return NULL;
   }
 
   /**
    * {@inheritdoc}
    */
   public function hasChildren() : bool {
-    self::throwIfNotValid();
+    $this->throwIfNotValid();
     return is_array($this->value) && count($this->value) > 0;
   }
 
@@ -54,7 +59,7 @@ class RecursiveReferenceArrayIterator implements \RecursiveIterator {
    * {@inheritdoc}
    */
   public function key() : string|int {
-    self::throwIfNotValid();
+    $this->throwIfNotValid();
     return $this->key;
   }
 
@@ -84,7 +89,7 @@ class RecursiveReferenceArrayIterator implements \RecursiveIterator {
 
   private function setKeyAndValueFromCurrentPosition() : void {
     $this->key = key($this->arr);
-    if (array_key_exists($this->key, $this->arr)) {
+    if ($this->key !== NULL && array_key_exists($this->key, $this->arr)) {
       $this->value =& $this->arr[$this->key];
     }
     else {
@@ -94,6 +99,9 @@ class RecursiveReferenceArrayIterator implements \RecursiveIterator {
     }
   }
 
+  /**
+   * @phpstan-assert !null $this->key
+   */
   private function throwIfNotValid() : void {
     if (!$this->valid()) {
       throw new InvalidOperationException('Iterator is not set to any element.');

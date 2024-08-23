@@ -39,24 +39,24 @@ final class IterationHelpers {
    *
    * @param \RecursiveIterator<TKey, TValue> $iterator
    *   Iterator to walk.
-   * @param callable(TKey $key, TValue $value, TContext|null &$context) : bool $operation
+   * @param callable(TKey $key, TValue $value, TContext &$context) : bool $operation
    *   Operation to apply for every element. The $context object stores
    *   information associated with the current level being traversed, and is
    *   passed by reference so that changes can be made and retained. The return
    *   value indicates whether iteration should be continued (TRUE to continue,
    *   FALSE to halt).
-   * @param ?callable&(TKey $key, TValue $value, TContext|null &$context, &$shouldDrill = TRUE) : ?TContext $drillDown
+   * @param ?callable (TKey $key, TValue $value, TContext &$context, bool &$shouldDrill) : ?TContext $drillDown
    *   This is called before moving down a level, and allows one to prevent the
    *   drill-down operation (by returning FALSE). The context is passed by
-   *   reference, so that it can be changed. The new context should be returned
-   *   by reference, and $shouldDrill should be set to TRUE if a drill-down is
+   *   reference, so that it can be changed. The new context *should be returned
+   *   by reference*, and $shouldDrill should be set to TRUE if a drill-down is
    *   desired.
    *
    *   Note that if changes are made to keys or values (not the referenced
    *   objects thereof) between $operation() and $drillDown(), $value will not
    *   reflect the changes.
    *
-   *   If NULL is passed for $drillDown, the function &() { $newContext = NULL; return $newContext; }
+   *   If NULL is passed for $drillDown, the function &() { $newContext =& $context; return $newContext; }
    *   is used.
    * @param ?callable(TContext $context) : bool $levelFinish
    *   This is called after there are no more siblings left at a given level.
@@ -64,7 +64,7 @@ final class IterationHelpers {
    *   indicates whether iteration should be continued (TRUE to continue, FALSE
    *   to halt). If NULL is passed for this parameter, the function ($c) => TRUE
    *   is used.
-   * @param ?TContext $initialContext
+   * @param TContext $initialContext
    *   The context information to be stored at the root level. Passed by
    *   reference so that modifications made while walking the iterator are
    *   preserved.
@@ -73,8 +73,13 @@ final class IterationHelpers {
    *   Returns FALSE if $operation or $levelFinish returned FALSE at some point;
    *   otherwise returns TRUE.
    */
-  public static function walkRecursiveIterator(\RecursiveIterator $iterator, callable $operation, ?callable $drillDown = NULL, ?callable $levelFinish = NULL, &$initialContext = NULL) : bool {
-    $drillDown ??= function &() { $newContext = NULL; return $newContext; };
+  public static function walkRecursiveIterator(\RecursiveIterator $iterator,
+    callable $operation,
+    ?callable $drillDown = NULL,
+    ?callable $levelFinish = NULL,
+    &$initialContext = NULL) : bool {
+
+    $drillDown ??= function &() { $newContext =& $initialContext; return $newContext; };
     $levelFinish ??= fn() => TRUE;
 
     // Prepare the iterator.
