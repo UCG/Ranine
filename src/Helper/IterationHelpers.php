@@ -45,7 +45,7 @@ final class IterationHelpers {
    *   passed by reference so that changes can be made and retained. The return
    *   value indicates whether iteration should be continued (TRUE to continue,
    *   FALSE to halt).
-   * @param ?callable (TKey $key, TValue $value, TContext &$context, bool &$shouldDrill) : ?TContext $drillDown
+   * @param ?callable(TKey $key, TValue $value, TContext &$context, bool &$shouldDrill) : ?TContext $drillDown
    *   This is called before moving down a level, and allows one to prevent the
    *   drill-down operation (by returning FALSE). The context is passed by
    *   reference, so that it can be changed. The new context *should be returned
