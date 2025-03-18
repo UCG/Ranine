@@ -44,4 +44,74 @@ class StringHelpersTest extends TestCase {
     // Input: $str = 'Hello, there.'
     // Expected output: 'Hello, there.'
   }
+
+  /**
+   * Tests the isNonEmptyString() method with null input.
+   *
+   * @covers ::isNonEmptyString
+   */
+  public function testisNonEmptyStringNullInput() {
+    // Input: $value = NULL.
+    // Expected output: NULL.
+  }
+
+  /**
+   * Tests the isNonEmptyString() method with an empty value.
+   *
+   * @covers ::isNonEmptyString
+   */
+  public function testisNonEmptyStringEmptyInput() {
+    // Input: $value = ''.
+    // Expected output: FALSE.
+  }
+
+  /**
+   * Tests the isNonEmptyString() method with an non-empty value.
+   *
+   * @covers ::isNonEmptyString
+   */
+  public function testisNonEmptyStringOrdinaryInput() {
+    // Input: $value = '44'.
+    // Expected output: TRUE.
+  }
+
+  /**
+   * Tests the isNonEmptyString() method with a strange non-empty value.
+   *
+   * @covers ::isNonEmptyString
+   */
+  public function testisNonEmptyStringUnordinaryInput() {
+    // Input: $value = '$%^&'.
+    // Expected output: TRUE.
+  }
+
+  /**
+   * Tests the isNullOrEmpty() method with a null input.
+   *
+   * @covers ::isNullOrEmpty
+   */
+  public function testisNullOrEmptyNullInput() {
+    // Input: $value = NULL.
+    // Expected output: TRUE.
+  }
+
+  /**
+   * Tests the isNullOrEmpty() method with an empty input.
+   *
+   * @covers ::isNullOrEmpty
+   */
+  public function testisNullOrEmptyEmptyInput() {
+    // Input: $value = ''.
+    // Expected output: TRUE.
+  }
+
+  /**
+   * Tests the isNullOrEmpty() method with a non-empty input.
+   *
+   * @covers ::isNullOrEmpty
+   */
+  public function testisNullOrEmptyOrdinaryInput() {
+    // Input: $value = 'Hello, there.'.
+    // Expected output: FALSE.
+  }
 }
