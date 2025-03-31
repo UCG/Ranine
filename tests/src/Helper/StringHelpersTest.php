@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Ranine\Tests\Helper;
 
-require_once '../../../src/Helper/StringHelpers.php';
+// require_once '../../../src/Helper/StringHelpers.php';
 
 use PHPUnit\Framework\TestCase;
 use Ranine\Helper\StringHelpers;
