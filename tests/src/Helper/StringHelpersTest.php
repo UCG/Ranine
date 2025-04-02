@@ -332,7 +332,7 @@ class StringHelpersTest extends TestCase {
 
     $this->assertEquals('!', StringHelpers::getAfter('Hello, there!', 'e'));
   }
-  
+
   /**
    * Tests the getAfter() method with $source[$endIndex] === $separator.
    *
@@ -365,7 +365,7 @@ class StringHelpersTest extends TestCase {
    *
    * @covers ::getAfter
    */
-  public function testGetAfterSeparatorToolong() : void {
+  public function testGetAfterSeparatorTooLong() : void {
     // Input: 
     // $source: 'Hello, there!'
     // $separator: 'ee'
