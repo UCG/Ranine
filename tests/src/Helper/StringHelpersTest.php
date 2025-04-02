@@ -55,6 +55,19 @@ class StringHelpersTest extends TestCase {
   }
 
   /**
+   * Tests the assemble() method with ordinary strings and separator.
+   *
+   * @covers ::assemble
+   */
+  public function testAssembleOrdinarySeparatorAndItems() : void {
+    // Input:
+    // $separator: '?'
+    // $items: 'Hello? ' , 'There!'
+
+    $this->assertEquals("Hello\e??There!", StringHelpers::assemble('?', 'Hello?', 'There!'));
+  }
+
+  /**
    * Tests the assemble() method with an empty separator string.
    *
    * @covers ::assemble
@@ -66,19 +79,6 @@ class StringHelpersTest extends TestCase {
 
     $this->expectException(\InvalidArgumentException::class);
     StringHelpers::assemble('', "H\eello?", " th\eer\ee.");
-  }
-
-  /**
-   * Tests the assemble() method with ordinary strings and separator.
-   *
-   * @covers ::assemble
-   */
-  public function testAssembleOrdinarySeparatorAndItems() : void {
-    // Input:
-    // $separator: '?'
-    // $items: 'Hello? ' , 'There!'
-
-    $this->assertEquals("Hello\e??There!", StringHelpers::assemble('?', 'Hello?', 'There!'));
   }
 
   /**
@@ -276,6 +276,21 @@ class StringHelpersTest extends TestCase {
 
     $this->assertEquals("\eHello, t\ehere.", StringHelpers::escape('Hello, there.', ['h', 'H'], "\e"));
   }
+  
+  /**
+   * Tests the escape() method with a special character that is not a string.
+   *
+   * @covers ::escape
+   */
+  public function testEscapeOtherSpecialCharacterNotString() : void {
+    // Input: 
+    // $str = 'Hello, there.',
+    // $otherSpecialCharacters = [1] ,
+    // $escapeCharacter = "\e".
+
+    $this->expectException(\InvalidArgumentException::class);
+    StringHelpers::escape('Hello, there.', [1], "\e");
+  }
 
   /**
    * Tests the escape() method with a special character that is too long.
@@ -290,21 +305,6 @@ class StringHelpersTest extends TestCase {
 
     $this->expectException(\InvalidArgumentException::class);
     StringHelpers::escape('Hello, there.', ['yy','!'], "\e");
-  }
-
-  /**
-   * Tests the escape() method with a special character that is not a string.
-   *
-   * @covers ::escape
-   */
-  public function testEscapeOtherSpecialCharacterNotString() : void {
-    // Input: 
-    // $str = 'Hello, there.',
-    // $otherSpecialCharacters = [1] ,
-    // $escapeCharacter = "\e".
-
-    $this->expectException(\InvalidArgumentException::class);
-    StringHelpers::escape('Hello, there.', [1], "\e");
   }
   
   /**
@@ -334,6 +334,19 @@ class StringHelpersTest extends TestCase {
   }
   
   /**
+   * Tests the getAfter() method with $source[$endIndex] === $separator.
+   *
+   * @covers ::getAfter
+   */
+  public function testGetAfterSeparatorAtEndOfSource() : void {
+    // Input: 
+    // $source: '12344'
+    // $separator: '4'
+
+    $this->assertEquals('', StringHelpers::getAfter('12344', '4'));
+  }
+  
+  /**
    * Tests the getAfter() method with a separator that is empty.
    *
    * @covers ::getAfter
@@ -359,19 +372,6 @@ class StringHelpersTest extends TestCase {
 
     $this->expectException(\InvalidArgumentException::class);
     StringHelpers::getAfter('Hello, there.', 'ee');  
-  }
-
-   /**
-   * Tests the getAfter() method with $source[$endIndex] === $separator.
-   *
-   * @covers ::getAfter
-   */
-  public function testGetAfterSeparatorAtEndOfSource() : void {
-    // Input: 
-    // $source: '12344'
-    // $separator: '4'
-
-    $this->assertEquals('', StringHelpers::getAfter('12344', '4'));
   }
 
    /**
