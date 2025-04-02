@@ -4,8 +4,6 @@ declare(strict_types = 1);
 
 namespace Ranine\Tests\Helper;
 
-// require_once '../../../src/Helper/StringHelpers.php';
-
 use PHPUnit\Framework\TestCase;
 use Ranine\Helper\StringHelpers;
 
@@ -35,12 +33,25 @@ class StringHelpersTest extends TestCase {
    *
    * @covers ::assemble
    */
-  public function testAssembleItemsStringEmpty() : void {
+  public function testAssembleItemsStringsEmpty() : void {
     // Input:
     // $separator: '?'
     // $items: '' , ''
 
     $this->assertEquals('?', StringHelpers::assemble('?', '', ''));
+  }
+
+  /**
+   * Tests the assemble() method with just one item string.
+   *
+   * @covers ::assemble
+   */
+  public function testAssembleOnlyOneItem() : void {
+    // Input:
+    // $separator: '?'
+    // $items: 'Hello?'
+
+    $this->assertEquals("Hello\e?", StringHelpers::assemble('?', 'Hello?'));
   }
 
   /**
@@ -58,20 +69,7 @@ class StringHelpersTest extends TestCase {
   }
 
   /**
-   * Tests the assemble() method with just one item string.
-   *
-   * @covers ::assemble
-   */
-  public function testAssembleOnlyOneItem() : void {
-    // Input:
-    // $separator: '?'
-    // $items: 'Hello?'
-
-    $this->assertEquals("Hello\e?", StringHelpers::assemble('?', 'Hello?'));
-  }
-
-  /**
-   * Tests the assemble() method with an empty string.
+   * Tests the assemble() method with ordinary strings and separator.
    *
    * @covers ::assemble
    */
@@ -84,7 +82,7 @@ class StringHelpersTest extends TestCase {
   }
 
   /**
-   * Tests the assemble() method with an empty string.
+   * Tests the assemble() method with a separator that is too long.
    *
    * @covers ::assemble
    */
@@ -299,7 +297,7 @@ class StringHelpersTest extends TestCase {
    *
    * @covers ::escape
    */
-  public function testEscapeOtherSpecialCharactersNotString() : void {
+  public function testEscapeOtherSpecialCharacterNotString() : void {
     // Input: 
     // $str = 'Hello, there.',
     // $otherSpecialCharacters = [1] ,
@@ -336,7 +334,7 @@ class StringHelpersTest extends TestCase {
   }
   
   /**
-   * Tests the getAfter() method with a seperator that is empty.
+   * Tests the getAfter() method with a separator that is empty.
    *
    * @covers ::getAfter
    */
@@ -350,7 +348,7 @@ class StringHelpersTest extends TestCase {
   }
 
   /**
-   * Tests the getAfter() method with seperator length greater than 1.
+   * Tests the getAfter() method with separator length greater than 1.
    *
    * @covers ::getAfter
    */
@@ -368,7 +366,7 @@ class StringHelpersTest extends TestCase {
    *
    * @covers ::getAfter
    */
-  public function testGetAfterSourceAndSeparator() : void {
+  public function testGetAfterSeparatorAtEndOfSource() : void {
     // Input: 
     // $source: '12344'
     // $separator: '4'
