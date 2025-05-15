@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace Ranine\Tests\Helper;
 
+require_once 'PHPUnit/Framework.php';
+require_once '../../../src/Helper/CollectionHelpers.php';
 use PHPUnit\Framework\TestCase;
 use Ranine\Helper\CollectionHelpers;
 
@@ -32,6 +34,26 @@ class CollectionHelpersTest extends TestCase {
   }
 
   /**
+   * Tests the condenseAndSortRanges() method to make sure exception is thrown
+   * when a key is greater than it's value.
+   * 
+   * @covers ::condenseAndSortRanges
+   */
+  public function testCondenseAndSortRangesKeysGreaterThanValues() : void {
+
+  }
+
+  /**
+   * Tests the condenseAndSortRanges() method to make sure exception is thrown
+   * when a key or value in $ranges is non-integral.
+   * 
+   * @covers ::condenseAndSortRanges
+   */
+  public function testCondenseAndSortRangesNonIntegralKeyOrValue() : void {
+
+  }
+
+  /**
    * Tests the getSortedRanges() method.
    *
    * @covers ::getSortedRanges
@@ -50,4 +72,62 @@ class CollectionHelpersTest extends TestCase {
     foreach ($output5 as $v) { $this->assertTrue(FALSE); }
   }
 
+/**
+ *  Tests the getSortedRanges() method to make sure exception is thrown when a 
+ *  value in $integers was not an integer.
+ * 
+ * @covers ::getSortedRanges
+ */
+  public function testGetSortedRangesValueNotInteger() : void {
+    $this->expectException(\InvalidArgumentException::class);
+    CollectionHelpers::getSortedRanges([-1, 0, 2, 3, 'a']);
+  }
+
+  /**
+   * Tests the removeDuplicatesFromSortedArray() method.
+   * 
+   * @covers ::removeDuplicatesFromSortedArray
+   * @dataProvider provideDataForRemoveDuplicatesTest
+   */
+  public function testRemoveDuplicatesFromSortedArray(array $input, array $expectedValues, array $expectedKeys) : void {
+    CollectionHelpers::removeDuplicatesFromSortedArray($input);
+
+    // Test if values are the same.
+    $actualValues = array_values($input);
+    $this->assertSame($expectedValues, $actualValues, 'Values do not match.');
+    
+    // Test if keys are same.
+    $numberOfKeys = count($expectedKeys);
+    $actualKeys = array_keys($input);
+    for ($i = 0; $i < $numberOfKeys; $i++) {
+      $this->assertTrue(in_array($actualKeys[$i], $expectedKeys[$i]));
+    }
+
+  }
+  
+  public function provideDataForRemoveDuplicatesTest() : array {
+    return [
+      'Ordinary' => [
+        [-1, -1, 0, 0, 2, 3, 4, 5, 7, 8, 'a' => 10, 10, 12, 14, 15, 16, 17, 17],
+        [-1, 0, 2, 3, 4, 5, 7, 8, 10, 12, 14, 15, 16, 17],
+        [[0,1], [2,3], [4], [5], [6], [7], [8], [9], ['a', 10], [11], [12], [13], [14], [15, 16]],
+      ],
+      'All Duplicates' => [
+        [-1, -1, 0, 0, 2, 2, 3, 3, 17, 17],
+        [-1, 0, 2, 3, 17],
+        [[0,1], [2,3], [4,5], [6,7], [8,9]],
+      ],
+      'Single' => [
+        [-1],
+        [-1],
+        [[0]],
+      ],
+      'Empty' => [
+        [],
+        [],
+        [],
+      ],
+
+    ];
+  }
 }
