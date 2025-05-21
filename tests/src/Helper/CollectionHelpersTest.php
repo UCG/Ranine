@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace Ranine\Tests\Helper;
 
-require_once 'PHPUnit/Framework.php';
 require_once '../../../src/Helper/CollectionHelpers.php';
 use PHPUnit\Framework\TestCase;
 use Ranine\Helper\CollectionHelpers;
@@ -16,6 +15,22 @@ use Ranine\Helper\CollectionHelpers;
  * @group ranine
  */
 class CollectionHelpersTest extends TestCase {
+
+  public function provideDataWhereKeyIsGreaterThanValue() : array {
+    return [
+      [[4 => 3, 3 => 4]],
+      [[55 => -7]],
+      [[77 => 9]],
+    ];
+  }
+
+  public function provideDataWhereKeyAndOrValueIsNonIntegral() : array {
+    return [
+      [[4 => 3, 3.3 => 4]],
+      [[5.5 => -7]],
+      [[77 => 9.9]],
+    ];
+  }
 
   /**
    * Tests the condenseAndSortRanges() method.
@@ -38,9 +53,13 @@ class CollectionHelpersTest extends TestCase {
    * when a key is greater than it's value.
    * 
    * @covers ::condenseAndSortRanges
+   * 
+   * @dataProvider provideDataWhereKeyIsGreaterThanValue
    */
-  public function testCondenseAndSortRangesKeysGreaterThanValues() : void {
-
+  public function testCondenseAndSortRangesKeysGreaterThanValues(array $badArray) : void {
+    $this->expectException(\InvalidArgumentException::class);
+    $result = CollectionHelpers::condenseAndSortRanges($badArray);
+    foreach ($result as $v);
   }
 
   /**
@@ -48,9 +67,13 @@ class CollectionHelpersTest extends TestCase {
    * when a key or value in $ranges is non-integral.
    * 
    * @covers ::condenseAndSortRanges
+   * 
+   * @dataProvider provideDataWhereKeyAndOrValueIsNonIntegral
    */
-  public function testCondenseAndSortRangesNonIntegralKeyOrValue() : void {
-
+  public function testCondenseAndSortRangesNonIntegralKeyOrValue($badArray) : void {
+    $this->expectException(\InvalidArgumentException::class);
+    $result = CollectionHelpers::condenseAndSortRanges($badArray);
+    foreach ($result as $v);
   }
 
   /**
