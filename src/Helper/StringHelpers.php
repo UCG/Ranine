@@ -115,6 +115,7 @@ final class StringHelpers {
   public static function getAfter(string $source, string $separator) : string {
     if (strlen($separator) !== 1) throw new \InvalidArgumentException('$separator must be of unit length.');
 
+    if ($source === '') return '';
     $endIndex = strlen($source) - 1;
     if ($source[$endIndex] === $separator) return '';
     for ($i = ($endIndex - 1); $i >= 0; $i--) {
