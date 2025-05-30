@@ -59,7 +59,7 @@ class ExtendableIterableTest extends TestCase {
   }
 
 public function testAppendKeyAndValue() : void {
-  $iter
+  $iter = 0;
 }
 
   public function provideDataForTestAll() : array {
