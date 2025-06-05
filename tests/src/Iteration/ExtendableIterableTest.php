@@ -41,26 +41,46 @@ class ExtendableIterableTest extends TestCase {
    * Test the append() method.
    * 
    * @covers ::append
+   * @dataProvider provideDataForTestAppend - Remember to write one!
    */
-  public function testAppend() : void {
-    $iter = ExtendableIterable::from([1, 3]);
-    $iterToAppend = [3, 4, 5];
+  public function testAppend(array $iterData,
+    array $iterToAppend,
+    array $expectedValues,
+    array $expectedKeys,
+    int $count) : void {
+      
+    $iter = ExtendableIterable::from($iterData);
     $appendedIter = $iter->append($iterToAppend);
     $i = 0;
-    $expectedValues = [1, 3, 3, 4, 5];
-    $expectedKeys = [0, 1, 0, 1, 2];
     foreach ($appendedIter as $key => $value) {
       $this->assertSame($expectedValues[$i], $value);
       $this->assertSame($expectedKeys[$i], $key);
       $i++;
     }
-    $this->assertSame(5, $i);
+    $this->assertSame($count, $i);
   
   }
 
-public function testAppendKeyAndValue() : void {
-  $iter = 0;
-}
+  public function testAppendKeyAndValue() : void {
+    $iter = ExtendableIterable::from([]);
+    $appendKeyAndValue = $iter->appendKeyAndValue(5, 8);
+    $i = 0;
+    $expectedValues = [8];
+    $expectedKeys = [5];
+    foreach ($appendKeyAndValue as $key => $value) {
+      $this->assertSame($expectedValues[$i], $value);
+      $this->assertSame($expectedKeys[$i], $key);
+      $i++;
+    }
+  }
+
+  public function provideDataForTestAppend() : array {
+    return [
+      'empty' => [[],[],[],[],0],
+      'single-append' => [[1],[7],[1, 7], [0, 0], 2],
+      'bad-key' => []
+    ];
+  }
 
   public function provideDataForTestAll() : array {
     return [
