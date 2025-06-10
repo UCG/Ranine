@@ -41,7 +41,7 @@ class ExtendableIterableTest extends TestCase {
    * Test the append() method.
    * 
    * @covers ::append
-   * @dataProvider provideDataForTestAppend - Remember to write one!
+   * @dataProvider provideDataForTestAppend
    */
   public function testAppend(array $iterData,
     array $iterToAppend,
@@ -61,6 +61,9 @@ class ExtendableIterableTest extends TestCase {
   
   }
 
+  /**
+   * @covers ::appendKeyAndValue
+   */
   public function testAppendKeyAndValue() : void {
     $iter = ExtendableIterable::from([]);
     $appendKeyAndValue = $iter->appendKeyAndValue(5, 8);
@@ -72,14 +75,19 @@ class ExtendableIterableTest extends TestCase {
       $this->assertSame($expectedKeys[$i], $key);
       $i++;
     }
+    $this->assertSame(1, $i);
+
   }
 
   public function provideDataForTestAppend() : array {
     return [
       'empty' => [[],[],[],[],0],
       'single-append' => [[1],[7],[1, 7], [0, 0], 2],
-      'bad-key' => []
     ];
+  }
+
+  public function provideDataForTestKeyAndValue() : array {
+    // write this!
   }
 
   public function provideDataForTestAll() : array {
