@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace Ranine\Tests\Helper;
 
-require_once '../../../src/Helper/CollectionHelpers.php';
 use PHPUnit\Framework\TestCase;
 use Ranine\Helper\CollectionHelpers;
 
@@ -16,22 +15,7 @@ use Ranine\Helper\CollectionHelpers;
  */
 class CollectionHelpersTest extends TestCase {
 
-  public function provideDataWhereKeyIsGreaterThanValue() : array {
-    return [
-      [[4 => 3, 3 => 4]],
-      [[55 => -7]],
-      [[77 => 9]],
-    ];
-  }
-
-  public function provideDataWhereKeyAndOrValueIsNonIntegral() : array {
-    return [
-      [[4 => 3, 3.3 => 4]],
-      [[5.5 => -7]],
-      [[77 => 9.9]],
-    ];
-  }
-
+  
   /**
    * Tests the condenseAndSortRanges() method.
    *
@@ -53,7 +37,6 @@ class CollectionHelpersTest extends TestCase {
    * when a key is greater than it's value.
    * 
    * @covers ::condenseAndSortRanges
-   * 
    * @dataProvider provideDataWhereKeyIsGreaterThanValue
    */
   public function testCondenseAndSortRangesKeysGreaterThanValues(array $badArray) : void {
@@ -61,21 +44,20 @@ class CollectionHelpersTest extends TestCase {
     $result = CollectionHelpers::condenseAndSortRanges($badArray);
     foreach ($result as $v);
   }
-
+  
   /**
    * Tests the condenseAndSortRanges() method to make sure exception is thrown
    * when a key or value in $ranges is non-integral.
    * 
    * @covers ::condenseAndSortRanges
-   * 
    * @dataProvider provideDataWhereKeyAndOrValueIsNonIntegral
    */
-  public function testCondenseAndSortRangesNonIntegralKeyOrValue($badArray) : void {
+  public function testCondenseAndSortRangesNonIntegralKeyOrValue(array $badArray) : void {
     $this->expectException(\InvalidArgumentException::class);
     $result = CollectionHelpers::condenseAndSortRanges($badArray);
     foreach ($result as $v);
   }
-
+  
   /**
    * Tests the getSortedRanges() method.
    *
@@ -87,25 +69,25 @@ class CollectionHelpersTest extends TestCase {
     $output3 = CollectionHelpers::getSortedRanges([-1, 2, 3, 4, 5, 7, 8, 10, 12, 14, 15, 17]);
     $output4 = CollectionHelpers::getSortedRanges([4]);
     $output5 = CollectionHelpers::getSortedRanges([]);
-
+    
     $this->assertTrue(($output1 instanceof \Traversable ? iterator_to_array($output1) : $output1) === [-1 => 0, 2 => 5, 7 => 8, 10 => 10, 12 => 12, 14 => 17]);
     $this->assertTrue(($output2 instanceof \Traversable ? iterator_to_array($output2) : $output2) === [-1 => 0, 2 => 5, 7 => 8, 10 => 10, 12 => 12, 14 => 15, 17 => 17]);
     $this->assertTrue(($output3 instanceof \Traversable ? iterator_to_array($output3) : $output3) === [-1 => -1, 2 => 5, 7 => 8, 10 => 10, 12 => 12, 14 => 15, 17 => 17]);
     $this->assertTrue(($output4 instanceof \Traversable ? iterator_to_array($output4) : $output4) === [4 => 4]);
     foreach ($output5 as $v) { $this->assertTrue(FALSE); }
   }
-
-/**
- *  Tests the getSortedRanges() method to make sure exception is thrown when a 
- *  value in $integers was not an integer.
- * 
- * @covers ::getSortedRanges
- */
+  
+  /**
+   *  Tests the getSortedRanges() method to make sure exception is thrown when a 
+   *  value in $integers was not an integer.
+   * 
+   * @covers ::getSortedRanges
+   */
   public function testGetSortedRangesValueNotInteger() : void {
     $this->expectException(\InvalidArgumentException::class);
     CollectionHelpers::getSortedRanges([-1, 0, 2, 3, 'a']);
   }
-
+  
   /**
    * Tests the removeDuplicatesFromSortedArray() method.
    * 
@@ -125,7 +107,7 @@ class CollectionHelpersTest extends TestCase {
     for ($i = 0; $i < $numberOfKeys; $i++) {
       $this->assertTrue(in_array($actualKeys[$i], $expectedKeys[$i]));
     }
-
+    
   }
   
   public function provideDataForRemoveDuplicatesTest() : array {
@@ -150,7 +132,24 @@ class CollectionHelpersTest extends TestCase {
         [],
         [],
       ],
-
+      
     ];
   }
+
+  public function provideDataWhereKeyAndOrValueIsNonIntegral() : array {
+    return [
+      [[4 => 3, 3.3 => 4]],
+      [[5.5 => -7]],
+      [[77 => 9.9]],
+    ];
+  }
+  
+  public function provideDataWhereKeyIsGreaterThanValue() : array {
+    return [
+      [[4 => 3, 3 => 4]],
+      [[55 => -7]],
+      [[77 => 9]],
+    ];
+  }
+  
 }
