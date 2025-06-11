@@ -83,7 +83,32 @@ class ExtendableIterableTest extends TestCase {
 
   }
 
+  public function testAppendValue(array $iterData,
+  array $iterToAppend,
+  array $expectedValues,
+  array $expectedKeys,
+  int $count) : void {
+    
+  $iter = ExtendableIterable::from($iterData);
+  $appendedIter = $iter->append($iterToAppend);
+  $i = 0;
+  foreach ($appendedIter as $key => $value) {
+    $this->assertSame($expectedValues[$i], $value);
+    $this->assertSame($expectedKeys[$i], $key);
+    $i++;
+  }
+  $this->assertSame($count, $i);
+
+  }
+
   public function provideDataForTestAppend() : array {
+    return [
+      'empty' => [[],[],[],[],0],
+      'single-append' => [[1],[7],[1, 7], [0, 0], 2],
+    ];
+  }
+  
+  public function provideDataForTestAppendValue() : array {
     return [
       'empty' => [[],[],[],[],0],
       'single-append' => [[1],[7],[1, 7], [0, 0], 2],
