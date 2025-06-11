@@ -111,6 +111,21 @@ class ExtendableIterableTest extends TestCase {
 
   }
 
+  /**
+   * @covers ::filter
+   * @dataProvider provideDataForTestFilter
+   */
+  public function testFilter(array $input,
+    callable $filter,
+    array $expectedKeys,
+    array $expectedValues,
+    int $expectedCount) : void {
+
+    $iter = ExtendableIterable::from($input);
+    $filteredIter = $iter->filter($filter);
+    $this->assertIterableKeysAndValues($filteredIter, $expectedKeys, $expectedValues, $expectedCount);
+  }
+
   public function provideDataForTestAppend() : array {
     return [
       'empty' => [[],[],[],[],0],
@@ -155,6 +170,29 @@ class ExtendableIterableTest extends TestCase {
       'normal-false-predicate' => [[1 => 2, 3 => 4], fn(int $k, int $v) => $k + $v < 1, FALSE],
       'normal-true-predicate' => [[1 => 2, 3 => 4], fn(int $k, int $v) => $k + $v === 7, TRUE],
     ];
+  }
+
+  public function provideDataForTestFilter() : array {
+    return [
+      'empty' => [[], fn() => TRUE, [], [], 0],
+      'single-pass' => [[2 => 3], fn($k, $v) => $k > 0 && $v > 0, [2], [3], 1],
+      'single-fail' => [[1 => 1], fn($k, $v) => $k < 0, [], [], 0],
+      'multi-pass' => [[2 => 3, 4 => NULL], fn($k, $v) => $k % 2 === 0, [2, 4], [3, NULL], 2],
+      'multi-fail' => [[0 => 0, 1 => 1], fn($k, $v) => $v > 2, [], [], 0],
+      'some-pass' => [[2, 5, 6], fn($k, $v) => $v % 2 === 0, [0, 2], [2, 6], 2],
+    ];
+  }
+
+  private function assertIterableKeysAndValues(iterable $iterableUnderTest,
+    array $expectedKeys, array $expectedValues, int $expectedCount) : void {
+
+    $i = 0;
+    foreach ($filteredIter as $k => $v) {
+      $this->assertSame($expectedKeys[$i], $k);
+      $this->assertSame($expectedValues[$i], $v);
+      $i++;
+    }
+    $this->assertSame($expectedCount, $i);
   }
 
 }
