@@ -63,6 +63,7 @@ class ExtendableIterableTest extends TestCase {
 
   /**
    * @covers ::appendKeyAndValue
+   * @dataProvider provideDataForTestAppendKeyAndValue
    */
   public function testAppendKeyAndValue(array $iterData,
   array $keysToAppend,
@@ -83,6 +84,15 @@ class ExtendableIterableTest extends TestCase {
 
   }
 
+  /**
+   * @covers ::appendValue
+   * @dataProvider provideDataForTestAppendValue
+   * @param array $iterData
+   * @param array $iterToAppend
+   * @param array $expectedValues
+   * @param array $expectedKeys
+   * @param int $count
+   */
   public function testAppendValue(array $iterData,
   array $iterToAppend,
   array $expectedValues,
