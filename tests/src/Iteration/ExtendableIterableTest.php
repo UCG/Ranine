@@ -111,6 +111,13 @@ class ExtendableIterableTest extends TestCase {
 
   }
 
+
+  public function testApply() : void {
+    $iter = ExtendableIterable::from([]);
+    $processing = function($key, $value) {} ; // figure out a way to test if proccessing was indeed called on each iteration.
+    $appliedIter = $iter->apply($processing);
+  }
+
   /**
    * @covers ::filter
    * @dataProvider provideDataForTestFilter
@@ -187,7 +194,7 @@ class ExtendableIterableTest extends TestCase {
     array $expectedKeys, array $expectedValues, int $expectedCount) : void {
 
     $i = 0;
-    foreach ($filteredIter as $k => $v) {
+    foreach ($iterableUnderTest as $k => $v) {
       $this->assertSame($expectedKeys[$i], $k);
       $this->assertSame($expectedValues[$i], $v);
       $i++;
