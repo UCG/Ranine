@@ -112,6 +112,66 @@ class ExtendableIterableTest extends TestCase {
   }
 
   /**
+   * @covers ::applyWith
+   * @dataProvider provideDataForTestApplyWith
+   */
+  public function testApplyWith(array $iterData,
+    array $other,
+    array $expectedCurrentKeys,
+    array $expectedCurrentValues,
+    array $expectedOtherKeys,
+    array $expectedOtherValues) : void {
+
+    $iter = ExtendableIterable::from($iterData);
+
+    $numberOfElementsForWhichBothItersAreValid = min(count($iterData), count($other));
+    $isIterBiggerThanOther = count($iterData) > count($other);
+
+    $i = 0;
+    $iter->applyWith($other,
+    function (int $kCurrent, int $vCurrent, int $kOther, int $vOther)
+    use ($expectedCurrentKeys,
+      $expectedCurrentValues,
+      $expectedOtherKeys,
+      $expectedOtherValues,
+      $numberOfElementsForWhichBothItersAreValid, &$i) : void {
+
+      $this->assertLessThan($numberOfElementsForWhichBothItersAreValid, $i);
+      $this->assertSame($kCurrent, $expectedCurrentKeys[$i]);
+      $this->assertSame($vCurrent, $expectedCurrentValues[$i]);
+      $this->assertSame($kOther, $expectedOtherKeys[$i]);
+      $this->assertSame($vOther, $expectedOtherValues[$i]);
+      $i++;
+    }, function (int $kCurrent, int $vCurrent)
+    use($isIterBiggerThanOther,
+      $numberOfElementsForWhichBothItersAreValid,
+      $expectedCurrentKeys,
+      $expectedCurrentValues,
+      &$i) : void {
+
+      $this->assertTrue($isIterBiggerThanOther);
+      $this->assertGreaterThan($numberOfElementsForWhichBothItersAreValid, $i);
+      $this->assertSame($kCurrent, $expectedCurrentKeys[$i]);
+      $this->assertSame($vCurrent, $expectedCurrentValues[$i]);
+      $i++;
+    }, function (int $kOther, int $vOther) use ($isIterBiggerThanOther,
+      $numberOfElementsForWhichBothItersAreValid,
+      $expectedOtherKeys,
+      $expectedOtherValues,
+      &$i) {
+
+      $this->assertFalse($isIterBiggerThanOther);
+      $this->assertGreaterThan($numberOfElementsForWhichBothItersAreValid, $i);
+      $this->assertSame($kOther, $expectedOtherKeys[$i]);
+      $this->assertSame($vOther, $expectedOtherValues[$i]);
+      $i++;
+    });
+
+    $totalNumberOfIterations = max(count($iterData), count($other));
+    $this->assertSame($totalNumberOfIterations, $i);
+  }
+
+  /**
    * @covers ::filter
    * @dataProvider provideDataForTestFilter
    */
@@ -169,6 +229,17 @@ class ExtendableIterableTest extends TestCase {
       'double-key-only-false-predicate' =>[[5 => 4, 3 => 6], fn(int $k) => $k % 2 === 0, FALSE],
       'normal-false-predicate' => [[1 => 2, 3 => 4], fn(int $k, int $v) => $k + $v < 1, FALSE],
       'normal-true-predicate' => [[1 => 2, 3 => 4], fn(int $k, int $v) => $k + $v === 7, TRUE],
+    ];
+  }
+
+  public function provideDataForTestApplyWith() : array {
+    return [
+      'empty-both' => [[], [], [], [], [], []],
+      'current-empty' => [[], [2 => 3, 4 => 5], [], [], [2, 4], [3, 5]],
+      'other-empty' => [['a' => 'b', 'c' => 'd'], [], ['a', 'c'], ['b', 'd'], [], []],
+      'same-size' => [[2 => 4], [5 => 7], [2], [4], [5], [7]],
+      'current-larger' => [[3 => 3, 0 => 0], [1 => 'a'], [3, 0], [3, 0], [1], ['a']],
+      'other-larger' => [[0 => NULL], [1 => 2, 3 => 4], [0], [NULL], [1, 3], [2, 4]],
     ];
   }
 
