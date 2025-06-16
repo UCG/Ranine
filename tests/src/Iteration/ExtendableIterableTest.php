@@ -89,32 +89,38 @@ class ExtendableIterableTest extends TestCase {
    * @dataProvider provideDataForTestAppendValue
    * @param array $iterData
    * @param array $iterToAppend
-   * @param array $expectedValues
    * @param array $expectedKeys
-   * @param int $count
+   * @param array $expectedValues
+   * @param int $expectedCount
    */
   public function testAppendValue(array $iterData,
   array $iterToAppend,
-  array $expectedValues,
   array $expectedKeys,
-  int $count) : void {
+  array $expectedValues,
+  int $expectedCount) : void {
     
   $iter = ExtendableIterable::from($iterData);
-  $appendedIter = $iter->append($iterToAppend);
-  $i = 0;
-  foreach ($appendedIter as $key => $value) {
-    $this->assertSame($expectedValues[$i], $value);
-    $this->assertSame($expectedKeys[$i], $key);
-    $i++;
-  }
-  $this->assertSame($count, $i);
+  $appendedIter = $iter->appendValue($value);
+  // $i = 0;
+  // foreach ($appendedIter as $key => $value) {
+  //  $this->assertSame($expectedValues[$i], $value);
+  //  $this->assertSame($expectedKeys[$i], $key);
+  //  $i++;
+  // }
+  // $this->assertSame($count, $i);
+
+  $this->assertIterableKeysAndValues($appendedIter, $expectedKeys, $expectedValues, $expectedCount);
 
   }
 
 
   public function testApply() : void {
     $iter = ExtendableIterable::from([]);
-    $processing = function($key, $value) {} ; // figure out a way to test if proccessing was indeed called on each iteration.
+    $processing = function($key, $value) {
+      for ($i = 0; $i <= 1; $i++) {
+        $this->assertNotSame()
+      }
+    } ; // figure out a way to test if proccessing was indeed called on each iteration.
     $appliedIter = $iter->apply($processing);
   }
 
@@ -174,8 +180,12 @@ class ExtendableIterableTest extends TestCase {
       $i++;
     });
 
-    $totalNumberOfIterations = max(count($iterData), count($other));
-    $this->assertSame($totalNumberOfIterations, $i);
+    // $totalNumberOfIterations = max(count($iterData), count($other));
+    // $this->assertSame($totalNumberOfIterations, $i);
+
+    $filteredIter = $iter->filter($filter);
+    $this->assertIterableKeysAndValues($filteredIter, $expectedKeys, $expectedValues, $expectedCount);
+
   }
 
   /**
