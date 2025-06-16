@@ -188,15 +188,31 @@ class ExtendableIterableTest extends TestCase {
   }
 
   /**
+   * @covers ::count
+   * @dataProvider provideDataForTestCount
+   */
+  public function testCount(iterable $iterData,
+    int $expectedCount
+    ) : void {
+    // assemble
+    $source = ExtendableIterable::from($iterData);
+    // act
+    $countedSource = $source->count();
+    // assert
+    $this->assertSame($expectedCount, $countedSource);
+  }
+
+  
+  /**
    * @covers ::filter
    * @dataProvider provideDataForTestFilter
    */
   public function testFilter(array $input,
-    callable $filter,
-    array $expectedKeys,
+  callable $filter,
+  array $expectedKeys,
     array $expectedValues,
     int $expectedCount) : void {
-
+      
     $iter = ExtendableIterable::from($input);
     $filteredIter = $iter->filter($filter);
     $this->assertIterableKeysAndValues($filteredIter, $expectedKeys, $expectedValues, $expectedCount);
@@ -211,7 +227,7 @@ class ExtendableIterableTest extends TestCase {
     $keysIter = $iter->getKeys();
     $this->assertIterableKeysAndValues($keysIter, $expectedKeys, $expectedValues);
   }
-
+  
   /**
    * @covers ::isEmpty
    */
@@ -222,7 +238,7 @@ class ExtendableIterableTest extends TestCase {
     $this->assertTrue($emptyIter->isEmpty());
     $this->assertFalse($nonEmptyIter->isEmpty());
   }
-
+  
   /**
    * @covers ::reduce
    * @dataProvider provideDataForTestReduce
@@ -250,7 +266,7 @@ class ExtendableIterableTest extends TestCase {
       'single-append' => [[1],[7],[1, 7], [0, 0], 2],
     ];
   }
-
+  
   public function provideDataForTestAppendKeyAndValue() : array {
     return [
       'empty' => [[],[],[],[],[],0],
@@ -258,7 +274,7 @@ class ExtendableIterableTest extends TestCase {
       'multi-key-value-append' => [[5,5],[7, 4],[1,9],[5,5,1,9],[0,1,7,4], 4],
     ];
   }
-
+  
   public function provideDataForTestAll() : array {
     return [
       'empty' => [[], fn() => FALSE, TRUE],
@@ -270,7 +286,7 @@ class ExtendableIterableTest extends TestCase {
       'normal-true-predicate' => [[1 => 2, 3 => 4], fn(int $k, int $v) => $k + $v <= 7, TRUE],
     ];
   }
-
+  
   public function provideDataForTestAny() : array {
     return [
       'empty' => [[], fn() => TRUE, FALSE],
@@ -282,7 +298,7 @@ class ExtendableIterableTest extends TestCase {
       'normal-true-predicate' => [[1 => 2, 3 => 4], fn(int $k, int $v) => $k + $v === 7, TRUE],
     ];
   }
-
+  
   public function provideDataForTestApplyWith() : array {
     return [
       'empty-both' => [[], [], [], [], [], []],
@@ -291,6 +307,15 @@ class ExtendableIterableTest extends TestCase {
       'same-size' => [[2 => 4], [5 => 7], [2], [4], [5], [7]],
       'current-larger' => [[3 => 3, 0 => 0], [1 => 'a'], [3, 0], [3, 0], [1], ['a']],
       'other-larger' => [[0 => NULL], [1 => 2, 3 => 4], [0], [NULL], [1, 3], [2, 4]],
+    ];
+  }
+  
+  public function provideDataForTestCount() : array {
+    return [
+      'empty' => [[],0],
+      'array' => [[2,4,6],3],
+      'iterable' => [2,1],
+      'other' => ['a',1]      
     ];
   }
 
