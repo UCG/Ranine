@@ -202,6 +202,41 @@ class ExtendableIterableTest extends TestCase {
     $this->assertIterableKeysAndValues($filteredIter, $expectedKeys, $expectedValues, $expectedCount);
   }
 
+  /**
+   * @covers ::getKeys
+   * @dataProvider provideDataForTestGetKeys
+   */
+  public function testGetKeys(array $dataForInitialIter, array $expectedKeys, array $expectedValues) : void {
+    $iter = ExtendableIterable::from($dataForInitialIter);
+    $keysIter = $iter->getKeys();
+    $this->assertIterableKeysAndValues($keysIter, $expectedKeys, $expectedValues);
+  }
+
+  /**
+   * @covers ::isEmpty
+   */
+  public function testIsEmpty() : void {
+    $emptyIter = ExtendableIterable::from([]);
+    $nonEmptyIter = ExtendableIterable::from([0 => NULL]);
+
+    $this->assertTrue($emptyIter->isEmpty());
+    $this->assertFalse($nonEmptyIter->isEmpty());
+  }
+
+  /**
+   * @covers ::reduce
+   * @dataProvider provideDataForTestReduce
+   */
+  public function testReduce(array $iterData,
+    callable $reduction,
+    mixed $initialValueOfAggregate,
+    mixed $expectedOutput) : void {
+
+    $iter = ExtendableIterable::from($iterData);
+    $finalValue = $iter->reduce($reduction, $initialValueOfAggregate);
+    $this->assertSame($expectedOutput, $finalValue);
+  }
+
   public function provideDataForTestAppend() : array {
     return [
       'empty' => [[],[],[],[],0],
@@ -267,6 +302,22 @@ class ExtendableIterableTest extends TestCase {
       'multi-pass' => [[2 => 3, 4 => NULL], fn($k, $v) => $k % 2 === 0, [2, 4], [3, NULL], 2],
       'multi-fail' => [[0 => 0, 1 => 1], fn($k, $v) => $v > 2, [], [], 0],
       'some-pass' => [[2, 5, 6], fn($k, $v) => $v % 2 === 0, [0, 2], [2, 6], 2],
+    ];
+  }
+
+  public function provideDataForTestGetKeys() : array {
+    return [
+      'empty' => [[], [], []],
+      'single' => [[1 => 'b'], [0], [1]],
+      'multi' => [[1 => 'b', 'c' => NULL], [0, 1], [1, 'c']],
+    ];
+  }
+
+  public function provideDataForTestReduce() : array{
+    return [
+      'empty' => [[], fn() => 1, 5, 5],
+      'single' => [[1 => 2], fn($k, $v, $a) => $k + $v + $a, -1, 2],
+      'multi' => [[1 => 2, 3 => 4], fn($k, $v, $a) => $a + $v, 0, 10],
     ];
   }
 
