@@ -113,12 +113,11 @@ class ExtendableIterableTest extends TestCase {
 
   }
 
-
   public function testApply() : void {
     $iter = ExtendableIterable::from([]);
     $processing = function($key, $value) {
       for ($i = 0; $i <= 1; $i++) {
-        $this->assertNotSame()
+        // $this->assertNotSame()
       }
     } ; // figure out a way to test if proccessing was indeed called on each iteration.
     $appliedIter = $iter->apply($processing);
