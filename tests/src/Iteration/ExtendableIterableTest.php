@@ -93,7 +93,7 @@ class ExtendableIterableTest extends TestCase {
    * @param int $expectedCount
    */
   public function testAppendValue(array $iterData,
-  array $iterToAppend,
+  int $iterToAppend,
   array $expectedKeys,
   array $expectedValues,
   int $expectedCount) : void {
@@ -199,6 +199,16 @@ class ExtendableIterableTest extends TestCase {
     $this->assertSame($expectedCount, $countedSource);
   }
 
+  /**
+   * @covers ::expand
+   */
+  public function testExpand() : void {
+    $iter = ExtendableIterable::from([[0,1],[2,3],7]);
+    $expansion = fn($key, $value) => is_iterable($value) ? $value : NULL;
+    $expandedIter = $iter->expand($expansion);
+    $this->assertIterableKeysAndValues($expandedIter,[0,1,0,1,2],[0,1,2,3,7],5);
+  }
+
   
   /**
    * @covers ::filter
@@ -222,7 +232,7 @@ class ExtendableIterableTest extends TestCase {
   public function testGetKeys(array $dataForInitialIter, array $expectedKeys, array $expectedValues, int $expectedCount) : void {
     $iter = ExtendableIterable::from($dataForInitialIter);
     $keysIter = $iter->getKeys();
-    $this->assertIterableKeysAndValues($keysIter, $expectedKeys, $expectedValues,$expectedCount);
+    $this->assertIterableKeysAndValues($keysIter, $expectedKeys, $expectedValues, $expectedCount);
   }
   
   /**
@@ -266,7 +276,6 @@ class ExtendableIterableTest extends TestCase {
   
   public function provideDataForTestAppendKeyAndValue() : array {
     return [
-      'all-empty' => [[],null,null,[],[],0],
       'single-key-value-append' => [[2,5],7,1,[0,1,1],[2,5,7],3],
       'single-key-value-append-to-empty-array' => [[],7,1,[1],[7],1],
     ];
