@@ -66,14 +66,14 @@ class ExtendableIterableTest extends TestCase {
    * @dataProvider provideDataForTestAppendKeyAndValue
    */
   public function testAppendKeyAndValue(array $iterData,
-  array $keysToAppend,
-  array $valuesToAppend,
+  int $keyToAppend,
+  int $valueToAppend,
   array $expectedValues,
   array $expectedKeys,
   int $count) : void {
 
     $iter = ExtendableIterable::from($iterData);
-    $appendKeyAndValue = $iter->appendKeyAndValue($keysToAppend, $valuesToAppend);
+    $appendKeyAndValue = $iter->appendKeyAndValue($keyToAppend, $valueToAppend);
     $i = 0;
     foreach ($appendKeyAndValue as $key => $value) {
       $this->assertSame($expectedValues[$i], $value);
@@ -81,7 +81,6 @@ class ExtendableIterableTest extends TestCase {
       $i++;
     }
     $this->assertSame($count, $i);
-
   }
 
   /**
@@ -100,27 +99,29 @@ class ExtendableIterableTest extends TestCase {
   int $expectedCount) : void {
     
   $iter = ExtendableIterable::from($iterData);
-  $appendedIter = $iter->appendValue($value);
-  // $i = 0;
-  // foreach ($appendedIter as $key => $value) {
-  //  $this->assertSame($expectedValues[$i], $value);
-  //  $this->assertSame($expectedKeys[$i], $key);
-  //  $i++;
-  // }
-  // $this->assertSame($count, $i);
-
+  $appendedIter = $iter->appendValue($iterToAppend);
   $this->assertIterableKeysAndValues($appendedIter, $expectedKeys, $expectedValues, $expectedCount);
 
   }
 
   public function testApply() : void {
-    $iter = ExtendableIterable::from([]);
-    $processing = function($key, $value) {
-      for ($i = 0; $i <= 1; $i++) {
-        // $this->assertNotSame()
-      }
-    } ; // figure out a way to test if proccessing was indeed called on each iteration.
+    $iter = ExtendableIterable::from([1,5,12]);
+    $expectedKeys = [0,1,2];
+    $expectedValues = [1,5,12];
+    $currentIndex = -1;
+    $processing = function($key, $value) use ($expectedKeys, $expectedValues, &$currentIndex) {
+      $this->assertGreaterThanOrEqual(0,$currentIndex);
+      $this->assertLessThanOrEqual(2, $currentIndex);
+      $this->assertSame($expectedValues[$currentIndex], $value);
+      $this->assertSame($expectedKeys[$currentIndex], $key);
+    };
     $appliedIter = $iter->apply($processing);
+    $currentIndex++;
+    foreach ($appliedIter as $k => $v) {
+      $this->assertSame($expectedValues[$currentIndex], $v);
+      $this->assertSame($expectedKeys[$currentIndex], $k);
+      $currentIndex++;
+    }
   }
 
   /**
@@ -179,12 +180,8 @@ class ExtendableIterableTest extends TestCase {
       $i++;
     });
 
-    // $totalNumberOfIterations = max(count($iterData), count($other));
-    // $this->assertSame($totalNumberOfIterations, $i);
-
-    $filteredIter = $iter->filter($filter);
-    $this->assertIterableKeysAndValues($filteredIter, $expectedKeys, $expectedValues, $expectedCount);
-
+    $totalNumberOfIterations = max(count($iterData), count($other));
+    $this->assertSame($totalNumberOfIterations, $i);
   }
 
   /**
@@ -222,10 +219,10 @@ class ExtendableIterableTest extends TestCase {
    * @covers ::getKeys
    * @dataProvider provideDataForTestGetKeys
    */
-  public function testGetKeys(array $dataForInitialIter, array $expectedKeys, array $expectedValues) : void {
+  public function testGetKeys(array $dataForInitialIter, array $expectedKeys, array $expectedValues, int $expectedCount) : void {
     $iter = ExtendableIterable::from($dataForInitialIter);
     $keysIter = $iter->getKeys();
-    $this->assertIterableKeysAndValues($keysIter, $expectedKeys, $expectedValues);
+    $this->assertIterableKeysAndValues($keysIter, $expectedKeys, $expectedValues,$expectedCount);
   }
   
   /**
@@ -269,9 +266,9 @@ class ExtendableIterableTest extends TestCase {
   
   public function provideDataForTestAppendKeyAndValue() : array {
     return [
-      'empty' => [[],[],[],[],[],0],
-      'single-key-value-append' => [[],[7],[1],[1],[7], 1],
-      'multi-key-value-append' => [[5,5],[7, 4],[1,9],[5,5,1,9],[0,1,7,4], 4],
+      'all-empty' => [[],null,null,[],[],0],
+      'single-key-value-append' => [[2,5],7,1,[0,1,1],[2,5,7],3],
+      'single-key-value-append-to-empty-array' => [[],7,1,[1],[7],1],
     ];
   }
   
@@ -332,9 +329,9 @@ class ExtendableIterableTest extends TestCase {
 
   public function provideDataForTestGetKeys() : array {
     return [
-      'empty' => [[], [], []],
-      'single' => [[1 => 'b'], [0], [1]],
-      'multi' => [[1 => 'b', 'c' => NULL], [0, 1], [1, 'c']],
+      'empty' => [[], [], [], 0],
+      'single' => [[1 => 'b'], [0], [1], 1],
+      'multi' => [[1 => 'b', 'c' => NULL], [0, 1], [1, 'c'], 2],
     ];
   }
 
