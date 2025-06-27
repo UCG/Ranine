@@ -61,8 +61,8 @@ class ExtendableIterableTest extends TestCase {
   public function testAppendKeyAndValue(array $iterData,
   int $keyToAppend,
   int $valueToAppend,
-  array $expectedValues,
   array $expectedKeys,
+  array $expectedValues,
   int $expectedCount) : void {
 
     $iter = ExtendableIterable::from($iterData);
@@ -75,21 +75,24 @@ class ExtendableIterableTest extends TestCase {
    * @dataProvider provideDataForTestAppendValue
    */
   public function testAppendValue(iterable $iterData,
-  int $iterToAppend,
+  int $valueToAppend,
   array $expectedKeys,
   array $expectedValues,
   int $expectedCount) : void {
     
   $iter = ExtendableIterable::from($iterData);
-  $appendedIter = $iter->appendValue($iterToAppend);
+  $appendedIter = $iter->appendValue($valueToAppend);
   $this->assertIterableKeysAndValues($appendedIter, $expectedKeys, $expectedValues, $expectedCount);
 
   }
 
-  public function testApply() : void {
-    $iter = ExtendableIterable::from([1,5,12]);
-    $expectedKeys = [0,1,2];
-    $expectedValues = [1,5,12];
+  /**
+   * @covers ::apply
+   * @dataProvider provideDataForTestApply
+   */
+  public function testApply(iterable $iterData, array $expectedKeys,
+  array $expectedValues) : void {
+    $iter = ExtendableIterable::from($iterData);
     $currentIndex = -1;
     $processing = function($key, $value) use ($expectedKeys, $expectedValues, &$currentIndex) {
       $this->assertGreaterThanOrEqual(0,$currentIndex);
@@ -124,7 +127,7 @@ class ExtendableIterableTest extends TestCase {
 
     $i = 0;
     $iter->applyWith($other,
-    function (int $kCurrent, int $vCurrent, int $kOther, int $vOther)
+    function (mixed $kCurrent, mixed $vCurrent, mixed $kOther, mixed $vOther)
     use ($expectedCurrentKeys,
       $expectedCurrentValues,
       $expectedOtherKeys,
@@ -137,7 +140,7 @@ class ExtendableIterableTest extends TestCase {
       $this->assertSame($kOther, $expectedOtherKeys[$i]);
       $this->assertSame($vOther, $expectedOtherValues[$i]);
       $i++;
-    }, function (int $kCurrent, int $vCurrent)
+    }, function (mixed $kCurrent, mixed $vCurrent)
     use($isIterBiggerThanOther,
       $numberOfElementsForWhichBothItersAreValid,
       $expectedCurrentKeys,
@@ -145,11 +148,11 @@ class ExtendableIterableTest extends TestCase {
       &$i) : void {
 
       $this->assertTrue($isIterBiggerThanOther);
-      $this->assertGreaterThan($numberOfElementsForWhichBothItersAreValid, $i);
+      $this->assertGreaterThanOrEqual($numberOfElementsForWhichBothItersAreValid, $i);
       $this->assertSame($kCurrent, $expectedCurrentKeys[$i]);
       $this->assertSame($vCurrent, $expectedCurrentValues[$i]);
       $i++;
-    }, function (int $kOther, int $vOther) use ($isIterBiggerThanOther,
+    }, function (mixed $kOther, mixed $vOther) use ($isIterBiggerThanOther,
       $numberOfElementsForWhichBothItersAreValid,
       $expectedOtherKeys,
       $expectedOtherValues,
@@ -183,12 +186,16 @@ class ExtendableIterableTest extends TestCase {
 
   /**
    * @covers ::expand
+   * @dataProvider provideDataForTestExpand
    */
-  public function testExpand() : void {
-    $iter = ExtendableIterable::from([[0,1],[2,3],7]);
+  public function testExpand(iterable $iterData,
+    array $expectedKeys,
+    array $expectedValues,
+    int $expectedCount) : void {
+    $iter = ExtendableIterable::from($iterData);
     $expansion = fn($key, $value) => is_iterable($value) ? $value : NULL;
     $expandedIter = $iter->expand($expansion);
-    $this->assertIterableKeysAndValues($expandedIter,[0,1,0,1,2],[0,1,2,3,7],5);
+    $this->assertIterableKeysAndValues($expandedIter,$expectedKeys,$expectedValues,$expectedCount);
   }
 
   
@@ -251,7 +258,7 @@ class ExtendableIterableTest extends TestCase {
   
   public function provideDataForTestAppendValue() : array {
     return [
-      'single-append' => [1,7,[1, 7], [0, 1], 2],
+      'single-append' => [[1],7,[1, 7], [0, 1], 2],
     ];
   }
   
@@ -261,6 +268,7 @@ class ExtendableIterableTest extends TestCase {
       'single-key-value-append-to-empty-array' => [[],7,1,[1],[7],1],
     ];
   }
+
   
   public function provideDataForTestAll() : array {
     return [
@@ -286,6 +294,14 @@ class ExtendableIterableTest extends TestCase {
     ];
   }
   
+  public function provideDataForTestApply() : array {
+    return [
+      'empty' => [[],[],[]],
+      'single' => [[1],[0],[1]],
+      'multi' => [[8,6,11],[0,1,2],[8,6,11]],
+    ];
+  }
+
   public function provideDataForTestApplyWith() : array {
     return [
       'empty-both' => [[], [], [], [], [], []],
@@ -301,8 +317,17 @@ class ExtendableIterableTest extends TestCase {
     return [
       'empty' => [[],0],
       'array' => [[2,4,6],3],
-      'iterable' => [2,1],
-      'other' => ['a',1]      
+      'iterable' => [ExtendableIterable::fromKeyAndValue(2,1),1],
+    ];
+  }
+
+  public function provideDataForTestExpand() : array {
+    return [
+      'empty' => [[],[],[],0],
+      'all-expandable' => [[[0,1],[2,3]],[0,1,0,1],[0,1,2,3],4],
+      'all-non-expandable' => [[1,2,3],[0,1,2],[1,2,3],3],
+      'normal-mixed' => [[0,[1,2],3,[4,5]],[0,0,1,2,0,1],[0,1,2,3,4,5],6],
+      'does-not-expand-beyond-top-level' => [[[[0,1],2]],[0,1],[[0,1],2],2],
     ];
   }
 
@@ -329,7 +354,7 @@ class ExtendableIterableTest extends TestCase {
     return [
       'empty' => [[], fn() => 1, 5, 5],
       'single' => [[1 => 2], fn($k, $v, $a) => $k + $v + $a, -1, 2],
-      'multi' => [[1 => 2, 3 => 4], fn($k, $v, $a) => $a + $v, 0, 10],
+      'multi' => [[1 => 2, 3 => 4], fn($k, $v, $a) => $a + $v, 0, 6],
     ];
   }
 
