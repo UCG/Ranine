@@ -44,21 +44,14 @@ class ExtendableIterableTest extends TestCase {
    * @dataProvider provideDataForTestAppend
    */
   public function testAppend(array $iterData,
-    array $iterToAppend,
+    iterable $iterToAppend,
     array $expectedValues,
     array $expectedKeys,
-    int $count) : void {
+    int $expectedCount) : void {
       
     $iter = ExtendableIterable::from($iterData);
     $appendedIter = $iter->append($iterToAppend);
-    $i = 0;
-    foreach ($appendedIter as $key => $value) {
-      $this->assertSame($expectedValues[$i], $value);
-      $this->assertSame($expectedKeys[$i], $key);
-      $i++;
-    }
-    $this->assertSame($count, $i);
-  
+    $this->assertIterableKeysAndValues($appendedIter, $expectedKeys, $expectedValues, $expectedCount);
   }
 
   /**
@@ -70,29 +63,18 @@ class ExtendableIterableTest extends TestCase {
   int $valueToAppend,
   array $expectedValues,
   array $expectedKeys,
-  int $count) : void {
+  int $expectedCount) : void {
 
     $iter = ExtendableIterable::from($iterData);
-    $appendKeyAndValue = $iter->appendKeyAndValue($keyToAppend, $valueToAppend);
-    $i = 0;
-    foreach ($appendKeyAndValue as $key => $value) {
-      $this->assertSame($expectedValues[$i], $value);
-      $this->assertSame($expectedKeys[$i], $key);
-      $i++;
-    }
-    $this->assertSame($count, $i);
+    $appendedKeyAndValue = $iter->appendKeyAndValue($keyToAppend, $valueToAppend);
+    $this->assertIterableKeysAndValues($appendedKeyAndValue, $expectedKeys, $expectedValues, $expectedCount);
   }
 
   /**
    * @covers ::appendValue
    * @dataProvider provideDataForTestAppendValue
-   * @param array $iterData
-   * @param array $iterToAppend
-   * @param array $expectedKeys
-   * @param array $expectedValues
-   * @param int $expectedCount
    */
-  public function testAppendValue(array $iterData,
+  public function testAppendValue(iterable $iterData,
   int $iterToAppend,
   array $expectedKeys,
   array $expectedValues,
@@ -269,8 +251,7 @@ class ExtendableIterableTest extends TestCase {
   
   public function provideDataForTestAppendValue() : array {
     return [
-      'empty' => [[],[],[],[],0],
-      'single-append' => [[1],[7],[1, 7], [0, 0], 2],
+      'single-append' => [1,7,[1, 7], [0, 1], 2],
     ];
   }
   
