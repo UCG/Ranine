@@ -258,11 +258,12 @@ class ExtendableIterableTest extends TestCase {
   public function testTake(array $iterData,
     int $numberOfItemsToTake,
     array $expectedKeys,
-    array $expectedValues) : void {
+    array $expectedValues,
+    int $expectedCount) : void {
 
     $iter = ExtendableIterable::from($iterData);
     $result = $iter->take($numberOfItemsToTake);
-    $this->assertIterableKeysAndValues($result, $expectedKeys, $expectedValues, $numberOfItemsToTake);
+    $this->assertIterableKeysAndValues($result, $expectedKeys, $expectedValues, $expectedCount);
   }
 
   /**
@@ -385,12 +386,12 @@ class ExtendableIterableTest extends TestCase {
 
   public function provideDataForTestTake() : array {
     return [
-      'empty' => [[], 0, [], []],
-      'more-than-we-have' => [[1, 2], 3, [0, 1], [1, 2]],
-      'take-all-items' => [['a' => 0, 'b' => 1, 'c' => 2], 3, ['a', 'b', 'c'], [0, 1, 2]],
-      'take-some-items' => [[2, 4, 5], 2, [0, 1], [2, 4]],
-      'take-one-item' => [[2, 4, 5], 1, [0], [2]],
-      'take-none' => [[1], 0, [], []],
+      'empty' => [[], 0, [], [], 0],
+      'more-than-we-have' => [[1, 2], 3, [0, 1], [1, 2], 2],
+      'take-all-items' => [['a' => 0, 'b' => 1, 'c' => 2], 3, ['a', 'b', 'c'], [0, 1, 2], 3],
+      'take-some-items' => [[2, 4, 5], 2, [0, 1], [2, 4], 2],
+      'take-one-item' => [[2, 4, 5], 1, [0], [2], 1],
+      'take-none' => [[1], 0, [], [], 0],
     ];
   }
 
