@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Ranine\Tests\Iteration;
 
 use PHPUnit\Framework\TestCase;
+use Ranine\Exception\InvalidOperationException;
 use Ranine\Iteration\ExtendableIterable;
 
 /**
@@ -214,6 +215,24 @@ class ExtendableIterableTest extends TestCase {
     $iter = ExtendableIterable::from($input);
     $filteredIter = $iter->filter($filter);
     $this->assertIterableKeysAndValues($filteredIter, $expectedKeys, $expectedValues, $expectedCount);
+  }
+
+  /**
+   * @covers ::first
+   */
+  public function testFirst() : void {
+    $iter = ExtendableIterable::from([1]);
+    $first = $iter->first();
+    $this->assertSame(1,$first);
+  }
+
+  /**
+   * @covers ::first
+   */
+  public function testFirstIsEmpty() : void {
+    $iter = ExtendableIterable::empty();
+    $this->expectException(InvalidOperationException::class);
+    $iter->first();
   }
 
   /**
