@@ -235,6 +235,43 @@ class ExtendableIterableTest extends TestCase {
     $iter->first();
   }
 
+    /**
+   * @covers ::firstKey
+   */
+  public function testFirstKey() : void {
+    $iter = ExtendableIterable::from(['b' => NULL]);
+    $firstKey = $iter->firstKey();
+    $this->assertSame('b', $firstKey);
+  }
+
+  /**
+   * @covers ::firstKey
+   */
+  public function testFirstKeyIsEmpty() : void {
+    $iter = ExtendableIterable::empty();
+    $this->expectException(InvalidOperationException::class);
+    $iter->firstKey();
+  }
+
+  /**
+   * @covers ::firstKeyAndValue
+   */
+  public function testFirstKeyAndValue() : void {
+    $iter = ExtendableIterable::from([1 => NULL]);
+    $iter->firstKeyAndValue($key, $value);
+    $this->assertSame(1, $key);
+    $this->assertSame(NULL, $value);
+  }
+
+  /**
+   * @covers ::firstKeyAndValue
+   */
+  public function testFirstKeyAndValueIsEmpty() : void {
+    $iter = ExtendableIterable::empty();
+    $this->expectException(InvalidOperationException::class);
+    $iter->firstKeyAndValue($key, $value);
+  }
+
   /**
    * @covers ::getKeys
    * @dataProvider provideDataForTestGetKeys
