@@ -292,7 +292,20 @@ class ExtendableIterableTest extends TestCase {
     $this->assertTrue($emptyIter->isEmpty());
     $this->assertFalse($nonEmptyIter->isEmpty());
   }
-  
+
+  /**
+   * @covers ::map
+   */
+  public function testMap() : void {
+    $iter = ExtendableIterable::from([1 => 2, 3 => 6]);
+    // We'll use arrow notation since our functions are just single return expressions.
+    $keyMap = fn($k, $v) => $k**2 + $v;
+    $valueMap = fn($k, $v) => $v**2 - $k;
+
+    $mappedIter = $iter->map($valueMap, $keyMap);
+    $this->assertIterableKeysAndValues($mappedIter, [3, 15], [3, 33], 2);
+  }
+
   /**
    * @covers ::reduce
    * @dataProvider provideDataForTestReduce
