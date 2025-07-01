@@ -257,16 +257,20 @@ class ExtendableIterableTest extends TestCase {
    * @covers ::firstKeyAndValue
    */
   public function testFirstKeyAndValue() : void {
+    $key = 0;
+    $value = 0;
     $iter = ExtendableIterable::from([1 => NULL]);
     $iter->firstKeyAndValue($key, $value);
     $this->assertSame(1, $key);
     $this->assertSame(NULL, $value);
   }
-
+  
   /**
    * @covers ::firstKeyAndValue
    */
   public function testFirstKeyAndValueIsEmpty() : void {
+    $key = 0;
+    $value = 0;
     $iter = ExtendableIterable::empty();
     $this->expectException(InvalidOperationException::class);
     $iter->firstKeyAndValue($key, $value);
@@ -286,8 +290,7 @@ class ExtendableIterableTest extends TestCase {
    * @covers ::isEmpty
    */
   public function testIsEmpty() : void {
-    $emptyIter = ExtendableIterable::from([]);
-    $nonEmptyIter = ExtendableIterable::from([0 => NULL]);
+    $emptyIter = ExtendableIterable::from([]);   $nonEmptyIter = ExtendableIterable::from([0 => NULL]);
 
     $this->assertTrue($emptyIter->isEmpty());
     $this->assertFalse($nonEmptyIter->isEmpty());
@@ -295,15 +298,30 @@ class ExtendableIterableTest extends TestCase {
 
   /**
    * @covers ::map
+   * @dataProvider provideDataForTestMap
    */
-  public function testMap() : void {
-    $iter = ExtendableIterable::from([1 => 2, 3 => 6]);
+  public function testMap(iterable $iterData,
+    callable $keyMap,
+    callable $valueMap,
+    array $expectedKeys,
+    array $expectedValues,
+    int $expectedCount) : void {
+    $iter = ExtendableIterable::from($iterData);
     // We'll use arrow notation since our functions are just single return expressions.
-    $keyMap = fn($k, $v) => $k**2 + $v;
-    $valueMap = fn($k, $v) => $v**2 - $k;
-
+    // $keyMap = fn($k, $v) => $k**2 + $v;
+    // $valueMap = fn($k, $v) => $v**2 - $k;
     $mappedIter = $iter->map($valueMap, $keyMap);
-    $this->assertIterableKeysAndValues($mappedIter, [3, 15], [3, 33], 2);
+    $this->assertIterableKeysAndValues($mappedIter, $expectedKeys, $expectedValues, $expectedCount);
+  }
+
+  /**
+   * @covers ::mapSequentialKeys
+   */
+  public function testMapSequentialKeys() : void {
+    $iter = ExtendableIterable::from([1,2]);
+    $valueMap = fn($k, $v) => $v;
+    $mappedIter = $iter->mapSequentialKeys($valueMap);
+    $this->assertIterableKeysAndValues($mappedIter, [0,1], [1,2], 2);
   }
 
   /**
@@ -342,6 +360,21 @@ class ExtendableIterableTest extends TestCase {
     $iter = ExtendableIterable::fromKeyAndValue(2, 3);
     $this->expectException(\InvalidArgumentException::class);
     $iter->take(-1);
+  }
+
+  /**
+   * @covers ::takeWhile
+   */
+  public function testTakeWhile() : void {
+    $iter = ExtendableIterable::from([1,2,3,4,5]);
+    $predicate = fn($key, $value) : bool => TRUE;
+    $max = 4;
+    $newIter = $iter->takeWhile($predicate, $max);
+    $this->assertIterableKeysAndValues($newIter, [0,1,2,3], [1,2,3,4], 4);
+  }
+  
+  public function testTakeWhileMaxLessThanZero() : void {
+
   }
 
   public function provideDataForTestAppend() : array {
@@ -442,6 +475,68 @@ class ExtendableIterableTest extends TestCase {
       'empty' => [[], [], [], 0],
       'single' => [[1 => 'b'], [0], [1], 1],
       'multi' => [[1 => 'b', 'c' => NULL], [0, 1], [1, 'c'], 2],
+    ];
+  }
+
+  public function provideDataForTestMap() : array {
+    return [
+      'empty' => [[],fn($k, $v) => $k**2 + $v,fn($k, $v) => $v**2 - $k,[],[],0],
+      'negative-keyMap' => [
+        [0 => -1],
+        fn($k, $v) => $k**2 + $v,
+        fn($k, $v) => $v**2 - $k,
+        [-1],
+        [1],
+        1
+      ],
+      'negative-valueMap' => [
+        [1 => 0],
+        fn($k, $v) => $k**2 + $v,
+        fn($k, $v) => $v**2 - $k,
+        [1],
+        [-1],
+        1
+      ],
+      'negative-keyMap-and-valueMap' => [
+        [-2 => -1],
+        fn($k, $v) => $k + $v,
+        fn($k, $v) => $v + $k,
+        [-3],
+        [-3],
+        1
+      ],
+      'null-keyMap' => [
+        ExtendableIterable::fromKeyAndValue(NULL, 7),
+        fn($k) => $k,
+        fn($k, $v) => $v,
+        [NULL],
+        [7],
+        1
+      ],
+      'null-valueMap' => [
+        [2 => NULL],
+        fn($k, $v) => $k + $v,
+        fn($k, $v) => $v,
+        [2],
+        [NULL],
+        1
+      ],
+      'null-keyMap-and-valueMap' => [
+        ExtendableIterable::fromKeyAndValue(NULL, NULL),
+        fn($k) => $k,
+        fn($v) => $v,
+        [NULL],
+        [NULL],
+        1
+      ],
+      'multi' => [
+        [4 => 5, 5 => 9],
+        fn($k, $v) => $k**2 + $v,
+        fn($k, $v) => $v**2 - $k,
+        [21,34],
+        [21,76],
+        2
+      ],
     ];
   }
 
