@@ -377,6 +377,34 @@ class ExtendableIterableTest extends TestCase {
 
   }
 
+  /**
+   * @covers ::zip
+   * @dataProvider provideDataForTestZip
+   */
+  public function testZip(iterable $iterData,
+    iterable $other,
+    callable $keyMapBoth,
+    callable $valueMapBoth,
+    ?callable $keyMapCurrent,
+    ?callable $valueMapCurrent,
+    ?callable $keyMapOther,
+    ?callable $valueMapOther,
+    array $expectedKeys,
+    array $expectedValues,
+    int $expectedCount) : void {
+
+    $iter = ExtendableIterable::from($iterData);
+    $zipped = $iter->zip($other,
+      $keyMapBoth,
+      $valueMapBoth,
+      $keyMapCurrent,
+      $valueMapCurrent,
+      $keyMapOther,
+      $valueMapOther);
+
+    $this->assertIterableKeysAndValues($zipped, $expectedKeys, $expectedValues, $expectedCount);
+  }
+
   public function provideDataForTestAppend() : array {
     return [
       'empty' => [[],[],[],[],0],
@@ -556,6 +584,90 @@ class ExtendableIterableTest extends TestCase {
       'take-some-items' => [[2, 4, 5], 2, [0, 1], [2, 4], 2],
       'take-one-item' => [[2, 4, 5], 1, [0], [2], 1],
       'take-none' => [[1], 0, [], [], 0],
+    ];
+  }
+
+  public function provideDataForTestZip() : array {
+    return [
+      'both-iters-same-size' => [
+        [0 => 1, 4 => 5],
+        [2 => 2, 1 => 1],
+        fn($kC, $vC, $kO, $vO) => $kC**2 + $vO,
+        fn($kC, $vC, $kO, $vO) => $vC + $vO,
+        fn() => 0,
+        fn() => 0,
+        fn() => 0,
+        fn() => 0,
+        [2, 17],
+        [3, 6],
+        2,
+      ],
+      'current-iter-longer' => [
+        [2 => 3, 4 => 5, 10 => 13],
+        [2 => 2, 1 => 1],
+        fn($kC, $vC, $kO, $vO) => $kC + $vO,
+        fn($kC, $vC, $kO, $vO) => $vC - $vO,
+        fn($kC, $vC) => $vC,
+        fn($kC, $vC) => $kC,
+        fn() => 0,
+        fn() => 0,
+        [4, 5, 13],
+        [1, 4, 10],
+        3,
+      ],
+      'other-iter-longer' => [
+        [2 => 3, -1 => 5],
+        [2 => 2, 1 => 1, 20 => 20],
+        fn($kC, $vC, $kO, $vO) => $kC + $vO,
+        fn($kC, $vC, $kO, $vO) => $vC - $vO,
+        fn() => 0,
+        fn() => 0,
+        fn() => -1,
+        fn() => -2,
+        [4, 0, -1],
+        [1, 4, -2],
+        3,
+      ],
+      'both-empty' => [[], [], fn() => 0, fn() => 0, NULL, NULL, NULL, NULL, [], [], 0],
+      'current-empty' => [
+        [],
+        [2 => 2, 1 => 1],
+        fn() => 0,
+        fn() => 0,
+        fn() => 0,
+        fn() => 0,
+        fn($kO, $vO) => $kO**2,
+        fn($kO, $vO) => $vO**2,
+        [4, 1],
+        [4, 1],
+        2,
+      ],
+      'other-empty' => [
+        [3 => 2, 0 => 1],
+        [],
+        fn() => 0,
+        fn() => 0,
+        fn($kC, $vC) => $kC**2 + 1,
+        fn($kC, $vC) => $vC**2,
+        fn() => 0,
+        fn() => 0,
+        [10, 1],
+        [4, 1],
+        2,
+      ],
+      'optional-maps-null' => [
+        [1 => 2],
+        [2 => 2, 1 => 8],
+        fn($kC, $vC, $kO, $vO) => $kC + $vO,
+        fn($kC, $vC, $kO, $vO) => $vC - $vO,
+        NULL,
+        NULL,
+        NULL,
+        NULL,
+        [3, 1],
+        [0, 8],
+        2,
+      ],
     ];
   }
 
