@@ -393,6 +393,16 @@ class ExtendableIterableTest extends TestCase {
   }
 
   /**
+   * @covers ::toArray
+   * @dataProvider provideDataForTestToArray
+   */
+  public function testToArray(iterable $iterData, bool $preserveKeys, array $expectedFinalArray) : void {
+    $iter = ExtendableIterable::from(ExtendableIterable::from($iterData));
+    $arr = $iter->toArray($preserveKeys);
+    $this->assertTrue($arr === $expectedFinalArray);
+  }
+
+  /**
    * @covers ::zip
    * @dataProvider provideDataForTestZip
    */
@@ -620,6 +630,16 @@ class ExtendableIterableTest extends TestCase {
       'predicate-fails-before-max' => [[1,2,3,4],fn($k,$v) => $v+$k<6,5,[0,1,2],[1,2,3],3],
       'predicate-fails-after-max' => [[1,2,3,4],fn($k,$v) => $v*$k<30,3,[0,1,2],[1,2,3],3],
       'max-equals-zero' => [[1,2,3,4],fn($k,$v) => $v>0,0,[],[],0],
+    ];
+  }
+
+  public function provideDataForTestToArray() : array {
+    return [
+      'empty' => [ExtendableIterable::empty(), FALSE, []],
+      'preserve-keys' => [ExtendableIterable::fromKeyAndValue(2, 4), TRUE, [2 => 4]],
+      'keys-not-preserved' => [ExtendableIterable::from(ExtendableIterable::from([2 => 3, 0 => 1])), FALSE, [0 => 3, 1 => 1]],
+      'keys-preserved-with-array-object' => [new \ArrayObject([3 => 2, 1 => 3]), TRUE, [3 => 2, 1 => 3]],
+      'keys-preserved-with-array' => [['a' => 'c', 'd' => 'e'], TRUE, ['a' => 'c', 'd' => 'e']],
     ];
   }
 
