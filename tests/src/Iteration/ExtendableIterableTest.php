@@ -317,13 +317,12 @@ class ExtendableIterableTest extends TestCase {
    * @dataProvider provideDataForTestMapSequentialKeys
    */
   public function testMapSequentialKeys(array $iterData,
-    callable $valueMap,
+    ?callable $valueMap,
     array $expectedKeys,
     array $expectedValues,
     int $expectedCount) : void {
 
     $iter = ExtendableIterable::from($iterData);
-    // $valueMap = fn($k, $v) => $v;
     $mappedIter = $iter->mapSequentialKeys($valueMap);
     $this->assertIterableKeysAndValues($mappedIter, $expectedKeys, $expectedValues, $expectedCount);
   }
@@ -368,17 +367,26 @@ class ExtendableIterableTest extends TestCase {
 
   /**
    * @covers ::takeWhile
+   * @dataProvider provideDataForTestTakeWhile
    */
-  public function testTakeWhile() : void {
-    $iter = ExtendableIterable::from([1,2,3,4,5]);
-    $predicate = fn($key, $value) : bool => TRUE;
-    $max = 4;
+  public function testTakeWhile(iterable $iterData,
+    callable $predicate,
+    ?int $max,
+    array $expectedKeys,
+    array $expectedValues,
+    int $expectedCount) : void {
+
+    $iter = ExtendableIterable::from($iterData);
     $newIter = $iter->takeWhile($predicate, $max);
-    $this->assertIterableKeysAndValues($newIter, [0,1,2,3], [1,2,3,4], 4);
+    $this->assertIterableKeysAndValues($newIter, $expectedKeys, $expectedValues, $expectedCount);
   }
   
   public function testTakeWhileMaxLessThanZero() : void {
-
+    $iter = ExtendableIterable::from([1]);
+    $predicate = fn($k,$v) : bool => TRUE;
+    $max = -7;
+    $this->expectException(\InvalidArgumentException::class);
+    $iter->takeWhile($predicate,$max);
   }
 
   /**
@@ -575,9 +583,10 @@ class ExtendableIterableTest extends TestCase {
   public function provideDataForTestMapSequentialKeys() : array {
     return [
       'empty' => [[],fn($k, $v) => $v,[],[],0],
-      'null-value-map' => [[NULL,NULL],fn($k, $v) => $v,[0,1],[NULL,NULL],2],
-      'negative-value-map' => [[-11,-22],fn($k, $v) => $v,[0,1],[-11,-22],2],
-      'single' => [[5],fn($k, $v) => $v,[0],[5],1],
+      'null-value-map' => [[NULL,NULL],NULL,[0,1],[NULL,NULL],2],
+      'negative-value-map' => [[-11,-22],fn($k, $v) => $v + $v,[0,1],[-22,-44],2],
+      'single' => [[5],fn($k, $v) => $v * $k,[0],[0],1],
+      'non-sequential-input-keys' => [[9=>1,4=>13],fn($k,$v) => $v**2 - $k,[0,1],[-8,165],2],
     ];
   }
 
@@ -597,6 +606,17 @@ class ExtendableIterableTest extends TestCase {
       'take-some-items' => [[2, 4, 5], 2, [0, 1], [2, 4], 2],
       'take-one-item' => [[2, 4, 5], 1, [0], [2], 1],
       'take-none' => [[1], 0, [], [], 0],
+    ];
+  }
+
+  public function provideDataForTestTakeWhile() : array {
+    return [
+      'empty' => [[],fn($k,$v) => TRUE,2,[],[],0],
+      'predicate-true-for-all-no-max' => [[1,2,3,4],fn($k,$v) => $v>0,NULL,[0,1,2,3],[1,2,3,4],4],
+      'predicate-false-immediately' => [[1,2,3,4],fn($k,$v) => $v<0,NULL,[],[],0],
+      'predicate-fails-before-max' => [[1,2,3,4],fn($k,$v) => $v+$k<6,5,[0,1,2],[1,2,3],3],
+      'predicate-fails-after-max' => [[1,2,3,4],fn($k,$v) => $v*$k<30,3,[0,1,2],[1,2,3],3],
+      'max-equals-zero' => [[1,2,3,4],fn($k,$v) => $v>0,0,[],[],0],
     ];
   }
 
