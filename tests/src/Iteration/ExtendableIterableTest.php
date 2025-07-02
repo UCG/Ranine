@@ -380,7 +380,10 @@ class ExtendableIterableTest extends TestCase {
     $newIter = $iter->takeWhile($predicate, $max);
     $this->assertIterableKeysAndValues($newIter, $expectedKeys, $expectedValues, $expectedCount);
   }
-  
+
+  /**
+   * @covers ::takeWhile
+   */
   public function testTakeWhileMaxLessThanZero() : void {
     $iter = ExtendableIterable::from([1]);
     $predicate = fn($k,$v) : bool => TRUE;
