@@ -306,22 +306,26 @@ class ExtendableIterableTest extends TestCase {
     array $expectedKeys,
     array $expectedValues,
     int $expectedCount) : void {
+
     $iter = ExtendableIterable::from($iterData);
-    // We'll use arrow notation since our functions are just single return expressions.
-    // $keyMap = fn($k, $v) => $k**2 + $v;
-    // $valueMap = fn($k, $v) => $v**2 - $k;
     $mappedIter = $iter->map($valueMap, $keyMap);
     $this->assertIterableKeysAndValues($mappedIter, $expectedKeys, $expectedValues, $expectedCount);
   }
 
   /**
    * @covers ::mapSequentialKeys
+   * @dataProvider provideDataForTestMapSequentialKeys
    */
-  public function testMapSequentialKeys() : void {
-    $iter = ExtendableIterable::from([1,2]);
-    $valueMap = fn($k, $v) => $v;
+  public function testMapSequentialKeys(array $iterData,
+    callable $valueMap,
+    array $expectedKeys,
+    array $expectedValues,
+    int $expectedCount) : void {
+
+    $iter = ExtendableIterable::from($iterData);
+    // $valueMap = fn($k, $v) => $v;
     $mappedIter = $iter->mapSequentialKeys($valueMap);
-    $this->assertIterableKeysAndValues($mappedIter, [0,1], [1,2], 2);
+    $this->assertIterableKeysAndValues($mappedIter, $expectedKeys, $expectedValues, $expectedCount);
   }
 
   /**
@@ -565,6 +569,15 @@ class ExtendableIterableTest extends TestCase {
         [21,76],
         2
       ],
+    ];
+  }
+
+  public function provideDataForTestMapSequentialKeys() : array {
+    return [
+      'empty' => [[],fn($k, $v) => $v,[],[],0],
+      'null-value-map' => [[NULL,NULL],fn($k, $v) => $v,[0,1],[NULL,NULL],2],
+      'negative-value-map' => [[-11,-22],fn($k, $v) => $v,[0,1],[-11,-22],2],
+      'single' => [[5],fn($k, $v) => $v,[0],[5],1],
     ];
   }
 
