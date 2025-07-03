@@ -429,27 +429,6 @@ class ExtendableIterableTest extends TestCase {
 
     $this->assertIterableKeysAndValues($zipped, $expectedKeys, $expectedValues, $expectedCount);
   }
-
-  public function provideDataForTestAppend() : array {
-    return [
-      'empty' => [[],[],[],[],0],
-      'single-append' => [[1],[7],[1, 7], [0, 0], 2],
-    ];
-  }
-  
-  public function provideDataForTestAppendValue() : array {
-    return [
-      'single-append' => [[1],7,[0,0],[1,7],2],
-    ];
-  }
-  
-  public function provideDataForTestAppendKeyAndValue() : array {
-    return [
-      'single-key-value-append' => [[2,5],1,7,[0,1,1],[2,5,7],3],
-      'single-key-value-append-to-empty-array' => [[],1,7,[1],[7],1],
-    ];
-  }
-
   
   public function provideDataForTestAll() : array {
     return [
@@ -472,6 +451,26 @@ class ExtendableIterableTest extends TestCase {
       'double-key-only-false-predicate' =>[[5 => 4, 3 => 6], fn(int $k) => $k % 2 === 0, FALSE],
       'normal-false-predicate' => [[1 => 2, 3 => 4], fn(int $k, int $v) => $k + $v < 1, FALSE],
       'normal-true-predicate' => [[1 => 2, 3 => 4], fn(int $k, int $v) => $k + $v === 7, TRUE],
+    ];
+  }
+
+  public function provideDataForTestAppend() : array {
+    return [
+      'empty' => [[],[],[],[],0],
+      'single-append' => [[1],[7],[1, 7], [0, 0], 2],
+    ];
+  }
+  
+  public function provideDataForTestAppendKeyAndValue() : array {
+    return [
+      'single-key-value-append' => [[2,5],1,7,[0,1,1],[2,5,7],3],
+      'single-key-value-append-to-empty-array' => [[],1,7,[1],[7],1],
+    ];
+  }
+  
+  public function provideDataForTestAppendValue() : array {
+    return [
+      'single-append' => [[1],7,[0,0],[1,7],2],
     ];
   }
   
