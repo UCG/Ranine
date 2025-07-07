@@ -60,11 +60,11 @@ class ExtendableIterableTest extends TestCase {
    * @dataProvider provideDataForTestAppendKeyAndValue
    */
   public function testAppendKeyAndValue(array $iterData,
-  int $keyToAppend,
-  int $valueToAppend,
-  array $expectedKeys,
-  array $expectedValues,
-  int $expectedCount) : void {
+    int $keyToAppend,
+    int $valueToAppend,
+    array $expectedKeys,
+    array $expectedValues,
+    int $expectedCount) : void {
 
     $iter = ExtendableIterable::from($iterData);
     $appendedKeyAndValue = $iter->appendKeyAndValue($keyToAppend, $valueToAppend);
@@ -76,23 +76,24 @@ class ExtendableIterableTest extends TestCase {
    * @dataProvider provideDataForTestAppendValue
    */
   public function testAppendValue(iterable $iterData,
-  int $valueToAppend,
-  array $expectedKeys,
-  array $expectedValues,
-  int $expectedCount) : void {
+    int $valueToAppend,
+    array $expectedKeys,
+    array $expectedValues,
+    int $expectedCount) : void {
     
   $iter = ExtendableIterable::from($iterData);
   $appendedIter = $iter->appendValue($valueToAppend);
   $this->assertIterableKeysAndValues($appendedIter, $expectedKeys, $expectedValues, $expectedCount);
-
   }
 
   /**
    * @covers ::apply
    * @dataProvider provideDataForTestApply
    */
-  public function testApply(iterable $iterData, array $expectedKeys,
-  array $expectedValues) : void {
+  public function testApply(iterable $iterData, 
+    array $expectedKeys,
+    array $expectedValues) : void {
+
     $iter = ExtendableIterable::from($iterData);
     $currentIndex = -1;
     $processing = function($key, $value) use ($expectedKeys, $expectedValues, &$currentIndex) {
@@ -124,10 +125,8 @@ class ExtendableIterableTest extends TestCase {
     array $expectedOtherValues) : void {
 
     $iter = ExtendableIterable::from($iterData);
-
     $numberOfElementsForWhichBothItersAreValid = min(count($iterData), count($other));
     $isIterBiggerThanOther = count($iterData) > count($other);
-
     $i = 0;
     $iter->applyWith($other,
     function (mixed $kCurrent, mixed $vCurrent, mixed $kOther, mixed $vOther)
@@ -176,14 +175,9 @@ class ExtendableIterableTest extends TestCase {
    * @covers ::count
    * @dataProvider provideDataForTestCount
    */
-  public function testCount(iterable $iterData,
-    int $expectedCount
-    ) : void {
-    // assemble
+  public function testCount(iterable $iterData, int $expectedCount) : void {
     $source = ExtendableIterable::from($iterData);
-    // act
     $countedSource = $source->count();
-    // assert
     $this->assertSame($expectedCount, $countedSource);
   }
 
@@ -195,6 +189,7 @@ class ExtendableIterableTest extends TestCase {
     array $expectedKeys,
     array $expectedValues,
     int $expectedCount) : void {
+
     $iter = ExtendableIterable::from($iterData);
     $expansion = fn($key, $value) => is_iterable($value) ? $value : NULL;
     $expandedIter = $iter->expand($expansion);
@@ -207,8 +202,8 @@ class ExtendableIterableTest extends TestCase {
    * @dataProvider provideDataForTestFilter
    */
   public function testFilter(array $input,
-  callable $filter,
-  array $expectedKeys,
+    callable   $filter,
+    array $expectedKeys,
     array $expectedValues,
     int $expectedCount) : void {
       
@@ -291,7 +286,6 @@ class ExtendableIterableTest extends TestCase {
    */
   public function testIsEmpty() : void {
     $emptyIter = ExtendableIterable::from([]);   $nonEmptyIter = ExtendableIterable::from([0 => NULL]);
-
     $this->assertTrue($emptyIter->isEmpty());
     $this->assertFalse($nonEmptyIter->isEmpty());
   }
