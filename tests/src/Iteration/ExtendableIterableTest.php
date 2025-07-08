@@ -81,9 +81,9 @@ class ExtendableIterableTest extends TestCase {
     array $expectedValues,
     int $expectedCount) : void {
     
-  $iter = ExtendableIterable::from($iterData);
-  $appendedIter = $iter->appendValue($valueToAppend);
-  $this->assertIterableKeysAndValues($appendedIter, $expectedKeys, $expectedValues, $expectedCount);
+    $iter = ExtendableIterable::from($iterData);
+    $appendedIter = $iter->appendValue($valueToAppend);
+    $this->assertIterableKeysAndValues($appendedIter, $expectedKeys, $expectedValues, $expectedCount);
   }
 
   /**
@@ -224,7 +224,7 @@ class ExtendableIterableTest extends TestCase {
   /**
    * @covers ::first
    */
-  public function testFirstIsEmpty() : void {
+  public function testFirstEmptyFirst() : void {
     $iter = ExtendableIterable::empty();
     $this->expectException(InvalidOperationException::class);
     $iter->first();
@@ -242,7 +242,7 @@ class ExtendableIterableTest extends TestCase {
   /**
    * @covers ::firstKey
    */
-  public function testFirstKeyIsEmpty() : void {
+  public function testFirstKeyEmptyKey() : void {
     $iter = ExtendableIterable::empty();
     $this->expectException(InvalidOperationException::class);
     $iter->firstKey();
@@ -263,7 +263,7 @@ class ExtendableIterableTest extends TestCase {
   /**
    * @covers ::firstKeyAndValue
    */
-  public function testFirstKeyAndValueIsEmpty() : void {
+  public function testFirstKeyAndValueBothAreEmpty() : void {
     $key = 0;
     $value = 0;
     $iter = ExtendableIterable::empty();
