@@ -224,7 +224,7 @@ class ExtendableIterableTest extends TestCase {
   /**
    * @covers ::first
    */
-  public function testFirstEmptyFirst() : void {
+  public function testFirstEmptyIter() : void {
     $iter = ExtendableIterable::empty();
     $this->expectException(InvalidOperationException::class);
     $iter->first();
@@ -242,7 +242,7 @@ class ExtendableIterableTest extends TestCase {
   /**
    * @covers ::firstKey
    */
-  public function testFirstKeyEmptyKey() : void {
+  public function testFirstKeyEmptyIter() : void {
     $iter = ExtendableIterable::empty();
     $this->expectException(InvalidOperationException::class);
     $iter->firstKey();
@@ -263,7 +263,7 @@ class ExtendableIterableTest extends TestCase {
   /**
    * @covers ::firstKeyAndValue
    */
-  public function testFirstKeyAndValueBothAreEmpty() : void {
+  public function testFirstKeyAndValueEmptyIter() : void {
     $key = 0;
     $value = 0;
     $iter = ExtendableIterable::empty();
