@@ -138,8 +138,8 @@ class CollectionHelpersTest extends TestCase {
 
   public function provideDataWhereKeyAndOrValueIsNonIntegral() : array {
     return [
-      [[4 => 3, 3.3 => 4]],
-      [[5.5 => -7]],
+      [[4 => 3, '3.3' => 4]],
+      [['5.5' => -7]],
       [[77 => 9.9]],
     ];
   }
