@@ -45,7 +45,7 @@ class ParseHelpersTest extends TestCase {
    */
   public function testParseIntRange() : void {
     $divider = '-';
-    $range = "[0]$divider[5]";
+    $range = '0-5';
     $expectedResult = [0, 1, 2, 3, 4, 5];
     $this->assertEquals($expectedResult, ParseHelpers::parseIntRange($range, $divider));
   }
