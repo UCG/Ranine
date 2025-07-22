@@ -57,10 +57,32 @@ class ParseHelpersTest extends TestCase {
   }
 
   /**
-   * @covers ::parseIntRangeEndpoints
+   * @covers ::parseIntRange
+   * @dataProvider provideDataForTestParseIntRangeInvalidRange
    */
-  public function testParseIntRangeEndpoints() : void {
+  public function testParseIntRangeInvalidRange(string $range, string $divider) : void {
+    $this->expectException(ParseException::class);
+    ParseHelpers::parseIntRange($range, $divider);
+  }
 
+  /**
+   * @covers ::parseIntRange
+   */
+  public function testParseIntRangeEmptyDivider() : void {
+    $this->expectException(\InvalidArgumentException::class);
+    ParseHelpers::parseIntRange('2-3', '');
+  }
+
+  /**
+   * @covers ::parseIntRangeEndpoints
+   * @dataProvider provideDataForTestParseIntRangeEndpoints
+   */
+  public function testParseIntRangeEndpoints(string $range, string $divider, int $expectedStart, int $expectedEnd) : void {
+    $start = 0;
+    $end = 0;
+    ParseHelpers::parseIntRangeEndpoints($range, $start, $end, $divider);
+    $this->assertSame($expectedStart, $start);
+    $this->assertSame($expectedEnd, $end);
   }
 
   /**
@@ -136,17 +158,26 @@ class ParseHelpersTest extends TestCase {
     ];
   }
   
-  public function provideDataForTestParseIntRangeInvalid() : array {
+  public function provideDataForTestParseIntRangeInvalidRange() : array {
     return [
-      'start-greater-than-end' => ['5', '-', '3'],
-      'start-divider-same' => ['7', '7', '12'],
-      'invalid-divider' => [],
-      'empty-divider' => [],
-      'empty-start' => [],
-      'empty-end' => [],
-      'start-is-float' => [],
-      'end-is-bool' => [],
+      'start-greater-than-end' => ['5-3', '-'],
+      'start-divider-same' => ['7712', '7'],
+      'empty-start' => ['&3', '&'],
+      'empty-end' => ['3-', '-'],
+      'start-is-float' => ['3.0:5.0', ':'],
+      'end-is-bool' => ['2:FALSE', ':'],
+      'both-endpoints-non-numeric' => ['a-b', '-'],
+      'range-empty' => ['', '-'],
     ];
   }
-   
+
+  public function provideDataForTestParseIntRangeEndpoints() : array {
+    return [
+      'start-end-negative' => ['-4--1', '-', -4, -1],
+      'start-negative-end-positive' => ['-5-6', '-', -5, 6],
+      'start-end-same' => ['3&3', '&', 3, 3],
+      'start-end-both-positive' => ['2+8', '+', 2, 8],
+    ];
+  }
+
 }
