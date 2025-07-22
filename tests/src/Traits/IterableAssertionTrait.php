@@ -42,5 +42,30 @@ trait IterableAssertionTrait {
     }
     $this->assertSame($expectedCount, $i);
   }
+  
+  /**
+   * Asserts that a given iterable has values in a certain order.
+   *
+   * @param iterable $iterableUnderTest
+   *   Iterable we are testing.
+   * @param array $expectedValues
+   *   The values of this array are the values we expect to be in
+   *   $iterableUnderTest. The keys of this array indicate the expected order
+   *   of the values in $iterableUnderTest (i.e., $expectedValues[0] is the
+   *   first value we expect in $iterableUnderTest, $expectedValues[1] is the
+   *   second, etc.).
+   * @param int $expectedCount
+   *   Expected number of items in $iterableUnderTest.
+   */
+  private function assertIterableValues(iterable $iterableUnderTest,
+    array $expectedValues, int $expectedCount) : void {
+
+    $i = 0;
+    foreach ($iterableUnderTest as $v) {
+      $this->assertSame($expectedValues[$i], $v);
+      $i++;
+    }
+    $this->assertSame($expectedCount, $i);
+  }
 
 }
