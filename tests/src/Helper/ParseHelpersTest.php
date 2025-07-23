@@ -155,13 +155,14 @@ class ParseHelpersTest extends TestCase {
       'start-end-negative' => ['-7', '/', '-2', [-7, -6, -5, -4, -3, -2], 6],
       'same-start-and-end' => ['0', '|', '0', [0], 1],
       'ordinary-start-divider-and-end' => ['1', 'A', '9', [1, 2, 3, 4, 5, 6, 7, 8, 9], 9],
+      'three-dividers-at-start' => ['1110', '1', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 10],
+      'three-dividers-at-end' => ['9111', '1', [9, 10, 11], 3],
     ];
   }
   
   public function provideDataForTestParseIntRangeInvalidRange() : array {
     return [
       'start-greater-than-end' => ['5-3', '-'],
-      'start-divider-same' => ['7712', '7'],
       'empty-start' => ['&3', '&'],
       'empty-end' => ['3-', '-'],
       'start-is-float' => ['3.0:5.0', ':'],
@@ -177,6 +178,8 @@ class ParseHelpersTest extends TestCase {
       'start-negative-end-positive' => ['-5-6', '-', -5, 6],
       'start-end-same' => ['3&3', '&', 3, 3],
       'start-end-both-positive' => ['2+8', '+', 2, 8],
+      'three-dividers-at-start' => ['1110', '1', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 10],
+      'three-dividers-at-end' => ['9111', '1', [9, 10, 11], 3],
     ];
   }
 

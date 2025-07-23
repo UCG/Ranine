@@ -66,6 +66,10 @@ final class ParseHelpers {
   /**
    * Attempts to parse $range as an inclusive range of integer values.
    *
+   * If $divider appears multiple times in $range, the position of the divider
+   * shall be the first appearance of $divider in $range after index 0 (the
+   * start of the string).
+   *
    * @param string $range
    *   Range, which should be in the form "[start]$divider[end]", where [start]
    *   and [end] are string representations of integers which form the inclusive
@@ -92,6 +96,10 @@ final class ParseHelpers {
 
   /**
    * Attempts to get the integer endpoints of $range.
+   *
+   * If $divider appears multiple times in $range, the position of the divider
+   * shall be the first appearance of $divider in $range after index 0 (the
+   * start of the string).
    *
    * @param string $range
    *   Range, which should be in the form "[start]$divider[end]", where [start]
@@ -169,6 +177,10 @@ final class ParseHelpers {
   /**
    * Attempts to parse $range as an inclusive range of integer values.
    *
+   * If $divider appears multiple times in $range, the position of the divider
+   * shall be the first appearance of $divider in $range after index 0 (the
+   * start of the string).
+   *
    * @param string $range
    *   Range, which should be in the form "[start]$divider[end]", where [start]
    *   and [end] are string representations of integers which form the inclusive
@@ -202,6 +214,10 @@ final class ParseHelpers {
 
   /**
    * Attempts to get the integer endpoints of $range.
+   *
+   * If $divider appears multiple times in $range, the position of the divider
+   * shall be the first appearance of $divider in $range after index 0 (the
+   * start of the string).
    *
    * @param string $range
    *   Range, which should be in the form "[start]$divider[end]", where [start]
