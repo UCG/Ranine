@@ -86,6 +86,15 @@ class ParseHelpersTest extends TestCase {
   }
 
   /**
+   * @covers ::parseIntRangeEndpoints
+   * @dataProvider provideDataForTestParseIntRangeEndpointsInvalid
+   */
+  public function testParseIntRangeEndpointsInvalid(string $range, string $divider, int $start, int $end) : void {
+    $this->expectException(ParseException::class);
+    ParseHelpers::parseIntRangeEndpoints($range, $start, $end, $divider);
+  }
+
+  /**
    * @covers ::tryParseInt
    */
   public function testTryParseInt() : void {
@@ -168,6 +177,9 @@ class ParseHelpersTest extends TestCase {
       'end-is-bool' => ['2:FALSE', ':'],
       'both-endpoints-non-numeric' => ['a-b', '-'],
       'range-empty' => ['', '-'],
+      'two-dividers-together' => ['5$$9', '$'],
+      'two-dividers-with-int-between' => ['7(8(9', '('],
+      'divider-is-dash-and-start-is-negative' => ['"-5"-1', '-'],
     ];
   }
 
@@ -177,6 +189,22 @@ class ParseHelpersTest extends TestCase {
       'start-negative-end-positive' => ['-5-6', '-', -5, 6],
       'start-end-same' => ['3&3', '&', 3, 3],
       'start-end-both-positive' => ['2+8', '+', 2, 8],
+    ];
+  }
+
+  public function provideDataForTestParseIntRangeEndpointsInvalid() : array {
+    return [
+      'start-greater-than-end' => ['5-3', '-', 5, 3],
+      'start-divider-same' => ['7712', '7', 7, 12],
+      'empty-start' => ['&3', '&', 0, 3],
+      'empty-end' => ['3-', '-', 3, 0],
+      'start-is-float' => ['3.0:5.0', ':', 3, 5],
+      'end-is-bool' => ['2:FALSE', ':', 2, 0],
+      'both-endpoints-non-numeric' => ['a-b', '-', 1, 2],
+      'range-empty' => ['', '-', 0, 0],
+      'two-dividers-together' => ['5$$9', '$', 5, 9],
+      'two-dividers-with-int-between' => ['7(8(9', '(', 7, 9],
+      'divider-is-dash-and-start-is-negative' => ['"-5"-1', '-', -5, -1],
     ];
   }
 
