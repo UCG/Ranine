@@ -96,9 +96,11 @@ class ParseHelpersTest extends TestCase {
 
   /**
    * @covers ::tryParseInt
+   * @dataProvider provideDataForTestTryParseInt
    */
-  public function testTryParseInt() : void {
-
+  public function testTryParseInt(mixed $inputData, bool $expectedResult) : void {
+    $result = 0;
+    $this->assertSame($expectedResult, ParseHelpers::tryParseInt($inputData, $result));
   }
 
   /**
@@ -164,10 +166,10 @@ class ParseHelpersTest extends TestCase {
       'start-end-negative' => ['-7', '/', '-2', [-7, -6, -5, -4, -3, -2], 6],
       'same-start-and-end' => ['0', '|', '0', [0], 1],
       'ordinary-start-divider-and-end' => ['1', 'A', '9', [1, 2, 3, 4, 5, 6, 7, 8, 9], 9],
-      'three-dividers-at-start' => ['1110', '1', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 10],
-      'three-dividers-at-end' => ['9111', '1', [9, 10, 11], 3],
-      'start-end-negative' => ['-4--1', '-', [-4, -3, -2, -1], 4],
-      'start-negative-end-positive' => ['-5-6', '-', [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6], 12],
+      'three-dividers-at-start' => ['1', '1', '10', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 10],
+      'three-dividers-at-end' => ['9', '1', '11', [9, 10, 11], 3],
+      'start-end-negative' => ['-4', '-', '-1', [-4, -3, -2, -1], 4],
+      'start-negative-end-positive' => ['-5', '-', '6', [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6], 12],
     ];
   }
   
@@ -209,6 +211,17 @@ class ParseHelpersTest extends TestCase {
       'range-empty' => ['', '-', 0, 0],
       'two-dividers-together' => ['5$$9', '$', 5, 9],
       'two-dividers-with-int-between' => ['7(8(9', '(', 7, 9],
+    ];
+  }
+
+  public function provideDataForTestTryParseInt() : array {
+    return [
+      'empty' => ['', FALSE],
+      'int' => [777, TRUE],
+      'float' => [1.1, FALSE],
+      'int-string' => ['56', TRUE],
+      'bad-string' => ['8a8', FALSE],
+      'math' => ['5 + 9', FALSE],
     ];
   }
 
