@@ -15,7 +15,7 @@ class ParseHelpersTest extends TestCase {
 
   /**
    * @covers ::parseInt
-   * @dataProvider provideGoodDataForParseIntAndTryParseInt
+   * @dataProvider provideGoodDataForParseIntAndTryParseIntTests
    */
   public function testParseIntGoodData(int|string $valueToTryToParse, int $expectedResult) : void {
     $this->assertEquals($expectedResult, ParseHelpers::parseInt($valueToTryToParse));
@@ -23,9 +23,9 @@ class ParseHelpersTest extends TestCase {
 
   /**
    * @covers ::parseInt
-   * @dataProvider provideDataForTestParseIntInvalid
+   * @dataProvider provideBadDataForParseIntAndTryParseIntTests
    */
-  public function testParseIntInvalid(mixed $valueToTryToParse) : void {
+  public function testParseIntBadData(mixed $valueToTryToParse) : void {
     $this->expectException(ParseException::class);
     ParseHelpers::parseInt($valueToTryToParse);
   }
@@ -98,7 +98,7 @@ class ParseHelpersTest extends TestCase {
 
   /**
    * @covers ::tryParseInt
-   * @dataProvider provideGoodDataForParseIntAndTryParseInt
+   * @dataProvider provideGoodDataForParseIntAndTryParseIntTests
    */
   public function testTryParseIntGoodData(int|string $valueToTryToParse, int $expectedResult) : void {
     $result = 0;
@@ -108,7 +108,7 @@ class ParseHelpersTest extends TestCase {
 
   /**
    * @covers ::tryParseInt
-   * @dataProvider provideDataForTestTryParseIntBadData
+   * @dataProvider provideBadDataForParseIntAndTryParseIntTests
    */
   public function testTryParseIntBadData(mixed $inputData) : void {
     $result = 0;
@@ -134,16 +134,6 @@ class ParseHelpersTest extends TestCase {
    */
   public function testTryParseIntRangeEndpoints() : void {
 
-  }
-
-  public function provideDataForTestParseIntInvalid() : array {
-    return [
-      'strange-type' => [NULL],
-      'empty-string' => [''],
-      'bad-string' => ['4a'],
-      'really-bad-string' => ['abackjsdf!!'],
-      'float' => [4.0],
-    ];
   }
 
   public function provideDataForTestParseIntFromString() : array {
@@ -215,7 +205,7 @@ class ParseHelpersTest extends TestCase {
     ];
   }
 
-  public function provideDataForTestTryParseIntGoodData() : array {
+  public function provideGoodDataForParseIntAndTryParseIntTests() : array {
     return [
       'int' => [777, 777],
       'int-string' => ['56', 56],
@@ -226,7 +216,7 @@ class ParseHelpersTest extends TestCase {
     ];
   }
   
-  public function provideDataForTestTryParseIntBadData() : array {
+  public function provideBadDataForParseIntAndTryParseIntTests() : array {
     return [
       'empty' => [''],
       'float' => [1.1],
@@ -234,6 +224,8 @@ class ParseHelpersTest extends TestCase {
       'int-string-too-large' => [(string) (PHP_INT_MAX*10.0)],
       'bad-string' => ['8a8'],
       'math' => ['5 + 9'],
+      'strange-type' => [NULL],
+      'really-bad-string' => ['abackjsdf!!'],
     ];
   }
 
