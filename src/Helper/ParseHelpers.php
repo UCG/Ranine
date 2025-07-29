@@ -243,7 +243,12 @@ final class ParseHelpers {
     if ($range === '') {
       return FALSE;
     }
-    $rangeParts = explode($divider, $range, 2);
+    $dividerLength = strlen($divider);
+    $dividerPosition = strpos($range, $divider, 1);
+    if ($dividerPosition === FALSE) {
+      return FALSE;
+    }
+    $rangeParts = [substr($range, 0, $dividerPosition), substr($range, $dividerPosition + $dividerLength, NULL)];
     if (!is_array($rangeParts) || count($rangeParts) !== 2) {
       return FALSE;
     }
