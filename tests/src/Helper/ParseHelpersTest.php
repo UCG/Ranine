@@ -96,11 +96,21 @@ class ParseHelpersTest extends TestCase {
 
   /**
    * @covers ::tryParseInt
-   * @dataProvider provideDataForTestTryParseInt
+   * @dataProvider provideDataForTestTryParseIntGoodData
    */
-  public function testTryParseInt(mixed $inputData, bool $expectedResult) : void {
+  public function testTryParseIntGoodData(mixed $inputData, int $expectedResult) : void {
     $result = 0;
-    $this->assertSame($expectedResult, ParseHelpers::tryParseInt($inputData, $result));
+    $this->assertSame(TRUE, ParseHelpers::tryParseInt($inputData, $result));
+    $this->assertSame($expectedResult, $result);    
+  }
+
+  /**
+   * @covers ::tryParseInt
+   * @dataProvider provideDataForTestTryParseIntBadData
+   */
+  public function testTryParseIntBadData(mixed $inputData) : void {
+    $result = 0;
+    $this->assertFalse(ParseHelpers::tryParseInt($inputData, $result));
   }
 
   /**
@@ -214,15 +224,26 @@ class ParseHelpersTest extends TestCase {
     ];
   }
 
-  public function provideDataForTestTryParseInt() : array {
+  public function provideDataForTestTryParseIntGoodData() : array {
     return [
-      'empty' => ['', FALSE],
-      'int' => [777, TRUE],
-      'float' => [1.1, FALSE],
-      'int-string' => ['56', TRUE],
-      'bad-string' => ['8a8', FALSE],
-      'math' => ['5 + 9', FALSE],
+      'int' => [777, 777],
+      'int-string' => ['56', 56],
+      '0' => ['0', 0],
+      'negative-int' => [-4, -4],
+      'negative-int-string' => ['-4', -4],
     ];
   }
+  
+  public function provideDataForTestTryParseIntBadData() : array {
+    return [
+      'empty' => [''],
+      'float' => [1.1],
+      'float-string' => ['1.1'],
+      'int-string-too-large' => [(string) (PHP_INT_MAX*10.0)],
+      'bad-string' => ['8a8'],
+      'math' => ['5 + 9'],
+    ];
+  }
+
 
 }
