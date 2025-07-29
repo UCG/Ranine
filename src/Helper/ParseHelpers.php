@@ -243,19 +243,19 @@ final class ParseHelpers {
     if ($range === '') {
       return FALSE;
     }
+
     $dividerLength = strlen($divider);
     $dividerPosition = strpos($range, $divider, 1);
     if ($dividerPosition === FALSE) {
       return FALSE;
     }
-    $rangeParts = [substr($range, 0, $dividerPosition), substr($range, $dividerPosition + $dividerLength, NULL)];
-    if (!is_array($rangeParts) || count($rangeParts) !== 2) {
+
+    $rangeLeft = substr($range, 0, $dividerPosition);
+    $rangeRight = substr($range, $dividerPosition + $dividerLength);
+    if (!self::tryParseIntFromString($rangeRight, $end)) {
       return FALSE;
     }
-    if (!self::tryParseIntFromString($rangeParts[0], $start)) {
-      return FALSE;
-    }
-    if (!self::tryParseIntFromString($rangeParts[1], $end)) {
+    if (!self::tryParseIntFromString($rangeLeft, $start)) {
       return FALSE;
     }
     if ($end < $start) {
