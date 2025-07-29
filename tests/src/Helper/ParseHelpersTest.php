@@ -15,9 +15,9 @@ class ParseHelpersTest extends TestCase {
 
   /**
    * @covers ::parseInt
-   * @dataProvider provideDataForTestParseInt
+   * @dataProvider provideGoodDataForParseIntAndTryParseInt
    */
-  public function testParseInt(int|string $valueToTryToParse, int $expectedResult) : void {
+  public function testParseIntGoodData(int|string $valueToTryToParse, int $expectedResult) : void {
     $this->assertEquals($expectedResult, ParseHelpers::parseInt($valueToTryToParse));
   }
 
@@ -89,19 +89,21 @@ class ParseHelpersTest extends TestCase {
    * @covers ::parseIntRangeEndpoints
    * @dataProvider provideDataForTestParseIntRangeEndpointsInvalid
    */
-  public function testParseIntRangeEndpointsInvalid(string $range, string $divider, int $start, int $end) : void {
+  public function testParseIntRangeEndpointsInvalid(string $range, string $divider) : void {
+    $start = 0;
+    $end = 0;
     $this->expectException(ParseException::class);
     ParseHelpers::parseIntRangeEndpoints($range, $start, $end, $divider);
   }
 
   /**
    * @covers ::tryParseInt
-   * @dataProvider provideDataForTestTryParseIntGoodData
+   * @dataProvider provideGoodDataForParseIntAndTryParseInt
    */
-  public function testTryParseIntGoodData(mixed $inputData, int $expectedResult) : void {
+  public function testTryParseIntGoodData(int|string $valueToTryToParse, int $expectedResult) : void {
     $result = 0;
-    $this->assertSame(TRUE, ParseHelpers::tryParseInt($inputData, $result));
-    $this->assertSame($expectedResult, $result);    
+    $this->assertSame(TRUE, ParseHelpers::tryParseInt($valueToTryToParse, $result));
+    $this->assertSame($expectedResult, $result);
   }
 
   /**
@@ -134,17 +136,6 @@ class ParseHelpersTest extends TestCase {
 
   }
 
-  public function provideDataForTestParseInt() : array {
-    return [
-      'zero-int' => [0, 0],
-      'zero-string' => ['0', 0],
-      'negative-int' => [-4, -4],
-      'negative-string' => ['-23472', -23472],
-      'positive-int' => [PHP_INT_MAX, PHP_INT_MAX],
-      'positive-string' => ['1', 1],
-    ];
-  }
-  
   public function provideDataForTestParseIntInvalid() : array {
     return [
       'strange-type' => [NULL],
@@ -212,14 +203,14 @@ class ParseHelpersTest extends TestCase {
 
   public function provideDataForTestParseIntRangeEndpointsInvalid() : array {
     return [
-      'start-greater-than-end' => ['5-3', '-', 5, 3],
-      'empty-start' => ['&3', '&', 0, 3],
-      'empty-end' => ['3-', '-', 3, 0],
-      'start-is-float' => ['3.0:5.0', ':', 3, 5],
-      'end-is-bool' => ['2:FALSE', ':', 2, 0],
-      'both-endpoints-non-numeric' => ['a-b', '-', 1, 2],
-      'range-empty' => ['', '-', 0, 0],
-      'two-dividers-together' => ['5$$9', '$', 5, 9],
+      'start-greater-than-end' => ['5-3', '-'],
+      'empty-start' => ['&3', '&'],
+      'empty-end' => ['3-', '-'],
+      'start-is-float' => ['3.0:5.0', ':'],
+      'end-is-bool' => ['2:FALSE', ':'],
+      'both-endpoints-non-numeric' => ['a-b', '-'],
+      'range-empty' => ['', '-'],
+      'two-dividers-together' => ['5$$9', '$'],
       'two-dividers-with-int-between' => ['7(8(9', '(', 7, 9],
     ];
   }
@@ -229,6 +220,7 @@ class ParseHelpersTest extends TestCase {
       'int' => [777, 777],
       'int-string' => ['56', 56],
       '0' => ['0', 0],
+      'zero-int' => [0, 0],
       'negative-int' => [-4, -4],
       'negative-int-string' => ['-4', -4],
     ];
