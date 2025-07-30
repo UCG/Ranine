@@ -32,7 +32,7 @@ class ParseHelpersTest extends TestCase {
 
   /**
    * @covers ::parseIntFromString
-   * @dataProvider provideDataForTestParseIntFromString
+   * @dataProvider provideGoodDataForParseIntFromStringAndTryTests
    */
   public function testParseIntFromString(string $inputString, int $expectedResult) : void {
     $this->assertEquals($expectedResult, ParseHelpers::parseIntFromString($inputString));
@@ -40,7 +40,7 @@ class ParseHelpersTest extends TestCase {
 
   /**
    * @covers ::parseIntFromString
-   * @dataProvider provideDataForTestParseIntFromStringInvalid
+   * @dataProvider provideBadDataForParseIntFromStringAndTryTests
    */
   public function testParseIntFromStringInvalid(string $valueToTryToParse) : void {
     $this->expectException(ParseException::class);
@@ -105,7 +105,7 @@ class ParseHelpersTest extends TestCase {
     $this->assertSame(TRUE, ParseHelpers::tryParseInt($valueToTryToParse, $result));
     $this->assertSame($expectedResult, $result);
   }
-
+  
   /**
    * @covers ::tryParseInt
    * @dataProvider provideBadDataForParseIntAndTryParseIntTests
@@ -114,19 +114,34 @@ class ParseHelpersTest extends TestCase {
     $result = 0;
     $this->assertFalse(ParseHelpers::tryParseInt($inputData, $result));
   }
-
+  
   /**
    * @covers ::tryParseIntFromString
+   * @dataProvider provideGoodDataForParseIntFromStringAndTryTests
    */
-  public function testTryParseIntFromString() : void {
-
+  public function testTryParseIntFromString(mixed $inputData, $expectedResult) : void {
+    $result = 0;
+    $this->assertSame(TRUE, ParseHelpers::tryParseIntFromString($inputData, $result));
+    $this->assertSame($expectedResult, $result);
+  }
+  
+  /**
+   * @covers ::tryParseIntFromString
+   * @dataProvider provideBadDataForParseIntFromStringAndTryTests
+   */
+  public function testTryParseIntFromStringInvalid(mixed $inputData) : void {
+    $result = 0;
+    $this->assertSame(FALSE, ParseHelpers::tryParseIntFromString($inputData, $result));
   }
 
   /**
    * @covers ::tryParseIntRange
    */
   public function testTryParseIntRange() : void {
-
+    $start = 0;
+    $end = 0;
+    $output = [];
+    // $this->assertTrue(ParseHelpers::tryParseIntRange($start, $output));
   }
 
   /**
@@ -136,19 +151,22 @@ class ParseHelpersTest extends TestCase {
 
   }
 
-  public function provideDataForTestParseIntFromString() : array {
+  public function provideGoodDataForParseIntFromStringAndTryTests() : array {
     return [
       'negative-int' => ['-9', -9],
       'positive-int' => ['77', 77],
+      'zero' => ['0', 0],
+      'max-int' => [(string) PHP_INT_MAX, PHP_INT_MAX],
     ];
   }
-
-  public function provideDataForTestParseIntFromStringInvalid() : array {
+  
+  public function provideBadDataForParseIntFromStringAndTryTests() : array {
     return [
       'bool' => ['True'],
       'letters' => ['a1a'],
       'symbols' => ['@'],
-      'float' => ['0.01']
+      'float' => ['0.01'],
+      'int-written-out' => ['one'],
     ];
   }
 
