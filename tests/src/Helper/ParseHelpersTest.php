@@ -49,16 +49,15 @@ class ParseHelpersTest extends TestCase {
 
   /**
    * @covers ::parseIntRange
-   * @dataProvider provideDataForTestParseIntRange
+   * @dataProvider provideDataForParseIntRangeAndTryParseIntRangeTests
    */
-  public function testParseIntRange(string $start, string $divider, string $end, array $expectedValues, int $expectedCount) : void {
-    $range = $start . $divider . $end;
+  public function testParseIntRange(string $range, string $divider, array $expectedValues, int $expectedCount) : void {
     $this->assertIterableValues(ParseHelpers::parseIntRange($range, $divider), $expectedValues, $expectedCount);
   }
 
   /**
    * @covers ::parseIntRange
-   * @dataProvider provideDataForTestParseIntRangeInvalidRange
+   * @dataProvider provideInvalidRangeDataForParseIntRangeAndTryParseIntRangeTests
    */
   public function testParseIntRangeInvalidRange(string $range, string $divider) : void {
     $this->expectException(ParseException::class);
@@ -136,19 +135,39 @@ class ParseHelpersTest extends TestCase {
 
   /**
    * @covers ::tryParseIntRange
+   * @dataProvider provideDataForParseIntRangeAndTryParseIntRangeTests
    */
-  public function testTryParseIntRange() : void {
-    $start = 0;
-    $end = 0;
-    $output = [];
-    // $this->assertTrue(ParseHelpers::tryParseIntRange($start, $output));
+  public function testTryParseIntRange(string $range, string $divider, array $expectedValues, int $expectedCount) : void {
+    $output = NULL;
+    $succeeded = ParseHelpers::tryParseIntRange($range, $output, $divider);
+
+    $this->assertTrue($succeeded);
+    $this->assertIsIterable($output);
+    $this->assertIterableValues($output, $expectedValues, $expectedCount);
+  }
+
+  /**
+   * @covers ::tryParseIntRange
+   * @dataProvider provideInvalidRangeDataForParseIntRangeAndTryParseIntRangeTests
+   */
+  public function testTryParseIntRangeInvalidRange(string $range, string $divider) : void {
+    $output = NULL;
+    $this->assertFalse(ParseHelpers::tryParseIntRange($range, $output, $divider));
+  }
+
+  /**
+   * @covers ::tryParseIntRange
+   */
+  public function testTryParseIntRangeEmptyDivider() : void {
+    $output = NULL;
+    $this->expectException(\InvalidArgumentException::class);
+    ParseHelpers::tryParseIntRange('2-3', $output, '');
   }
 
   /**
    * @covers ::tryParseIntRangeEndpoints
    */
   public function testTryParseIntRangeEndpoints() : void {
-
   }
 
   public function provideGoodDataForParseIntFromStringAndTryTests() : array {
@@ -170,19 +189,19 @@ class ParseHelpersTest extends TestCase {
     ];
   }
 
-  public function provideDataForTestParseIntRange() : array {
+  public function provideDataForParseIntRangeAndTryParseIntRangeTests() : array {
     return [
-      'start-end-negative' => ['-7', '/', '-2', [-7, -6, -5, -4, -3, -2], 6],
-      'same-start-and-end' => ['0', '|', '0', [0], 1],
-      'ordinary-start-divider-and-end' => ['1', 'A', '9', [1, 2, 3, 4, 5, 6, 7, 8, 9], 9],
-      'three-dividers-at-start' => ['1', '1', '10', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 10],
-      'three-dividers-at-end' => ['9', '1', '11', [9, 10, 11], 3],
-      'start-end-negative' => ['-4', '-', '-1', [-4, -3, -2, -1], 4],
-      'start-negative-end-positive' => ['-5', '-', '6', [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6], 12],
+      'start-end-negative' => ['-7/-2', '/', [-7, -6, -5, -4, -3, -2], 6],
+      'same-start-and-end' => ['0|0', '|', [0], 1],
+      'ordinary-start-divider-and-end' => ['1A9', 'A', [1, 2, 3, 4, 5, 6, 7, 8, 9], 9],
+      'three-dividers-at-start' => ['1110', '1', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 10],
+      'three-dividers-at-end' => ['9111', '1', [9, 10, 11], 3],
+      'start-end-negative' => ['-4--1', '-', [-4, -3, -2, -1], 4],
+      'start-negative-end-positive' => ['-5-6', '-', [-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6], 12],
     ];
   }
   
-  public function provideDataForTestParseIntRangeInvalidRange() : array {
+  public function provideInvalidRangeDataForParseIntRangeAndTryParseIntRangeTests() : array {
     return [
       'start-greater-than-end' => ['5-3', '-'],
       'empty-start' => ['&3', '&'],

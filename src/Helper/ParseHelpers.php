@@ -185,7 +185,7 @@ final class ParseHelpers {
    *   Range, which should be in the form "[start]$divider[end]", where [start]
    *   and [end] are string representations of integers which form the inclusive
    *   lower and upper bounds of the range, respectively.
-   * @param iterable<int>|null &$output
+   * @param iterable<int>|null $output
    *   (output) Collection, whose values are sorted from lowest to
    *   highest and are the values in the range, or NULL if the parsing failed.
    * @param string $divider
