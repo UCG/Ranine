@@ -7,6 +7,7 @@ namespace Ranine\Tests\Iteration;
 use PHPUnit\Framework\TestCase;
 use Ranine\Exception\InvalidOperationException;
 use Ranine\Iteration\ExtendableIterable;
+use Ranine\Tests\Traits\IterableAssertionTrait;
 
 /**
  * Tests the ExtendableIterable class.
@@ -15,6 +16,8 @@ use Ranine\Iteration\ExtendableIterable;
  * @group ranine
  */
 class ExtendableIterableTest extends TestCase {
+
+  use IterableAssertionTrait;
 
   /**
    * Test the all() method.
@@ -718,18 +721,6 @@ class ExtendableIterableTest extends TestCase {
         2,
       ],
     ];
-  }
-
-  private function assertIterableKeysAndValues(iterable $iterableUnderTest,
-    array $expectedKeys, array $expectedValues, int $expectedCount) : void {
-
-    $i = 0;
-    foreach ($iterableUnderTest as $k => $v) {
-      $this->assertSame($expectedKeys[$i], $k);
-      $this->assertSame($expectedValues[$i], $v);
-      $i++;
-    }
-    $this->assertSame($expectedCount, $i);
   }
 
 }

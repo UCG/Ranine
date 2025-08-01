@@ -66,6 +66,10 @@ final class ParseHelpers {
   /**
    * Attempts to parse $range as an inclusive range of integer values.
    *
+   * If $divider appears multiple times in $range, the position of the divider
+   * shall be the first appearance of $divider in $range after index 0 (the
+   * start of the string).
+   *
    * @param string $range
    *   Range, which should be in the form "[start]$divider[end]", where [start]
    *   and [end] are string representations of integers which form the inclusive
@@ -92,6 +96,10 @@ final class ParseHelpers {
 
   /**
    * Attempts to get the integer endpoints of $range.
+   *
+   * If $divider appears multiple times in $range, the position of the divider
+   * shall be the first appearance of $divider in $range after index 0 (the
+   * start of the string).
    *
    * @param string $range
    *   Range, which should be in the form "[start]$divider[end]", where [start]
@@ -169,11 +177,15 @@ final class ParseHelpers {
   /**
    * Attempts to parse $range as an inclusive range of integer values.
    *
+   * If $divider appears multiple times in $range, the position of the divider
+   * shall be the first appearance of $divider in $range after index 0 (the
+   * start of the string).
+   *
    * @param string $range
    *   Range, which should be in the form "[start]$divider[end]", where [start]
    *   and [end] are string representations of integers which form the inclusive
    *   lower and upper bounds of the range, respectively.
-   * @param iterable<int>|null &$output
+   * @param iterable<int>|null $output
    *   (output) Collection, whose values are sorted from lowest to
    *   highest and are the values in the range, or NULL if the parsing failed.
    * @param string $divider
@@ -203,6 +215,10 @@ final class ParseHelpers {
   /**
    * Attempts to get the integer endpoints of $range.
    *
+   * If $divider appears multiple times in $range, the position of the divider
+   * shall be the first appearance of $divider in $range after index 0 (the
+   * start of the string).
+   *
    * @param string $range
    *   Range, which should be in the form "[start]$divider[end]", where [start]
    *   and [end] are string representations of integers which form the start and
@@ -227,14 +243,19 @@ final class ParseHelpers {
     if ($range === '') {
       return FALSE;
     }
-    $rangeParts = explode($divider, $range, 2);
-    if (!is_array($rangeParts) || count($rangeParts) !== 2) {
+
+    $dividerLength = strlen($divider);
+    $dividerPosition = strpos($range, $divider, 1);
+    if ($dividerPosition === FALSE) {
       return FALSE;
     }
-    if (!self::tryParseIntFromString($rangeParts[0], $start)) {
+
+    $rangeLeft = substr($range, 0, $dividerPosition);
+    $rangeRight = substr($range, $dividerPosition + $dividerLength);
+    if (!self::tryParseIntFromString($rangeRight, $end)) {
       return FALSE;
     }
-    if (!self::tryParseIntFromString($rangeParts[1], $end)) {
+    if (!self::tryParseIntFromString($rangeLeft, $start)) {
       return FALSE;
     }
     if ($end < $start) {
