@@ -118,4 +118,11 @@ class StringPartTest extends TestCase {
     $this->assertTrue(((string) $result) === $firstSentence);
   }
 
+  public function testCreate() : void {
+    $backingString = '';
+    $startPosition = -1;
+    $endPosition = -1;
+    $this->assertSame('', (string)StringPart::create($backingString, $startPosition, $endPosition));
+  }
+
 }
