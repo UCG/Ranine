@@ -118,11 +118,35 @@ class StringPartTest extends TestCase {
     $this->assertTrue(((string) $result) === $firstSentence);
   }
 
-  public function testCreate() : void {
-    $backingString = '';
-    $startPosition = -1;
-    $endPosition = -1;
-    $this->assertSame('', (string)StringPart::create($backingString, $startPosition, $endPosition));
+  public function testCreate(string $backingString, int $startPosition, int $endPosition, string $expectedString) : void {
+    $this->assertSame($expectedString, (string)StringPart::create($backingString, $startPosition, $endPosition));
+  }
+  
+  public function testCreateInvalid(string $backingString, int $startPosition, int $endPosition, string $expectedString) : void {
+    $this->expectException('\InvalidArgumentException');
+    StringPart::create($backingString, $startPosition, $endPosition);
+  }
+
+  public function provideDataForTestCreate() : array {
+    return [
+      'empty' => ['', -1, -1, ''],
+      'single-character' => ['Q', 0, 1, 'Q'],
+      'long-string' => ['One Ring to rule them all, One Ring to find them, One Ring to bring them all and in the darkness bind them.',
+        27,
+        107,
+        'One Ring to find them, One Ring to bring them all and in the darkness bind them.'
+      ],
+    ];
+  }
+  
+  public function provideDataForTestCreateInvalid() : array {
+    return [
+      'startPos-EndPos-empty-string' => [],
+      'startPosition-greater-than-endPosition' => [],
+      'startPos-or-endPos-less-than-zero-and-string-not-empty' => [],
+      'endPos-equal-or-greater-than-backingString' => [],
+      'backingString-not-empty-but-should-be' => [],
+    ];
   }
 
 }
