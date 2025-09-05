@@ -118,11 +118,28 @@ class StringPartTest extends TestCase {
     $this->assertTrue(((string) $result) === $firstSentence);
   }
 
+  /**
+   * @covers ::create
+   *
+   * @param string $backingString
+   * @param int $startPosition
+   * @param int $endPosition
+   * @param string $expectedString
+   * @dataProvider provideDataForTestCreate
+   */
   public function testCreate(string $backingString, int $startPosition, int $endPosition, string $expectedString) : void {
     $this->assertSame($expectedString, (string)StringPart::create($backingString, $startPosition, $endPosition));
   }
   
-  public function testCreateInvalid(string $backingString, int $startPosition, int $endPosition, string $expectedString) : void {
+  /**
+   * @covers ::create
+   *
+   * @param string $backingString
+   * @param int $startPosition
+   * @param int $endPosition
+   * @dataProvider provideDataForTestCreateInvalid
+   */
+  public function testCreateInvalid(string $backingString, int $startPosition, int $endPosition) : void {
     $this->expectException('\InvalidArgumentException');
     StringPart::create($backingString, $startPosition, $endPosition);
   }
@@ -130,10 +147,10 @@ class StringPartTest extends TestCase {
   public function provideDataForTestCreate() : array {
     return [
       'empty' => ['', -1, -1, ''],
-      'single-character' => ['Q', 0, 1, 'Q'],
+      'single-character' => ['Q', 0, 0, 'Q'],
       'long-string' => ['One Ring to rule them all, One Ring to find them, One Ring to bring them all and in the darkness bind them.',
         27,
-        107,
+        106,
         'One Ring to find them, One Ring to bring them all and in the darkness bind them.'
       ],
     ];
@@ -141,11 +158,10 @@ class StringPartTest extends TestCase {
   
   public function provideDataForTestCreateInvalid() : array {
     return [
-      'startPos-EndPos-empty-string' => [],
-      'startPosition-greater-than-endPosition' => [],
-      'startPos-or-endPos-less-than-zero-and-string-not-empty' => [],
-      'endPos-equal-or-greater-than-backingString' => [],
-      'backingString-not-empty-but-should-be' => [],
+      'startPos-greater-than-endPos' => ['Hey', 2, 1],
+      'startPos-or-endPos-less-than-zero-and-string-not-empty' => ['Hey', -3, -4],
+      'endPos-equal-or-greater-than-backingString' => ['Hey', 1, 7],
+      'backingString-not-empty-but-should-be' => ['Hey', -1, -1],
     ];
   }
 
