@@ -53,6 +53,10 @@ class StringPartTest extends TestCase {
     $this->assertTrue($part->getBackingString() === $sentence);
   }
 
+  public function testClear() : void {
+
+  }
+
   /**
    * Tests the equals() method.
    *
@@ -84,6 +88,26 @@ class StringPartTest extends TestCase {
     $this->assertFalse($part2->equalsStringPart($part1));
     $this->assertTrue($part1->equalsStringPart($part3));
     $this->assertTrue($part3->equalsStringPart($part1));
+  }
+
+  public function testGetBackingString() : void {
+
+  }
+
+  public function testGetEndPosition() : void {
+
+  }
+
+  public function testGetLength() : void {
+
+  }
+
+  public function testGetStartPosition() : void {
+
+  }
+
+  public function testIsEmpty() : void {
+
   }
 
   /**
@@ -142,6 +166,10 @@ class StringPartTest extends TestCase {
   public function testCreateInvalid(string $backingString, int $startPosition, int $endPosition) : void {
     $this->expectException('\InvalidArgumentException');
     StringPart::create($backingString, $startPosition, $endPosition);
+  }
+
+  public function testValidateStartAndEndPosition() : void {
+    
   }
 
   public function provideDataForTestCreate() : array {
