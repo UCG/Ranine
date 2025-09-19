@@ -90,8 +90,11 @@ class StringPartTest extends TestCase {
     $this->assertTrue($part3->equalsStringPart($part1));
   }
 
+  /**
+   * @covers ::getBackingString
+   */
   public function testGetBackingString() : void {
-
+    $this->assertSame('Somethin bit me!', getBackingString('Somethin bit me!'));
   }
 
   public function testGetEndPosition() : void {
@@ -166,10 +169,6 @@ class StringPartTest extends TestCase {
   public function testCreateInvalid(string $backingString, int $startPosition, int $endPosition) : void {
     $this->expectException('\InvalidArgumentException');
     StringPart::create($backingString, $startPosition, $endPosition);
-  }
-
-  public function testValidateStartAndEndPosition() : void {
-    
   }
 
   public function provideDataForTestCreate() : array {
