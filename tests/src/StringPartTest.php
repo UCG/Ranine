@@ -89,24 +89,43 @@ class StringPartTest extends TestCase {
     $this->assertTrue($part1->equalsStringPart($part3));
     $this->assertTrue($part3->equalsStringPart($part1));
   }
-
+  
   /**
    * @covers ::getBackingString
    */
   public function testGetBackingString() : void {
-    $this->assertSame('Somethin bit me!', getBackingString('Somethin bit me!'));
+    $part = StringPart::create('Somethin bit me!', 0, 7);
+    $this->assertSame('Somethin bit me!', $part->getBackingString());
+    // ~ Forest Gump
   }
-
+  
+  /**
+   * @covers ::getEndPosition
+   */
   public function testGetEndPosition() : void {
-
+    $part = StringPart::create('Somethin bit me!', 5, 10);
+    $this->assertSame(10, $part->getEndPosition());
+    // ~ Forest Gump
   }
 
-  public function testGetLength() : void {
-
+  /**
+   * @covers ::getLength
+   * @dataProvider provideDataForTestGetLength
+   */
+  public function testGetLength(int $startPosition, int $endPosition, int $expectedLength) : void {
+    $part = StringPart::create('I have the ears of a fox and the eyes a hawk.', $startPosition, $endPosition);
+    $this->assertSame($expectedLength, $part->getLength());
+    // ~ Gimli, son of Glo'in, The Lord of the Rings: The Fellowship of the Ring
   }
 
-  public function testGetStartPosition() : void {
 
+  /**
+   * @covers ::getStartPosition
+   * @dataProvider provideDataForGetStartPosition
+   */
+  public function testGetStartPosition(int $expectedStartPosition, int $startPosition, int $endPosition) : void {
+    $part = StringPart::create('From your starting position, play pawn to e4.', $startPosition, $endPosition);
+    $this->assertSame($expectedStartPosition, $part->getStartPosition());
   }
 
   public function testIsEmpty() : void {
@@ -185,10 +204,26 @@ class StringPartTest extends TestCase {
   
   public function provideDataForTestCreateInvalid() : array {
     return [
+      'endPos-not--1-when-startPos-is--1' => ['', -1, 0],
       'startPos-greater-than-endPos' => ['Hey', 2, 1],
       'startPos-or-endPos-less-than-zero-and-string-not-empty' => ['Hey', -3, -4],
       'endPos-equal-or-greater-than-backingString' => ['Hey', 1, 7],
-      'backingString-not-empty-but-should-be' => ['Hey', -1, -1],
+    ];
+  }
+
+  public function provideDataForTestGetLength() : array {
+    return [
+      'no-length' => [-1, -1, 0],
+      'full-length' => [0, 44, 45],
+      'partial' => [13, 33, 21],
+    ];
+  }
+
+  public function provideDataForGetStartPosition() : array {
+    return [
+      'empty-string' => [-1, -1, -1],
+      'normal-string' => [0, 0, 44],
+      'single-character-string' => [5, 5, 5],
     ];
   }
 
