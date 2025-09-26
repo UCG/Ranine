@@ -53,8 +53,12 @@ class StringPartTest extends TestCase {
     $this->assertTrue($part->getBackingString() === $sentence);
   }
 
+  /**
+   * @covers ::clear
+   */
   public function testClear() : void {
-
+    $part = StringPart::create('Delete this text!', 0, 16);
+    $this->assertSame('', $part->clear());
   }
 
   /**
@@ -128,8 +132,12 @@ class StringPartTest extends TestCase {
     $this->assertSame($expectedStartPosition, $part->getStartPosition());
   }
 
+  /**
+   * @covers ::isEmpty
+   */
   public function testIsEmpty() : void {
-
+    $part = StringPart::create('', -1,-1);
+    $this->assertSame(TRUE, $part->isEmpty());
   }
 
   /**
