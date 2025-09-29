@@ -38,7 +38,7 @@ class StringPartTest extends TestCase {
     $this->assertTrue(substr_compare($part->getBackingString(), $comparison, $part->getStartPosition(), $part->getLength()) === 0);
     $this->assertTrue(((string) $part) === $comparison);
   }
-
+  
   /**
    * Tests the clean() method.
    *
@@ -47,20 +47,47 @@ class StringPartTest extends TestCase {
   public function testClean() : void {
     $sentence = 'But the Court has cheated both sides, robbing the winners of an honest victory, and the losers of the peace that comes from a fair defeat.';
     // ~ A. Scalia, J., dissenting in United States v. Windsor
-
+    
     $part = StringPart::create('::.' . $sentence . 'jku', 3, strlen($sentence) + 2);
     $part->clean();
     $this->assertTrue($part->getBackingString() === $sentence);
   }
-
+  
   /**
    * @covers ::clear
    */
   public function testClear() : void {
-    $part = StringPart::create('Delete this text!', 0, 16);
-    $this->assertSame('', $part->clear());
+    $part = StringPart::create('Delete this text!', 0, 16)->clear();
+    $expected = '';
+    $this->assertTrue($part->equals($expected));
   }
 
+  /**
+   * @covers ::create
+   *
+   * @param string $backingString
+   * @param int $startPosition
+   * @param int $endPosition
+   * @param string $expectedString
+   * @dataProvider provideDataForTestCreate
+   */
+  public function testCreate(string $backingString, int $startPosition, int $endPosition, string $expectedString) : void {
+    $this->assertSame($expectedString, (string)StringPart::create($backingString, $startPosition, $endPosition));
+  }
+  
+  /**
+   * @covers ::create
+   *
+   * @param string $backingString
+   * @param int $startPosition
+   * @param int $endPosition
+   * @dataProvider provideDataForTestCreateInvalid
+   */
+  public function testCreateInvalid(string $backingString, int $startPosition, int $endPosition) : void {
+    $this->expectException('\InvalidArgumentException');
+    StringPart::create($backingString, $startPosition, $endPosition);
+  }
+  
   /**
    * Tests the equals() method.
    *
@@ -119,9 +146,8 @@ class StringPartTest extends TestCase {
   public function testGetLength(int $startPosition, int $endPosition, int $expectedLength) : void {
     $part = StringPart::create('I have the ears of a fox and the eyes a hawk.', $startPosition, $endPosition);
     $this->assertSame($expectedLength, $part->getLength());
-    // ~ Gimli, son of Glo'in, The Lord of the Rings: The Fellowship of the Ring
+    // ~ J. R. Tolkien, Gimli, son of Glo'in, The Lord of the Rings: The Fellowship of the Ring
   }
-
 
   /**
    * @covers ::getStartPosition
@@ -136,8 +162,10 @@ class StringPartTest extends TestCase {
    * @covers ::isEmpty
    */
   public function testIsEmpty() : void {
-    $part = StringPart::create('', -1,-1);
-    $this->assertSame(TRUE, $part->isEmpty());
+    $part = StringPart::create(' ', -1,-1);
+    $this->assertTrue($part->isEmpty());
+    $part = StringPart::create('I feel so empty! But I am not!!', 0, 30);
+    $this->assertFalse($part->isEmpty());
   }
 
   /**
@@ -172,32 +200,6 @@ class StringPartTest extends TestCase {
     $this->assertTrue(((string) $result) === $firstSentence);
   }
 
-  /**
-   * @covers ::create
-   *
-   * @param string $backingString
-   * @param int $startPosition
-   * @param int $endPosition
-   * @param string $expectedString
-   * @dataProvider provideDataForTestCreate
-   */
-  public function testCreate(string $backingString, int $startPosition, int $endPosition, string $expectedString) : void {
-    $this->assertSame($expectedString, (string)StringPart::create($backingString, $startPosition, $endPosition));
-  }
-  
-  /**
-   * @covers ::create
-   *
-   * @param string $backingString
-   * @param int $startPosition
-   * @param int $endPosition
-   * @dataProvider provideDataForTestCreateInvalid
-   */
-  public function testCreateInvalid(string $backingString, int $startPosition, int $endPosition) : void {
-    $this->expectException('\InvalidArgumentException');
-    StringPart::create($backingString, $startPosition, $endPosition);
-  }
-
   public function provideDataForTestCreate() : array {
     return [
       'empty' => ['', -1, -1, ''],
@@ -206,6 +208,7 @@ class StringPartTest extends TestCase {
         27,
         106,
         'One Ring to find them, One Ring to bring them all and in the darkness bind them.'
+        // ~ J. R. Tolkien, The Lord of the Rings
       ],
     ];
   }
@@ -227,7 +230,7 @@ class StringPartTest extends TestCase {
     ];
   }
 
-  public function provideDataForGetStartPosition() : array {
+  public function provideDataForTestGetStartPosition() : array {
     return [
       'empty-string' => [-1, -1, -1],
       'normal-string' => [0, 0, 44],
