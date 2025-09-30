@@ -65,10 +65,6 @@ class StringPartTest extends TestCase {
   /**
    * @covers ::create
    *
-   * @param string $backingString
-   * @param int $startPosition
-   * @param int $endPosition
-   * @param string $expectedString
    * @dataProvider provideDataForTestCreate
    */
   public function testCreate(string $backingString, int $startPosition, int $endPosition, string $expectedString) : void {
@@ -78,9 +74,6 @@ class StringPartTest extends TestCase {
   /**
    * @covers ::create
    *
-   * @param string $backingString
-   * @param int $startPosition
-   * @param int $endPosition
    * @dataProvider provideDataForTestCreateInvalid
    */
   public function testCreateInvalid(string $backingString, int $startPosition, int $endPosition) : void {
