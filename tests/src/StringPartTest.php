@@ -73,7 +73,6 @@ class StringPartTest extends TestCase {
   
   /**
    * @covers ::create
-   *
    * @dataProvider provideDataForTestCreateInvalid
    */
   public function testCreateInvalid(string $backingString, int $startPosition, int $endPosition) : void {
