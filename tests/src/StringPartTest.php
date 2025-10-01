@@ -38,7 +38,7 @@ class StringPartTest extends TestCase {
     $this->assertTrue(substr_compare($part->getBackingString(), $comparison, $part->getStartPosition(), $part->getLength()) === 0);
     $this->assertTrue(((string) $part) === $comparison);
   }
-  
+
   /**
    * Tests the clean() method.
    *
@@ -47,7 +47,7 @@ class StringPartTest extends TestCase {
   public function testClean() : void {
     $sentence = 'But the Court has cheated both sides, robbing the winners of an honest victory, and the losers of the peace that comes from a fair defeat.';
     // ~ A. Scalia, J., dissenting in United States v. Windsor
-    
+
     $part = StringPart::create('::.' . $sentence . 'jku', 3, strlen($sentence) + 2);
     $part->clean();
     $this->assertTrue($part->getBackingString() === $sentence);
