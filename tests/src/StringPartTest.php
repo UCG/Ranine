@@ -205,7 +205,7 @@ class StringPartTest extends TestCase {
     ];
   }
   
-  public function provideDataForTestCreateInvalid() : array {
+  public static function provideDataForTestCreateInvalid() : array {
     return [
       'endPos-not--1-when-startPos-is--1' => ['', -1, 0],
       'startPos-greater-than-endPos' => ['Hey', 2, 1],
@@ -214,7 +214,7 @@ class StringPartTest extends TestCase {
     ];
   }
 
-  public function provideDataForTestGetLength() : array {
+  public static function provideDataForTestGetLength() : array {
     return [
       'no-length' => [-1, -1, 0],
       'full-length' => [0, 44, 45],
@@ -222,7 +222,7 @@ class StringPartTest extends TestCase {
     ];
   }
 
-  public function provideDataForTestGetStartPosition() : array {
+  public static function provideDataForTestGetStartPosition() : array {
     return [
       'empty-string' => [-1, -1, -1],
       'normal-string' => [0, 0, 44],
