@@ -32,40 +32,6 @@ class ArraySchemaTest extends TestCase {
   private ArraySchema $schema;
 
   /**
-   * Provides valid arrays for testValidateValidSchema().
-   *
-   * @return mixed[][][]
-   *   Arrays.
-   */
-  public function provideValidArrays() : array {
-    return [
-      [[
-        '1' => [
-          '1_1' => [
-            '1_1_1' => 2,
-          ],
-          '1_2' => [
-            '1_2_1' => 3,
-            '1_2_2' => 'c',
-          ],
-          '1_3' => 'a',
-        ],
-        '2' => FALSE,
-      ]],
-      [[
-        '1' => [
-          '1_2' => [
-            '1_2_1' => 3,
-            '1_2_2' => 'c',
-          ],
-          '1_3' => 'a',
-        ],
-        '2' => FALSE,
-      ]],
-    ];
-  }
-
-  /**
    * Tests the validate() method with an array with a missing element.
    *
    * @covers ::validate
@@ -194,6 +160,40 @@ class ArraySchemaTest extends TestCase {
       ]),
       '2' => new ArraySchemaRule(fn($x) => is_bool($x) ? NULL : new InvalidTypeArraySchemaException(self::BAD_SCHEMA_MESSAGE_2)),
     ]);
+  }
+
+  /**
+   * Provides valid arrays for testValidateValidSchema().
+   *
+   * @return mixed[][][]
+   *   Arrays.
+   */
+  public static function provideValidArrays() : array {
+    return [
+      [[
+        '1' => [
+          '1_1' => [
+            '1_1_1' => 2,
+          ],
+          '1_2' => [
+            '1_2_1' => 3,
+            '1_2_2' => 'c',
+          ],
+          '1_3' => 'a',
+        ],
+        '2' => FALSE,
+      ]],
+      [[
+        '1' => [
+          '1_2' => [
+            '1_2_1' => 3,
+            '1_2_2' => 'c',
+          ],
+          '1_3' => 'a',
+        ],
+        '2' => FALSE,
+      ]],
+    ];
   }
 
 }

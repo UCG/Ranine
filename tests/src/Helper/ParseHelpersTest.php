@@ -212,7 +212,7 @@ class ParseHelpersTest extends TestCase {
     $this->assertFalse(ParseHelpers::tryParseIntRange($range, $output, $divider));
   }
   
-  public function provideBadDataForParseIntAndTryParseIntTests() : array {
+  public static function provideBadDataForParseIntAndTryParseIntTests() : array {
     return [
       'empty' => [''],
       'float' => [1.1],
@@ -225,7 +225,7 @@ class ParseHelpersTest extends TestCase {
     ];
   }
   
-  public function provideBadDataForParseIntFromStringAndTryTests() : array {
+  public static function provideBadDataForParseIntFromStringAndTryTests() : array {
     return [
       'bool' => ['True'],
       'letters' => ['a1a'],
@@ -235,7 +235,7 @@ class ParseHelpersTest extends TestCase {
     ];
   }
   
-  public function provideBadDataForParseIntRangeEndpointsAndTryTests() : array {
+  public static function provideBadDataForParseIntRangeEndpointsAndTryTests() : array {
     return [
       'start-greater-than-end' => ['5-3', '-'],
       'empty-start' => ['&3', '&'],
@@ -249,7 +249,7 @@ class ParseHelpersTest extends TestCase {
     ];
   }
   
-  public function provideDataForParseIntRangeAndTryParseIntRangeTests() : array {
+  public static function provideDataForParseIntRangeAndTryParseIntRangeTests() : array {
     return [
       'start-end-negative' => ['-7/-2', '/', [-7, -6, -5, -4, -3, -2], 6],
       'same-start-and-end' => ['0|0', '|', [0], 1],
@@ -261,7 +261,7 @@ class ParseHelpersTest extends TestCase {
     ];
   }
   
-  public function provideGoodDataForParseIntAndTryParseIntTests() : array {
+  public static function provideGoodDataForParseIntAndTryParseIntTests() : array {
     return [
       'int' => [777, 777],
       'int-string' => ['56', 56],
@@ -272,7 +272,7 @@ class ParseHelpersTest extends TestCase {
     ];
   }
   
-  public function provideGoodDataForParseIntFromStringAndTryTests() : array {
+  public static function provideGoodDataForParseIntFromStringAndTryTests() : array {
     return [
       'negative-int' => ['-9', -9],
       'positive-int' => ['77', 77],
@@ -281,7 +281,7 @@ class ParseHelpersTest extends TestCase {
     ];
   }
   
-  public function provideGoodDataForParseIntRangeEndpointsAndTryTests() : array {
+  public static function provideGoodDataForParseIntRangeEndpointsAndTryTests() : array {
     return [
       'start-end-negative' => ['-4--1', '-', -4, -1],
       'start-negative-end-positive' => ['-5-6', '-', -5, 6],
@@ -293,7 +293,7 @@ class ParseHelpersTest extends TestCase {
     ];
   }
   
-  public function provideInvalidRangeDataForParseIntRangeAndTryParseIntRangeTests() : array {
+  public static function provideInvalidRangeDataForParseIntRangeAndTryParseIntRangeTests() : array {
     return [
       'start-greater-than-end' => ['5-3', '-'],
       'empty-start' => ['&3', '&'],

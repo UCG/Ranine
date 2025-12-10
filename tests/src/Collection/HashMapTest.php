@@ -17,46 +17,6 @@ use Ranine\Exception\KeyNotFoundException;
 class HashMapTest extends TestCase {
 
   /**
-   * Provides arguments for testAdd().
-   *
-   * @return array<callable() : iterable>[]
-   *   Arguments.
-   * @phpstan-return array<array{0: callable() : iterable}>
-   */
-  public function provideTestAddArgument() : array {
-    return [
-      [function () : iterable {
-        yield 'jkuu' => 2;
-        yield 'jk' => 3.0;
-        yield 'uiu' => 2;
-      }],
-      [function () : iterable {
-        yield 0 => 0;
-        yield 4 => 'a';
-        yield 5 => 'b';
-      }],
-      [function () : iterable {
-        yield 0.0 => 'a';
-        yield -1.0 => 2;
-        yield -1.01 => NULL;
-        yield NULL => NULL;
-      }],
-      [function () : iterable {
-        yield ['a' => 'b', 'c' => 'd'] => NULL;
-        yield ['a' => 'c', 'c' => 'e'] => 0;
-        yield ['a' => 'b', 'c' => 'd', 'e' => 'f'] => 0;
-        yield ['c' => 'd', 'a' => 'b'] => NULL;
-        yield ['a' => 'b'] => 3;
-        yield ['c' => 'd'] => 4;
-        yield [0, 1, 2] => 6;
-        yield ['a', 'b', 'c', 'd'] => 2;
-        yield ['a', 'b'] => '';
-        yield ['a', 'c'] => 1;
-      }],
-    ];
-  }
-
-  /**
    * Tests the add(), get() and hasKey() methods.
    *
    * Uses the default hashing / comparison.
@@ -142,6 +102,46 @@ class HashMapTest extends TestCase {
     $this->assertTrue($map->get(8) === 0);
     $this->expectException(KeyNotFoundException::class);
     $map->set(9, 0, FALSE);
+  }
+
+  /**
+   * Provides arguments for testAdd().
+   *
+   * @return array<callable() : iterable>[]
+   *   Arguments.
+   * @phpstan-return array<array{0: callable() : iterable}>
+   */
+  public static function provideTestAddArgument() : array {
+    return [
+      [function () : iterable {
+        yield 'jkuu' => 2;
+        yield 'jk' => 3.0;
+        yield 'uiu' => 2;
+      }],
+      [function () : iterable {
+        yield 0 => 0;
+        yield 4 => 'a';
+        yield 5 => 'b';
+      }],
+      [function () : iterable {
+        yield 0.0 => 'a';
+        yield -1.0 => 2;
+        yield -1.01 => NULL;
+        yield NULL => NULL;
+      }],
+      [function () : iterable {
+        yield ['a' => 'b', 'c' => 'd'] => NULL;
+        yield ['a' => 'c', 'c' => 'e'] => 0;
+        yield ['a' => 'b', 'c' => 'd', 'e' => 'f'] => 0;
+        yield ['c' => 'd', 'a' => 'b'] => NULL;
+        yield ['a' => 'b'] => 3;
+        yield ['c' => 'd'] => 4;
+        yield [0, 1, 2] => 6;
+        yield ['a', 'b', 'c', 'd'] => 2;
+        yield ['a', 'b'] => '';
+        yield ['a', 'c'] => 1;
+      }],
+    ];
   }
 
 }

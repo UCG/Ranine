@@ -426,8 +426,8 @@ class ExtendableIterableTest extends TestCase {
 
     $this->assertIterableKeysAndValues($zipped, $expectedKeys, $expectedValues, $expectedCount);
   }
-  
-  public function provideDataForTestAll() : array {
+
+  public static function provideDataForTestAll() : array {
     return [
       'empty' => [[], fn() => FALSE, TRUE],
       'single-false-predicate' => [[1], fn() => FALSE, FALSE],
@@ -438,8 +438,8 @@ class ExtendableIterableTest extends TestCase {
       'normal-true-predicate' => [[1 => 2, 3 => 4], fn(int $k, int $v) => $k + $v <= 7, TRUE],
     ];
   }
-  
-  public function provideDataForTestAny() : array {
+
+  public static function provideDataForTestAny() : array {
     return [
       'empty' => [[], fn() => TRUE, FALSE],
       'single-false-predicate' => [[1], fn() => FALSE, FALSE],
@@ -451,27 +451,27 @@ class ExtendableIterableTest extends TestCase {
     ];
   }
 
-  public function provideDataForTestAppend() : array {
+  public static function provideDataForTestAppend() : array {
     return [
       'empty' => [[],[],[],[],0],
       'single-append' => [[1],[7],[1, 7], [0, 0], 2],
     ];
   }
   
-  public function provideDataForTestAppendKeyAndValue() : array {
+  public static function provideDataForTestAppendKeyAndValue() : array {
     return [
       'single-key-value-append' => [[2,5],1,7,[0,1,1],[2,5,7],3],
       'single-key-value-append-to-empty-array' => [[],1,7,[1],[7],1],
     ];
   }
   
-  public function provideDataForTestAppendValue() : array {
+  public static function provideDataForTestAppendValue() : array {
     return [
       'single-append' => [[1],7,[0,0],[1,7],2],
     ];
   }
-  
-  public function provideDataForTestApply() : array {
+
+  public static function provideDataForTestApply() : array {
     return [
       'empty' => [[],[],[]],
       'single' => [[1],[0],[1]],
@@ -479,7 +479,7 @@ class ExtendableIterableTest extends TestCase {
     ];
   }
 
-  public function provideDataForTestApplyWith() : array {
+  public static function provideDataForTestApplyWith() : array {
     return [
       'empty-both' => [[], [], [], [], [], []],
       'current-empty' => [[], [2 => 3, 4 => 5], [], [], [2, 4], [3, 5]],
@@ -489,8 +489,8 @@ class ExtendableIterableTest extends TestCase {
       'other-larger' => [[0 => NULL], [1 => 2, 3 => 4], [0], [NULL], [1, 3], [2, 4]],
     ];
   }
-  
-  public function provideDataForTestCount() : array {
+
+  public static function provideDataForTestCount() : array {
     return [
       'empty' => [[],0],
       'array' => [[2,4,6],3],
@@ -498,7 +498,7 @@ class ExtendableIterableTest extends TestCase {
     ];
   }
 
-  public function provideDataForTestExpand() : array {
+  public static function provideDataForTestExpand() : array {
     return [
       'empty' => [[],[],[],0],
       'all-expandable' => [[[0,1],[2,3]],[0,1,0,1],[0,1,2,3],4],
@@ -508,7 +508,7 @@ class ExtendableIterableTest extends TestCase {
     ];
   }
 
-  public function provideDataForTestFilter() : array {
+  public static function provideDataForTestFilter() : array {
     return [
       'empty' => [[], fn() => TRUE, [], [], 0],
       'single-pass' => [[2 => 3], fn($k, $v) => $k > 0 && $v > 0, [2], [3], 1],
@@ -519,7 +519,7 @@ class ExtendableIterableTest extends TestCase {
     ];
   }
 
-  public function provideDataForTestGetKeys() : array {
+  public static function provideDataForTestGetKeys() : array {
     return [
       'empty' => [[], [], [], 0],
       'single' => [[1 => 'b'], [0], [1], 1],
@@ -527,7 +527,7 @@ class ExtendableIterableTest extends TestCase {
     ];
   }
 
-  public function provideDataForTestMap() : array {
+  public static function provideDataForTestMap() : array {
     return [
       'empty' => [[],fn($k, $v) => $k**2 + $v,fn($k, $v) => $v**2 - $k,[],[],0],
       'negative-keyMap' => [
@@ -589,7 +589,7 @@ class ExtendableIterableTest extends TestCase {
     ];
   }
 
-  public function provideDataForTestMapSequentialKeys() : array {
+  public static function provideDataForTestMapSequentialKeys() : array {
     return [
       'empty' => [[],fn($k, $v) => $v,[],[],0],
       'null-value-map' => [[NULL,NULL],NULL,[0,1],[NULL,NULL],2],
@@ -599,7 +599,7 @@ class ExtendableIterableTest extends TestCase {
     ];
   }
 
-  public function provideDataForTestReduce() : array{
+  public static function provideDataForTestReduce() : array{
     return [
       'empty' => [[], fn() => 1, 5, 5],
       'single' => [[1 => 2], fn($k, $v, $a) => $k + $v + $a, -1, 2],
@@ -607,7 +607,7 @@ class ExtendableIterableTest extends TestCase {
     ];
   }
 
-  public function provideDataForTestTake() : array {
+  public static function provideDataForTestTake() : array {
     return [
       'empty' => [[], 0, [], [], 0],
       'more-than-we-have' => [[1, 2], 3, [0, 1], [1, 2], 2],
@@ -618,7 +618,7 @@ class ExtendableIterableTest extends TestCase {
     ];
   }
 
-  public function provideDataForTestTakeWhile() : array {
+  public static function provideDataForTestTakeWhile() : array {
     return [
       'empty' => [[],fn($k,$v) => TRUE,2,[],[],0],
       'predicate-true-for-all-no-max' => [[1,2,3,4],fn($k,$v) => $v>0,NULL,[0,1,2,3],[1,2,3,4],4],
@@ -629,7 +629,7 @@ class ExtendableIterableTest extends TestCase {
     ];
   }
 
-  public function provideDataForTestToArray() : array {
+  public static function provideDataForTestToArray() : array {
     return [
       'empty' => [ExtendableIterable::empty(), FALSE, []],
       'preserve-keys' => [ExtendableIterable::fromKeyAndValue(2, 4), TRUE, [2 => 4]],
@@ -639,7 +639,7 @@ class ExtendableIterableTest extends TestCase {
     ];
   }
 
-  public function provideDataForTestZip() : array {
+  public static function provideDataForTestZip() : array {
     return [
       'both-iters-same-size' => [
         [0 => 1, 4 => 5],

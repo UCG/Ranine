@@ -17,45 +17,6 @@ use Ranine\Iteration\ExtendableIterable;
 class HashSetTest extends TestCase {
 
   /**
-   * Provides arguments for testAdd().
-   *
-   * @return mixed[][][]
-   *   Arguments.
-   */
-  public function provideTestAddArguments() : array {
-    return [
-      [[
-        'jkuu',
-        'jk',
-        'uiu',
-      ]],
-      [[
-        0,
-        4,
-        5,
-      ]],
-      [[
-        0.0,
-        -1.0,
-        -1.01,
-        1,
-      ]],
-      [[
-        ['a' => 'b', 'c' => 'd'],
-        ['a' => 'c', 'c' => 'e'],
-        ['a' => 'b', 'c' => 'd', 'e' => 'f'],
-        ['c' => 'd', 'a' => 'b'],
-        ['a' => 'b'],
-        ['c' => 'd'],
-        [0, 1, 2],
-        ['a', 'b', 'c', 'd'],
-        ['a', 'b'],
-        ['a', 'c'],
-      ]],
-    ];
-  }
-
-  /**
    * Tests the add() and has() methods.
    *
    * Uses the default hashing / comparison.
@@ -113,6 +74,45 @@ class HashSetTest extends TestCase {
     $this->assertTrue($set->remove(5));
     $this->assertFalse($set->has(5));
     $this->assertTrue($set->has(3));
+  }
+
+  /**
+   * Provides arguments for testAdd().
+   *
+   * @return mixed[][][]
+   *   Arguments.
+   */
+  public static function provideTestAddArguments() : array {
+    return [
+      [[
+        'jkuu',
+        'jk',
+        'uiu',
+      ]],
+      [[
+        0,
+        4,
+        5,
+      ]],
+      [[
+        0.0,
+        -1.0,
+        -1.01,
+        1,
+      ]],
+      [[
+        ['a' => 'b', 'c' => 'd'],
+        ['a' => 'c', 'c' => 'e'],
+        ['a' => 'b', 'c' => 'd', 'e' => 'f'],
+        ['c' => 'd', 'a' => 'b'],
+        ['a' => 'b'],
+        ['c' => 'd'],
+        [0, 1, 2],
+        ['a', 'b', 'c', 'd'],
+        ['a', 'b'],
+        ['a', 'c'],
+      ]],
+    ];
   }
 
 }

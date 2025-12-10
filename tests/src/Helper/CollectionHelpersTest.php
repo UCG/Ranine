@@ -110,7 +110,7 @@ class CollectionHelpersTest extends TestCase {
     
   }
   
-  public function provideDataForRemoveDuplicatesTest() : array {
+  public static function provideDataForRemoveDuplicatesTest() : array {
     return [
       'Ordinary' => [
         [-1, -1, 0, 0, 2, 3, 4, 5, 7, 8, 'a' => 10, 10, 12, 14, 15, 16, 17, 17],
@@ -136,7 +136,7 @@ class CollectionHelpersTest extends TestCase {
     ];
   }
 
-  public function provideDataWhereKeyAndOrValueIsNonIntegral() : array {
+  public static function provideDataWhereKeyAndOrValueIsNonIntegral() : array {
     return [
       [[4 => 3, '3.3' => 4]],
       [['5.5' => -7]],
@@ -144,7 +144,7 @@ class CollectionHelpersTest extends TestCase {
     ];
   }
   
-  public function provideDataWhereKeyIsGreaterThanValue() : array {
+  public static function provideDataWhereKeyIsGreaterThanValue() : array {
     return [
       [[4 => 3, 3 => 4]],
       [[55 => -7]],
