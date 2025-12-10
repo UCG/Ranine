@@ -192,7 +192,7 @@ class StringPartTest extends TestCase {
     $this->assertTrue(((string) $result) === $firstSentence);
   }
 
-  public function provideDataForTestCreate() : array {
+  public static function provideDataForTestCreate() : array {
     return [
       'empty' => ['', -1, -1, ''],
       'single-character' => ['Q', 0, 0, 'Q'],
