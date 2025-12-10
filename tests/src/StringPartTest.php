@@ -143,7 +143,7 @@ class StringPartTest extends TestCase {
 
   /**
    * @covers ::getStartPosition
-   * @dataProvider provideDataForGetStartPosition
+   * @dataProvider provideDataForTestGetStartPosition
    */
   public function testGetStartPosition(int $expectedStartPosition, int $startPosition, int $endPosition) : void {
     $part = StringPart::create('From your starting position, play pawn to e4.', $startPosition, $endPosition);
