@@ -76,8 +76,12 @@ final class DatabaseHelpers {
           // properly: the destructor might not be called, which can lead to
           // out-of-order destruction during shutdown later. See
           // https://bugs.xdebug.org/view.php?id=2222, https://www.drupal.org/project/drupal/issues/3405976
-          // and https://www.drupal.org/project/drupal/issues/3406985 (once
-          // 3406985 is resolved, we can remove this hack). This does raise a
+          // and https://www.drupal.org/project/drupal/issues/3406985, and
+          // https://www.drupal.org/project/drupal/issues/3398767. Once that
+          // last issue is resolved, probably in Drupal 11.3, we can use
+          // $transaction->commitOrRelease() here and remove this hack.
+          //
+          // The hack does raise a
           // potential issue: will there be problems when the destructor is
           // called as the object is destroyed. Fortunately, the destructor
           // seems to be idempotent, but this is certainly not optimal...
