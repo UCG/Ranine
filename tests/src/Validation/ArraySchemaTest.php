@@ -4,20 +4,23 @@ declare(strict_types = 1);
 
 namespace Ranine\Tests\Validation;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 use Ranine\Validation\ArraySchema;
 use Ranine\Validation\ArraySchemaRule;
 use Ranine\Exception\ExtraElementsArraySchemaException;
 use Ranine\Exception\InvalidArraySchemaException;
 use Ranine\Exception\MissingElementArraySchemaException;
-use PHPUnit\Framework\TestCase;
 use Ranine\Exception\InvalidTypeArraySchemaException;
 
-/**
- * Tests the ArraySchema class.
- *
- * @coversDefaultClass \Ranine\Validation\ArraySchema
- * @group ranine
- */
+#[TestDox('Tests the ArraySchema class.')]
+#[CoversClass(ArraySchema::class)]
+#[Group('ranine')]
 class ArraySchemaTest extends TestCase {
 
   private const BAD_SCHEMA_MESSAGE_1_1_1 = 'Value must be the integer "two."';
@@ -26,16 +29,11 @@ class ArraySchemaTest extends TestCase {
   private const BAD_SCHEMA_MESSAGE_1_3 = 'Value must be "a".';
   private const BAD_SCHEMA_MESSAGE_2 = 'Value must be a boolean.';
 
-  /**
-   * Array schema under test.
-   */
+  #[TestDox('Array schema under test.')]
   private ArraySchema $schema;
 
-  /**
-   * Tests the validate() method with an array with a missing element.
-   *
-   * @covers ::validate
-   */
+  #[TestDox('Tests the validate() method with an array with a missing element.')]
+  #[CoversFunction('validate')]
   public function testValidateInvalidSchemaMissingElement() : void {
     $arr = [
       '1' => [
@@ -51,11 +49,8 @@ class ArraySchemaTest extends TestCase {
     $this->schema->validate($arr);
   }
 
-  /**
-   * Tests the validate() method with an array with an invalid optional element.
-   *
-   * @covers ::validate
-   */
+  #[TestDox('Tests the validate() method with an array with an invalid optional element.')]
+  #[CoversFunction('validate')]
   public function testValidateInvalidSchemaInvalidOptionalElement() : void {
     $arr = [
       '1' => [
@@ -76,11 +71,8 @@ class ArraySchemaTest extends TestCase {
     $this->schema->validate($arr);
   }
 
-  /**
-   * Tests the validate() method with an array with an extra element.
-   *
-   * @covers ::validate
-   */
+  #[TestDox('Tests the validate() method with an array with an extra element.')]
+  #[CoversFunction('validate')]
   public function testValidateInvalidSchemaExtraElement() : void {
     $arr = [
       '1' => [
@@ -101,11 +93,8 @@ class ArraySchemaTest extends TestCase {
     $this->schema->validate($arr);
   }
 
-  /**
-   * Tests the validate() method with an array with a wrong value.
-   *
-   * @covers ::validate
-   */
+  #[TestDox('Tests the validate() method with an array with a wrong value.')]
+  #[CoversFunction('validate')]
   public function testValidateInvalidSchemaWrongValue() : void {
     $arr = [
       '1' => [
@@ -127,15 +116,13 @@ class ArraySchemaTest extends TestCase {
   }
 
   /**
-   * Tests the validate() method with array(s) with valid schemas.
-   *
-   * @covers ::validate
-   * @dataProvider provideValidArrays
-   * @doesNotPerformAssertions
-   *
    * @param array $arr
    *   Array to test with.
    */
+  #[TestDox('Tests the validate() method with array(s) with valid schemas.')]
+  #[CoversFunction('validate')]
+  #[DataProvider('provideValidArrays')]
+  #[DoesNotPerformAssertions]
   public function testValidateValidSchema(array $arr) : void {
     $this->schema->validate($arr);
   }
@@ -163,11 +150,10 @@ class ArraySchemaTest extends TestCase {
   }
 
   /**
-   * Provides valid arrays for testValidateValidSchema().
-   *
    * @return mixed[][][]
    *   Arrays.
    */
+  #[TestDox('Provides valid arrays for testValidateValidSchema().')]
   public static function provideValidArrays() : array {
     return [
       [[
