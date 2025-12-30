@@ -4,49 +4,43 @@ declare(strict_types = 1);
 
 namespace Ranine\Tests\Iteration;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 use Ranine\Exception\InvalidOperationException;
 use Ranine\Iteration\ExtendableIterable;
 use Ranine\Tests\Traits\IterableAssertionTrait;
 
-/**
- * Tests the ExtendableIterable class.
- *
- * @coversDefaultClass \Ranine\Iteration\ExtendableIterable
- * @group ranine
- */
+#[TestDox('Tests the ExtendableIterable class.')]
+#[CoversClass(ExtendableIterable::class)]
+#[Group('ranine')]
 class ExtendableIterableTest extends TestCase {
 
   use IterableAssertionTrait;
 
-  /**
-   * Test the all() method.
-   *
-   * @covers ::all
-   * @dataProvider provideDataForTestAll
-   */
+  #[TestDox('Test the all() method.')]
+  #[CoversFunction('all')]
+  #[DataProvider('provideDataForTestAll')]
   public function testAll(array $inputData, callable $predicate, bool $expectedResult) : void {
     $iter = ExtendableIterable::from($inputData);
     $this->assertSame($expectedResult, $iter->all($predicate));
   }
 
-  /**
-   * Test the any() method.
-   * 
-   * @covers ::any
-   * @dataProvider provideDataForTestAny
-   */
+  #[TestDox('Test the any() method.')]
+  #[CoversFunction('any')]
+  #[DataProvider('provideDataForTestAny')]
   public function testAny(array $inputData, callable $predicate, bool $expectedResult) : void {
     $iter = ExtendableIterable::from($inputData);  
     $this->assertSame($expectedResult, $iter->any($predicate));
   }
 
-  /**
-   * Test the append() method.
-   * 
-   * @covers ::append
-   * @dataProvider provideDataForTestAppend
-   */
+  #[TestDox('Test the append() method.')]
+  #[CoversFunction('append')]
+  #[DataProvider('provideDataForTestAppend')]
   public function testAppend(array $iterData,
     iterable $iterToAppend,
     array $expectedValues,
@@ -58,10 +52,8 @@ class ExtendableIterableTest extends TestCase {
     $this->assertIterableKeysAndValues($appendedIter, $expectedKeys, $expectedValues, $expectedCount);
   }
 
-  /**
-   * @covers ::appendKeyAndValue
-   * @dataProvider provideDataForTestAppendKeyAndValue
-   */
+  #[CoversFunction('appendKeyAndValue')]
+  #[DataProvider('provideDataForTestAppendKeyAndValue')]
   public function testAppendKeyAndValue(array $iterData,
     int $keyToAppend,
     int $valueToAppend,
@@ -74,10 +66,8 @@ class ExtendableIterableTest extends TestCase {
     $this->assertIterableKeysAndValues($appendedKeyAndValue, $expectedKeys, $expectedValues, $expectedCount);
   }
 
-  /**
-   * @covers ::appendValue
-   * @dataProvider provideDataForTestAppendValue
-   */
+  #[CoversFunction('appendValue')]
+  #[DataProvider('provideDataForTestAppendValue')]
   public function testAppendValue(iterable $iterData,
     int $valueToAppend,
     array $expectedKeys,
@@ -89,10 +79,8 @@ class ExtendableIterableTest extends TestCase {
     $this->assertIterableKeysAndValues($appendedIter, $expectedKeys, $expectedValues, $expectedCount);
   }
 
-  /**
-   * @covers ::apply
-   * @dataProvider provideDataForTestApply
-   */
+  #[CoversFunction('apply')]
+  #[DataProvider('provideDataForTestApply')]
   public function testApply(iterable $iterData, 
     array $expectedKeys,
     array $expectedValues) : void {
@@ -116,10 +104,8 @@ class ExtendableIterableTest extends TestCase {
     $this->assertTrue(TRUE);
   }
 
-  /**
-   * @covers ::applyWith
-   * @dataProvider provideDataForTestApplyWith
-   */
+  #[CoversFunction('applyWith')]
+  #[DataProvider('provideDataForTestApplyWith')]
   public function testApplyWith(array $iterData,
     array $other,
     array $expectedCurrentKeys,
@@ -174,86 +160,70 @@ class ExtendableIterableTest extends TestCase {
     $this->assertSame($totalNumberOfIterations, $i);
   }
 
-  /**
-   * @covers ::count
-   * @dataProvider provideDataForTestCount
-   */
+  #[CoversFunction('count')]
+  #[DataProvider('provideDataForTestCount')]
   public function testCount(iterable $iterData, int $expectedCount) : void {
     $source = ExtendableIterable::from($iterData);
     $countedSource = $source->count();
     $this->assertSame($expectedCount, $countedSource);
   }
 
-  /**
-   * @covers ::expand
-   * @dataProvider provideDataForTestExpand
-   */
+  #[CoversFunction('expand')]
+  #[DataProvider('provideDataForTestExpand')]
   public function testExpand(iterable $iterData,
-    array $expectedKeys,
-    array $expectedValues,
-    int $expectedCount) : void {
-
+  array $expectedKeys,
+  array $expectedValues,
+  int $expectedCount) : void {
+    
     $iter = ExtendableIterable::from($iterData);
     $expansion = fn($key, $value) => is_iterable($value) ? $value : NULL;
     $expandedIter = $iter->expand($expansion);
     $this->assertIterableKeysAndValues($expandedIter,$expectedKeys,$expectedValues,$expectedCount);
   }
-
   
-  /**
-   * @covers ::filter
-   * @dataProvider provideDataForTestFilter
-   */
+  
+  #[CoversFunction('filter')]
+  #[DataProvider('provideDataForTestFilter')]
   public function testFilter(array $input,
-    callable   $filter,
-    array $expectedKeys,
-    array $expectedValues,
-    int $expectedCount) : void {
-      
+  callable   $filter,
+  array $expectedKeys,
+  array $expectedValues,
+  int $expectedCount) : void {
+    
     $iter = ExtendableIterable::from($input);
     $filteredIter = $iter->filter($filter);
     $this->assertIterableKeysAndValues($filteredIter, $expectedKeys, $expectedValues, $expectedCount);
   }
-
-  /**
-   * @covers ::first
-   */
+  
+  #[CoversFunction('first')]
   public function testFirst() : void {
     $iter = ExtendableIterable::from([1]);
     $first = $iter->first();
     $this->assertSame(1,$first);
   }
-
-  /**
-   * @covers ::first
-   */
+  
+  #[CoversFunction('first')]
   public function testFirstEmptyIter() : void {
     $iter = ExtendableIterable::empty();
     $this->expectException(InvalidOperationException::class);
     $iter->first();
   }
-
-    /**
-   * @covers ::firstKey
-   */
+  
+  #[CoversFunction('firstKey')]
   public function testFirstKey() : void {
     $iter = ExtendableIterable::from(['b' => NULL]);
     $firstKey = $iter->firstKey();
     $this->assertSame('b', $firstKey);
   }
-
-  /**
-   * @covers ::firstKey
-   */
+  
+  #[CoversFunction('firstKey')]
   public function testFirstKeyEmptyIter() : void {
     $iter = ExtendableIterable::empty();
     $this->expectException(InvalidOperationException::class);
     $iter->firstKey();
   }
-
-  /**
-   * @covers ::firstKeyAndValue
-   */
+  
+  #[CoversFunction('firstKeyAndValue')]
   public function testFirstKeyAndValue() : void {
     $key = 0;
     $value = 0;
@@ -263,9 +233,7 @@ class ExtendableIterableTest extends TestCase {
     $this->assertSame(NULL, $value);
   }
   
-  /**
-   * @covers ::firstKeyAndValue
-   */
+  #[CoversFunction('firstKeyAndValue')]
   public function testFirstKeyAndValueEmptyIter() : void {
     $key = 0;
     $value = 0;
@@ -273,114 +241,96 @@ class ExtendableIterableTest extends TestCase {
     $this->expectException(InvalidOperationException::class);
     $iter->firstKeyAndValue($key, $value);
   }
-
-  /**
-   * @covers ::getKeys
-   * @dataProvider provideDataForTestGetKeys
-   */
+  
+  #[CoversFunction('getKeys')]
+  #[DataProvider('provideDataForTestGetKeys')]
   public function testGetKeys(array $dataForInitialIter, array $expectedKeys, array $expectedValues, int $expectedCount) : void {
     $iter = ExtendableIterable::from($dataForInitialIter);
     $keysIter = $iter->getKeys();
     $this->assertIterableKeysAndValues($keysIter, $expectedKeys, $expectedValues, $expectedCount);
   }
   
-  /**
-   * @covers ::isEmpty
-   */
+  #[CoversFunction('isEmpty')]
   public function testIsEmpty() : void {
     $emptyIter = ExtendableIterable::from([]);   $nonEmptyIter = ExtendableIterable::from([0 => NULL]);
     $this->assertTrue($emptyIter->isEmpty());
     $this->assertFalse($nonEmptyIter->isEmpty());
   }
-
-  /**
-   * @covers ::map
-   * @dataProvider provideDataForTestMap
-   */
+  
+  #[CoversFunction('map')]
+  #[DataProvider('provideDataForTestMap')]
   public function testMap(iterable $iterData,
-    callable $keyMap,
-    callable $valueMap,
-    array $expectedKeys,
-    array $expectedValues,
-    int $expectedCount) : void {
-
+  callable $keyMap,
+  callable $valueMap,
+  array $expectedKeys,
+  array $expectedValues,
+  int $expectedCount) : void {
+    
     $iter = ExtendableIterable::from($iterData);
     $mappedIter = $iter->map($valueMap, $keyMap);
     $this->assertIterableKeysAndValues($mappedIter, $expectedKeys, $expectedValues, $expectedCount);
   }
-
-  /**
-   * @covers ::mapSequentialKeys
-   * @dataProvider provideDataForTestMapSequentialKeys
-   */
+  
+  #[CoversFunction('mapSequentialKeys')]
+  #[DataProvider('provideDataForTestMapSequentialKeys')]
   public function testMapSequentialKeys(array $iterData,
-    ?callable $valueMap,
-    array $expectedKeys,
-    array $expectedValues,
-    int $expectedCount) : void {
-
+  ?callable $valueMap,
+  array $expectedKeys,
+  array $expectedValues,
+  int $expectedCount) : void {
+    
     $iter = ExtendableIterable::from($iterData);
     $mappedIter = $iter->mapSequentialKeys($valueMap);
     $this->assertIterableKeysAndValues($mappedIter, $expectedKeys, $expectedValues, $expectedCount);
   }
-
-  /**
-   * @covers ::reduce
-   * @dataProvider provideDataForTestReduce
-   */
+  
+  #[CoversFunction('reduce')]
+  #[DataProvider('provideDataForTestReduce')]
   public function testReduce(array $iterData,
-    callable $reduction,
-    mixed $initialValueOfAggregate,
-    mixed $expectedOutput) : void {
-
+  callable $reduction,
+  mixed $initialValueOfAggregate,
+  mixed $expectedOutput) : void {
+    
     $iter = ExtendableIterable::from($iterData);
     $finalValue = $iter->reduce($reduction, $initialValueOfAggregate);
     $this->assertSame($expectedOutput, $finalValue);
   }
-
-  /**
-   * @covers ::take
-   * @dataProvider provideDataForTestTake
-   */
+  
+  #[CoversFunction('take')]
+  #[DataProvider('provideDataForTestTake')]
   public function testTake(array $iterData,
-    int $numberOfItemsToTake,
-    array $expectedKeys,
-    array $expectedValues,
-    int $expectedCount) : void {
+  int $numberOfItemsToTake,
+  array $expectedKeys,
+  array $expectedValues,
+  int $expectedCount) : void {
 
     $iter = ExtendableIterable::from($iterData);
     $result = $iter->take($numberOfItemsToTake);
     $this->assertIterableKeysAndValues($result, $expectedKeys, $expectedValues, $expectedCount);
   }
-
-  /**
-   * @covers ::take
-   */
+  
+  #[CoversFunction('take')]
   public function testTakeInvalidNumber() : void {
     $iter = ExtendableIterable::fromKeyAndValue(2, 3);
     $this->expectException(\InvalidArgumentException::class);
     $iter->take(-1);
   }
-
-  /**
-   * @covers ::takeWhile
-   * @dataProvider provideDataForTestTakeWhile
-   */
+  
+  #[CoversFunction('takeWhile')]
+  #[DataProvider('provideDataForTestTakeWhile')]
   public function testTakeWhile(iterable $iterData,
-    callable $predicate,
-    ?int $max,
-    array $expectedKeys,
-    array $expectedValues,
+  callable $predicate,
+  ?int $max,
+  array $expectedKeys,
+  array $expectedValues,
     int $expectedCount) : void {
 
     $iter = ExtendableIterable::from($iterData);
     $newIter = $iter->takeWhile($predicate, $max);
     $this->assertIterableKeysAndValues($newIter, $expectedKeys, $expectedValues, $expectedCount);
   }
-
-  /**
-   * @covers ::takeWhile
-   */
+  
+  #[CoversFunction('takeWhile')]
   public function testTakeWhileMaxLessThanZero() : void {
     $iter = ExtendableIterable::from([1]);
     $predicate = fn($k,$v) : bool => TRUE;
@@ -388,21 +338,17 @@ class ExtendableIterableTest extends TestCase {
     $this->expectException(\InvalidArgumentException::class);
     $iter->takeWhile($predicate,$max);
   }
-
-  /**
-   * @covers ::toArray
-   * @dataProvider provideDataForTestToArray
-   */
+  
+  #[CoversFunction('toArray')]
+  #[DataProvider('provideDataForTestToArray')]
   public function testToArray(iterable $iterData, bool $preserveKeys, array $expectedFinalArray) : void {
     $iter = ExtendableIterable::from(ExtendableIterable::from($iterData));
     $arr = $iter->toArray($preserveKeys);
     $this->assertTrue($arr === $expectedFinalArray);
   }
-
-  /**
-   * @covers ::zip
-   * @dataProvider provideDataForTestZip
-   */
+  
+  #[CoversFunction('zip')]
+  #[DataProvider('provideDataForTestZip')]
   public function testZip(iterable $iterData,
     iterable $other,
     callable $keyMapBoth,
