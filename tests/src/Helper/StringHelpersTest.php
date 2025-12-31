@@ -4,22 +4,21 @@ declare(strict_types = 1);
 
 namespace Ranine\Tests\Helper;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 use Ranine\Helper\StringHelpers;
 
-/**
- * Tests the StringHelpers class.
- *
- * @coversDefaultClass \Ranine\Helper\StringHelpers
- * @group ranine
- */
+#[TestDox('Tests the StringHelpers class.')]
+#[CoversClass(StringHelpers::class)]
+#[Group('ranine')]
 class StringHelpersTest extends TestCase {
 
-  /**
-   * Tests the assemble() method with escape characters in $items strings.
-   *
-   * @covers ::assemble
-   */
+  #[TestDox('Tests the assemble() method with escape characters in $items strings.')]
+  #[CoversFunction('assemble')]
   public function testAssembleEscapeCharacterInStrings() : void {
     // Input:
     // $separator: '?'
@@ -28,11 +27,8 @@ class StringHelpersTest extends TestCase {
     $this->assertEquals("H\e\eello\e??Th\e\eer\e\ee!", StringHelpers::assemble('?', "H\eello?", "Th\eer\ee!"));
   }
 
-  /**
-   * Tests the assemble() method with two empty items strings.
-   *
-   * @covers ::assemble
-   */
+  #[TestDox('Tests the assemble() method with two empty items strings.')]
+  #[CoversFunction('assemble')]
   public function testAssembleItemsStringsEmpty() : void {
     // Input:
     // $separator: '?'
@@ -41,11 +37,8 @@ class StringHelpersTest extends TestCase {
     $this->assertEquals('?', StringHelpers::assemble('?', '', ''));
   }
 
-  /**
-   * Tests the assemble() method with just one item string.
-   *
-   * @covers ::assemble
-   */
+  #[TestDox('Tests the assemble() method with just one item string.')]
+  #[CoversFunction('assemble')]
   public function testAssembleOnlyOneItem() : void {
     // Input:
     // $separator: '?'
@@ -54,11 +47,8 @@ class StringHelpersTest extends TestCase {
     $this->assertEquals("Hello\e?", StringHelpers::assemble('?', 'Hello?'));
   }
 
-  /**
-   * Tests the assemble() method with ordinary strings and separator.
-   *
-   * @covers ::assemble
-   */
+  #[TestDox('Tests the assemble() method with ordinary strings and separator.')]
+  #[CoversFunction('assemble')]
   public function testAssembleOrdinarySeparatorAndItems() : void {
     // Input:
     // $separator: '?'
@@ -67,11 +57,8 @@ class StringHelpersTest extends TestCase {
     $this->assertEquals("Hello\e??There!", StringHelpers::assemble('?', 'Hello?', 'There!'));
   }
 
-  /**
-   * Tests the assemble() method with an empty separator string.
-   *
-   * @covers ::assemble
-   */
+  #[TestDox('Tests the assemble() method with an empty separator string.')]
+  #[CoversFunction('assemble')]
   public function testAssembleSeparatorStringEmpty() : void {
     // Input:
     // $separator: ''
@@ -81,11 +68,8 @@ class StringHelpersTest extends TestCase {
     StringHelpers::assemble('', "H\eello?", " th\eer\ee.");
   }
 
-  /**
-   * Tests the assemble() method with a separator that is too long.
-   *
-   * @covers ::assemble
-   */
+  #[TestDox('Tests the assemble() method with a separator that is too long.')]
+  #[CoversFunction('assemble')]
   public function testAssembleSeparatorTooLong() : void {
     // Input:
     // $separator: '??'
@@ -95,33 +79,24 @@ class StringHelpersTest extends TestCase {
     StringHelpers::assemble('??', "H\eello?", " th\eer\ee.");
   }
 
-  /**
-   * Tests the emptyToNull() method with an empty string.
-   *
-   * @covers ::emptyToNull
-   */
+  #[TestDox('Tests the emptyToNull() method with an empty string.')]
+  #[CoversFunction('emptyToNull')]
   public function testEmptyToNullEmptyInput() : void {
     // Input: $str = "".
 
     $this->assertNull(StringHelpers::emptyToNull(''));
   }
 
-  /**
-   * Tests the emptyToNull() method with null input.
-   *
-   * @covers ::emptyToNull
-   */
+  #[TestDox('Tests the emptyToNull() method with null input.')]
+  #[CoversFunction('emptyToNull')]
   public function testEmptyToNullNullInput() : void {
     // Input: $str = NULL.
 
     $this->assertNull(StringHelpers::emptyToNull(NULL));
   }
 
-  /**
-   * Tests the emptyToNull() method with a non-empty string.
-   *
-   * @covers ::emptyToNull
-   */
+  #[TestDox('Tests the emptyToNull() method with a non-empty string.')]
+  #[CoversFunction('emptyToNull')]
   public function testEmptyToNullOrdinaryInput() : void {
     // Input: $str = 'Hello, there.'
 
