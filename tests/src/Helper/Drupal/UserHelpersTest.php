@@ -6,28 +6,26 @@ namespace Ranine\Tests\Helper\Drupal;
 
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 use Ranine\Exception\InvalidOperationException;
 use Ranine\Helper\Drupal\UserHelpers;
 use Ranine\Iteration\ExtendableIterable;
 use Ranine\Testing\Drupal\Traits\MockEntityTypeManagerCreationTrait;
 
-/**
- * Tests the UserHelpers class.
- *
- * @coversDefaultClass \Ranine\Helper\Drupal\UserHelpers
- * @group ranine
- */
+#[TestDox('Tests the UserHelpers class.')]
+#[CoversClass(UserHelpers::class)]
+#[Group('ranine')]
 class UserHelpersTest extends TestCase {
 
   use MockEntityTypeManagerCreationTrait;
 
-  /**
-   * Tests the getAttributeHash() method.
-   *
-   * @covers ::getAttributeHash
-   */
+  #[TestDox('Tests the getAttributeHash() method.')]
+  #[CoversFunction('getAttributeHash')]
   public function testGetAttributeHash() : void {
     // Create a binary representation retrieval that handles the email, user
     // status, and user timezone attributes.
