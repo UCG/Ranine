@@ -4,31 +4,30 @@ declare(strict_types = 1);
 
 namespace Ranine\Tests;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 use Ranine\Collection\HashMap;
 use Ranine\Exception\KeyNotFoundException;
 
-/**
- * Tests the HashMap class.
- *
- * @coversDefaultClass \Ranine\Collection\HashMap
- * @group ranine
- */
+#[CoversClass(HashMap::class)]
+#[Group('ranine')]
+#[TestDox('Tests the HashMap class.')]
 class HashMapTest extends TestCase {
 
   /**
-   * Tests the add(), get() and hasKey() methods.
-   *
-   * Uses the default hashing / comparison.
-   *
-   * @covers ::add
-   * @covers ::get
-   * @covers ::hasKey
-   * @dataProvider provideTestAddArgument
-   *
    * @param callable() : iterable $pairsGeneration
    *   Returns key/value pairs to add. Should be idempotent.
    */
+  #[CoversFunction('add')]
+  #[CoversFunction('get')]
+  #[CoversFunction('haskey')]
+  #[DataProvider('provideTestAddArgument')]
+  #[TestDox('Tests the add(), get() and hasKey() methods. 
+    Uses the default hashing / comparison.')]
   public function testAdd(callable $pairsGeneration) : void {
     $map = new HashMap();
     foreach ($pairsGeneration() as $key => $value) {
@@ -41,25 +40,17 @@ class HashMapTest extends TestCase {
     }
   }
 
-  /**
-   * Tests the getCount() method.
-   *
-   * Uses the default hashing / comparison.
-   *
-   * @covers ::getCount
-   */
+  #[CoversFunction('getCount')]
+  #[TestDox('Tests the getCount() method.
+    Uses the default hashing / comparison.')]
   public function testGetCount() : void {
     $map = new HashMap(NULL, NULL, [2 => 1, 3 => 1]);
     $this->assertTrue($map->getCount() === 2);
   }
 
-  /**
-   * Tests the getReference() method.
-   *
-   * Uses the default hashing / comparison.
-   *
-   * @covers ::getReference
-   */
+  #[CoversFunction('getReference')]
+  #[TestDox('Tests the getReference() method.
+    Uses the default hashing / comparison.')]
   public function testGetReference() : void {
     $map = new HashMap(NULL, NULL, [2 => 1, 4 => 2]);
     $ref =& $map->getReference(4);
@@ -67,14 +58,10 @@ class HashMapTest extends TestCase {
     $this->assertTrue($map->get(4) === 5);
   }
 
-  /**
-   * Tests the remove() and has() method.
-   *
-   * Uses the default hashing / comparison.
-   *
-   * @covers ::remove
-   * @covers ::has
-   */
+  #[CoversFunction('remove')]
+  #[CoversFunction('has')]
+  #[TestDox('Tests the remove() and has() method.
+    Uses the default hashing / comparison.')]
   public function testRemove() : void {
     $map = new HashMap(NULL, NULL, [2 => 4]);
     $this->assertFalse($map->remove(0));
@@ -84,15 +71,11 @@ class HashMapTest extends TestCase {
     $this->assertTrue($map->hasKey(3));
   }
 
-  /**
-   * Tests the set() (and get() and hasKey()) methods.
-   *
-   * Uses the default hashing / comparison.
-   *
-   * @covers ::set
-   * @covers ::get
-   * @covers ::hasKey
-   */
+  #[CoversFunction('set')]
+  #[CoversFunction('remgetove')]
+  #[CoversFunction('hasKey')]
+  #[TestDox('Tests the set() (and get() and hasKey()) methods.
+    Uses the default hashing / comparison.')]
   public function testSet() : void {
     $map = new HashMap(NULL, NULL, [2 => 4, 3 => 4, 4 => 5]);
     $this->assertFalse($map->set(4, 4, FALSE));
