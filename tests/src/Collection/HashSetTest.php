@@ -4,30 +4,29 @@ declare(strict_types = 1);
 
 namespace Ranine\Tests;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 use Ranine\Collection\HashSet;
 use Ranine\Iteration\ExtendableIterable;
 
-/**
- * Tests the HashSet class.
- *
- * @coversDefaultClass \Ranine\Collection\HashSet
- * @group ranine
- */
+#[CoversClass(HashSet::class)]
+#[Group('ranine')]
+#[TestDox('Tests the HashSet class.')]
 class HashSetTest extends TestCase {
 
   /**
-   * Tests the add() and has() methods.
-   *
-   * Uses the default hashing / comparison.
-   *
-   * @covers ::add
-   * @covers ::has
-   * @dataProvider provideTestAddArguments
-   *
    * @param array $items
    *   Items to add.
    */
+  #[CoversFunction('add')]
+  #[CoversFunction('has')]
+  #[DataProvider('provideTestAddArguments')]
+  #[TestDox('Tests the add() and has() methods. 
+    Uses the default hashing / comparison.')]
   public function testAdd(array $items) : void {
     $set = new HashSet();
     $oneIterationCompleted = FALSE;
@@ -37,17 +36,13 @@ class HashSetTest extends TestCase {
       $this->assertFalse($set->add($item));
       $oneIterationCompleted = TRUE;
     }
-    
+
     $this->assertTrue(ExtendableIterable::from($items)->all(fn($k, $item) => $set->has($item)));
   }
 
-  /**
-   * Tests the getCount() method.
-   *
-   * Uses the default hashing / comparison.
-   *
-   * @covers ::getCount
-   */
+  #[CoversFunction('getCount')]
+  #[TestDox('Tests the getCount() method. 
+    Uses the default hashing / comparison.')]
   public function testGetCount() : void {
     /** @var \Ranine\Collection\HashSet<int> */
     $set = new HashSet();
@@ -57,14 +52,10 @@ class HashSetTest extends TestCase {
     $this->assertTrue($set->getCount() === 2);
   }
 
-  /**
-   * Tests the remove() and has() method.
-   *
-   * Uses the default hashing / comparison.
-   *
-   * @covers ::remove
-   * @covers ::has
-   */
+  #[CoversFunction('remove')]
+  #[CoversFunction('has')]
+    #[TestDox('Tests the remove() and has() method.
+    Uses the default hashing / comparison.')]
   public function testRemove() : void {
     /** @var \Ranine\Collection\HashSet<int> */
     $set = new HashSet();
