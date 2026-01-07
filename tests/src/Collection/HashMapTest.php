@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace Ranine\Tests;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
@@ -14,6 +14,16 @@ use Ranine\Collection\HashMap;
 use Ranine\Exception\KeyNotFoundException;
 
 #[CoversClass(HashMap::class)]
+#[CoversMethod('HashMap','add')]
+#[CoversMethod('HashMap','get')]
+#[CoversMethod('HashMap','haskey')]
+#[CoversMethod('HashMap','getCount')]
+#[CoversMethod('HashMap','getReference')]
+#[CoversMethod('HashMap','remove')]
+#[CoversMethod('HashMap','has')]
+#[CoversMethod('HashMap','set')]
+#[CoversMethod('HashMap','remgetove')]
+#[CoversMethod('HashMap','hasKey')]
 #[Group('ranine')]
 #[TestDox('Tests the HashMap class.')]
 class HashMapTest extends TestCase {
@@ -22,9 +32,6 @@ class HashMapTest extends TestCase {
    * @param callable() : iterable $pairsGeneration
    *   Returns key/value pairs to add. Should be idempotent.
    */
-  #[CoversFunction('add')]
-  #[CoversFunction('get')]
-  #[CoversFunction('haskey')]
   #[DataProvider('provideTestAddArgument')]
   #[TestDox('Tests the add(), get() and hasKey() methods. 
     Uses the default hashing / comparison.')]
@@ -40,7 +47,6 @@ class HashMapTest extends TestCase {
     }
   }
 
-  #[CoversFunction('getCount')]
   #[TestDox('Tests the getCount() method.
     Uses the default hashing / comparison.')]
   public function testGetCount() : void {
@@ -48,7 +54,6 @@ class HashMapTest extends TestCase {
     $this->assertTrue($map->getCount() === 2);
   }
 
-  #[CoversFunction('getReference')]
   #[TestDox('Tests the getReference() method.
     Uses the default hashing / comparison.')]
   public function testGetReference() : void {
@@ -58,8 +63,6 @@ class HashMapTest extends TestCase {
     $this->assertTrue($map->get(4) === 5);
   }
 
-  #[CoversFunction('remove')]
-  #[CoversFunction('has')]
   #[TestDox('Tests the remove() and has() method.
     Uses the default hashing / comparison.')]
   public function testRemove() : void {
@@ -71,9 +74,6 @@ class HashMapTest extends TestCase {
     $this->assertTrue($map->hasKey(3));
   }
 
-  #[CoversFunction('set')]
-  #[CoversFunction('remgetove')]
-  #[CoversFunction('hasKey')]
   #[TestDox('Tests the set() (and get() and hasKey()) methods.
     Uses the default hashing / comparison.')]
   public function testSet() : void {

@@ -4,56 +4,59 @@ declare(strict_types = 1);
 
 namespace Ranine\Tests\Helper;
 
-use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ranine\Exception\ParseException;
 use Ranine\Helper\ParseHelpers;
 use Ranine\Tests\Traits\IterableAssertionTrait;
 
+#[CoversClass(ParseHelpers::class)]
+#[CoversMethod('ParseHelpers','parseInt')]
+#[CoversMethod('ParseHelpers','parseIntFromString')]
+#[CoversMethod('ParseHelpers','parseIntRange')]
+#[CoversMethod('ParseHelpers','parseIntRangeEndpoints')]
+#[CoversMethod('ParseHelpers','tryParseInt')]
+#[CoversMethod('ParseHelpers','tryParseIntFromString')]
+#[CoversMethod('ParseHelpers','tryParseIntRange')]
+#[CoversMethod('ParseHelpers','tryParseIntRangeEndpoints')]
 class ParseHelpersTest extends TestCase {
 
   use IterableAssertionTrait;
 
-  #[CoversFunction('parseInt')]
   #[DataProvider('provideBadDataForParseIntAndTryParseIntTests')]
   public function testParseIntBadData(mixed $valueToTryToParse) : void {
     $this->expectException(ParseException::class);
     ParseHelpers::parseInt($valueToTryToParse);
   }
 
-  #[CoversFunction('parseInt')]
   #[DataProvider('provideGoodDataForParseIntAndTryParseIntTests')]
   public function testParseIntGoodData(int|string $valueToTryToParse, int $expectedResult) : void {
     $this->assertEquals($expectedResult, ParseHelpers::parseInt($valueToTryToParse));
   }
 
-  #[CoversFunction('parseIntFromString')]
   #[DataProvider('provideGoodDataForParseIntFromStringAndTryTests')]
   public function testParseIntFromString(string $inputString, int $expectedResult) : void {
     $this->assertEquals($expectedResult, ParseHelpers::parseIntFromString($inputString));
   }
 
-  #[CoversFunction('parseIntFromString')]
   #[DataProvider('provideBadDataForParseIntFromStringAndTryTests')]
   public function testParseIntFromStringInvalid(string $valueToTryToParse) : void {
     $this->expectException(ParseException::class);
     ParseHelpers::parseIntFromString($valueToTryToParse);
   }
 
-  #[CoversFunction('parseIntRange')]
   #[DataProvider('provideDataForParseIntRangeAndTryParseIntRangeTests')]
   public function testParseIntRange(string $range, string $divider, array $expectedValues, int $expectedCount) : void {
     $this->assertIterableValues(ParseHelpers::parseIntRange($range, $divider), $expectedValues, $expectedCount);
   }
 
-  #[CoversFunction('parseIntRange')]
   public function testParseIntRangeEmptyDivider() : void {
     $this->expectException(\InvalidArgumentException::class);
     ParseHelpers::parseIntRange('2-3', '');
   }
 
-  #[CoversFunction('parseIntRangeEndpoints')]
   #[DataProvider('provideGoodDataForParseIntRangeEndpointsAndTryTests')]
   public function testParseIntRangeEndpoints(string $range, string $divider, int $expectedStart, int $expectedEnd) : void {
     $start = 0;
@@ -63,7 +66,6 @@ class ParseHelpersTest extends TestCase {
     $this->assertSame($expectedEnd, $end);
   }
 
-  #[CoversFunction('parseIntRangeEndpoints')]
   public function testParseIntRangeEndpointsInvalidDivider() : void {
     $start = 0;
     $end = 0;
@@ -73,7 +75,6 @@ class ParseHelpersTest extends TestCase {
     ParseHelpers::parseIntRangeEndpoints($range, $start, $end, $divider);
   }
 
-  #[CoversFunction('parseIntRangeEndpoints')]
   #[DataProvider('provideBadDataForParseIntRangeEndpointsAndTryTests')]
   public function testParseIntRangeEndpointsInvalidRange(string $range, string $divider) : void {
     $start = 0;
@@ -82,21 +83,18 @@ class ParseHelpersTest extends TestCase {
     ParseHelpers::parseIntRangeEndpoints($range, $start, $end, $divider);
   }
 
-  #[CoversFunction('parseIntRange')]
   #[DataProvider('provideInvalidRangeDataForParseIntRangeAndTryParseIntRangeTests')]
   public function testParseIntRangeInvalidRange(string $range, string $divider) : void {
     $this->expectException(ParseException::class);
     ParseHelpers::parseIntRange($range, $divider);
   }
 
-  #[CoversFunction('tryParseInt')]
   #[DataProvider('provideBadDataForParseIntAndTryParseIntTests')]
   public function testTryParseIntBadData(mixed $inputData) : void {
     $result = 0;
     $this->assertFalse(ParseHelpers::tryParseInt($inputData, $result));
   }
 
-  #[CoversFunction('tryParseInt')]
   #[DataProvider('provideGoodDataForParseIntAndTryParseIntTests')]
   public function testTryParseIntGoodData(int|string $valueToTryToParse, int $expectedResult) : void {
     $result = 0;
@@ -104,7 +102,6 @@ class ParseHelpersTest extends TestCase {
     $this->assertSame($expectedResult, $result);
   }
 
-  #[CoversFunction('tryParseIntFromString')]
   #[DataProvider('provideGoodDataForParseIntFromStringAndTryTests')]
   public function testTryParseIntFromString(mixed $inputData, $expectedResult) : void {
     $result = 0;
@@ -112,32 +109,28 @@ class ParseHelpersTest extends TestCase {
     $this->assertSame($expectedResult, $result);
   }
 
-  #[CoversFunction('tryParseIntFromString')]
   #[DataProvider('provideBadDataForParseIntFromStringAndTryTests')]
   public function testTryParseIntFromStringInvalid(mixed $inputData) : void {
     $result = 0;
     $this->assertSame(FALSE, ParseHelpers::tryParseIntFromString($inputData, $result));
   }
 
-  #[CoversFunction('tryParseIntRange')]
   #[DataProvider('provideDataForParseIntRangeAndTryParseIntRangeTests')]
   public function testTryParseIntRange(string $range, string $divider, array $expectedValues, int $expectedCount) : void {
     $output = NULL;
     $succeeded = ParseHelpers::tryParseIntRange($range, $output, $divider);
-    
+
     $this->assertTrue($succeeded);
     $this->assertIsIterable($output);
     $this->assertIterableValues($output, $expectedValues, $expectedCount);
   }
 
-  #[CoversFunction('tryParseIntRange')]
   public function testTryParseIntRangeEmptyDivider() : void {
     $output = NULL;
     $this->expectException(\InvalidArgumentException::class);
     ParseHelpers::tryParseIntRange('2-3', $output, '');
   }
 
-  #[CoversFunction('tryParseIntRangeEndpoints')]
   #[DataProvider('provideGoodDataForParseIntRangeEndpointsAndTryTests')]
   public function testTryParseIntRangeEndpoints(string $range, string $divider, int $expectedStart, int $expectedEnd) : void {
     $start = 0;
@@ -147,11 +140,7 @@ class ParseHelpersTest extends TestCase {
     $this->assertSame($expectedEnd, $end);
     $this->assertTrue($result);
   }
-  
-  /**
-   * @covers ::tryParseIntRangeEndpoints
-  */
-  #[CoversFunction('tryParseIntRangeEndpoints')]
+
   public function testTryParseIntRangeEndpointsInvalidDivider() : void {
     $start = 0;
     $end = 0;
@@ -161,7 +150,6 @@ class ParseHelpersTest extends TestCase {
     ParseHelpers::tryParseIntRangeEndpoints($range, $start, $end, $divider);
   }
 
-  #[CoversFunction('tryParseIntRangeEndpoints')]
   #[DataProvider('provideBadDataForParseIntRangeEndpointsAndTryTests')]
   public function testTryParseIntRangeEndpointsInvalidRange(string $range, string $divider) : void {
     $start = 0;
@@ -170,7 +158,6 @@ class ParseHelpersTest extends TestCase {
     $this->assertFalse($result);    
   }
 
-  #[CoversFunction('tryParseIntRange')]
   #[DataProvider('provideInvalidRangeDataForParseIntRangeAndTryParseIntRangeTests')]
   public function testTryParseIntRangeInvalidRange(string $range, string $divider) : void {
     $output = NULL;

@@ -5,27 +5,28 @@ declare(strict_types = 1);
 namespace Ranine\Tests;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversFunction;
-use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 use Ranine\BinaryStream;
 use Ranine\StringPart;
 
-#[TestDox('Tests the BinaryStream class.')]
 #[CoversClass(BinaryStream::class)]
+#[CoversMethod('BinaryStream','readUInt8')]
+#[CoversMethod('BinaryStream','readUreadUInt16BEInt8')]
+#[CoversMethod('BinaryStream','readUInt16LE')]
+#[CoversMethod('BinaryStream','readUInt32BE')]
+#[CoversMethod('BinaryStream','readUInt32LE')]
+#[CoversMethod('BinaryStream','readUInt64BE')]
+#[CoversMethod('BinaryStream','readUInt64LE')]
+#[CoversMethod('BinaryStream','readBytes')]
+#[CoversMethod('BinaryStream','readUntil')]
 #[Group('ranine')]
+#[TestDox('Tests the BinaryStream class.')]
 class BinaryStreamTest extends TestCase {
 
   #[TestDox('Tests various integer reading methods.')]
-  #[CoversFunction('readUInt8')]
-  #[CoversFunction('readUInt16BE')]
-  #[CoversFunction('readUInt16LE')]
-  #[CoversFunction('readUInt32BE')]
-  #[CoversFunction('readUInt32LE')]
-  #[CoversFunction('readUInt64BE')]
-  #[CoversFunction('readUInt64LE')]
   public function testIntegerReading() : void {
     $source = (function () {
       $str = pack('CVNnvPJ', 1, 1, 2, 3, 5, 8, 13);
@@ -45,7 +46,6 @@ class BinaryStreamTest extends TestCase {
   }
 
   #[TestDox('Tests the readBytes() method.')]
-  #[CoversFunction('readBytes')]
   public function testReadBytes() : void {
     $firstLine = 'O Sir! the good die first,';
     $secondLine = 'And they whose hearts are dry as summer dust';
@@ -64,7 +64,6 @@ class BinaryStreamTest extends TestCase {
   }
 
   #[TestDox('Tests the readUntil() method.')]
-  #[CoversFunction('readUntil')]
   public function testReadUntil() : void {
     $firstPart = 'It\'s all God\'s will';
     $secondPart = 'you can die in your sleep,';

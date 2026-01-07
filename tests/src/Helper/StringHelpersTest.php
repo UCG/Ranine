@@ -5,19 +5,25 @@ declare(strict_types = 1);
 namespace Ranine\Tests\Helper;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 use Ranine\Helper\StringHelpers;
 
-#[TestDox('Tests the StringHelpers class.')]
 #[CoversClass(StringHelpers::class)]
+#[CoversMethod('StringHelpers','assemble')]
+#[CoversMethod('StringHelpers','emptyToNull')]
+#[CoversMethod('StringHelpers','isNonEmptyString')]
+#[CoversMethod('StringHelpers','isNullOrEmpty')]
+#[CoversMethod('StringHelpers','escape')]
+#[CoversMethod('StringHelpers','getAfter')]
+#[CoversMethod('StringHelpers','getValueOrDefault')]
 #[Group('ranine')]
+#[TestDox('Tests the StringHelpers class.')]
 class StringHelpersTest extends TestCase {
 
   #[TestDox('Tests the assemble() method with escape characters in $items strings.')]
-  #[CoversFunction('assemble')]
   public function testAssembleEscapeCharacterInStrings() : void {
     // Input:
     // $separator: '?'
@@ -27,7 +33,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the assemble() method with two empty items strings.')]
-  #[CoversFunction('assemble')]
   public function testAssembleItemsStringsEmpty() : void {
     // Input:
     // $separator: '?'
@@ -37,7 +42,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the assemble() method with just one item string.')]
-  #[CoversFunction('assemble')]
   public function testAssembleOnlyOneItem() : void {
     // Input:
     // $separator: '?'
@@ -47,7 +51,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the assemble() method with ordinary strings and separator.')]
-  #[CoversFunction('assemble')]
   public function testAssembleOrdinarySeparatorAndItems() : void {
     // Input:
     // $separator: '?'
@@ -57,7 +60,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the assemble() method with an empty separator string.')]
-  #[CoversFunction('assemble')]
   public function testAssembleSeparatorStringEmpty() : void {
     // Input:
     // $separator: ''
@@ -68,7 +70,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the assemble() method with a separator that is too long.')]
-  #[CoversFunction('assemble')]
   public function testAssembleSeparatorTooLong() : void {
     // Input:
     // $separator: '??'
@@ -79,7 +80,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the emptyToNull() method with an empty string.')]
-  #[CoversFunction('emptyToNull')]
   public function testEmptyToNullEmptyInput() : void {
     // Input: $str = "".
 
@@ -87,7 +87,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the emptyToNull() method with null input.')]
-  #[CoversFunction('emptyToNull')]
   public function testEmptyToNullNullInput() : void {
     // Input: $str = NULL.
 
@@ -95,7 +94,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the emptyToNull() method with a non-empty string.')]
-  #[CoversFunction('emptyToNull')]
   public function testEmptyToNullOrdinaryInput() : void {
     // Input: $str = 'Hello, there.'
 
@@ -103,7 +101,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the isNonEmptyString() method with an empty value.')]
-  #[CoversFunction('isNonEmptyString')]
   public function testIsNonEmptyStringEmptyInput() : void {
     // Input: $value = ''.
 
@@ -111,7 +108,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the isNonEmptyString() method with null input.')]
-  #[CoversFunction('isNonEmptyString')]
   public function testIsNonEmptyStringNullInput() : void {
     // Input: $value = NULL.
 
@@ -119,7 +115,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the isNonEmptyString() method with an non-empty string value.')]
-  #[CoversFunction('isNonEmptyString')]
   public function testIsNonEmptyStringOrdinaryInput() : void {
     // Input: $value = '44'.
 
@@ -127,7 +122,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the isNonEmptyString() method with a strange non-empty value.')]
-  #[CoversFunction('isNonEmptyString')]
   public function testIsNonEmptyStringUnordinaryInput() : void {
     // Input: $value = '$%^ Ð &'.
 
@@ -135,7 +129,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the isNullOrEmpty() method with an empty input.')]
-  #[CoversFunction('isNullOrEmpty')]
   public function testIsNullOrEmptyEmptyInput() : void {
     // Input: $value = ''.
 
@@ -143,7 +136,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the isNullOrEmpty() method with a null input.')]
-  #[CoversFunction('isNullOrEmpty')]
   public function testIsNullOrEmptyNullInput() : void {
     // Input: $value = NULL.
 
@@ -151,7 +143,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the isNullOrEmpty() method with a non-empty input.')]
-  #[CoversFunction('isNullOrEmpty')]
   public function testIsNullOrEmptyOrdinaryInput() : void {
     // Input: $value = 'Hello, there.'.
 
@@ -159,7 +150,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the escape() method with an escape character in the input.')]
-  #[CoversFunction('escape')]
   public function testEscapeEscapeCharacterInInput() : void {
     // Input: 
     // $str = "Hello\e, there.",
@@ -170,7 +160,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the escape() method with an escape character that is empty.')]
-  #[CoversFunction('escape')]
   public function testEscapeEscapeCharacterLengthEmpty() : void {
     // Input: 
     // $str = 'Hello, there.',
@@ -182,7 +171,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the escape() method with an escape character that is too long.')]
-  #[CoversFunction('escape')]
   public function testEscapeEscapeCharacterLengthTooLong() : void {
     // Input: 
     // $str = 'Hello, there.',
@@ -194,7 +182,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the escape() method with nothing to escape.')]
-  #[CoversFunction('escape')]
   public function testEscapeNoEscape() : void {
     // Input: 
     // $str = 'Hello, there.',
@@ -205,7 +192,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the escape() method with Ordinary input and escape character.')]
-  #[CoversFunction('escape')]
   public function testEscapeOrdinaryEscape() : void {
     // Input: 
     // $str = 'Hello, there.',
@@ -216,7 +202,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the escape() method with a special character that is not a string.')]
-  #[CoversFunction('escape')]
   public function testEscapeOtherSpecialCharacterNotString() : void {
     // Input: 
     // $str = 'Hello, there.',
@@ -228,7 +213,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the escape() method with a special character that is too long.')]
-  #[CoversFunction('escape')]
   public function testEscapeOtherSpecialCharactersLengthTooLong() : void{
     // Input: 
     // $str = 'Hello, there.',
@@ -240,7 +224,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the getAfter() method with separator not found in source.')]
-  #[CoversFunction('getAfter')]
   public function testGetAfterNoSeparatorInSource() : void {
     // Input: 
     // $source: 'Hello, there!'
@@ -250,7 +233,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the getAfter() method with normal string values.')]
-  #[CoversFunction('getAfter')]
   public function testGetAfterOrdinaryInput() : void {
     // Input: 
     // $source: 'Hello, there!'
@@ -260,7 +242,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the getAfter() method with $source[$endIndex] === $separator.')]
-  #[CoversFunction('getAfter')]
   public function testGetAfterSeparatorAtEndOfSource() : void {
     // Input: 
     // $source: '12344'
@@ -270,7 +251,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the getAfter() method with a separator that is empty.')]
-  #[CoversFunction('getAfter')]
   public function testGetAfterSeparatorEmpty() : void {
     // Input: 
     // $source: 'Hello, there!'
@@ -281,7 +261,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the getAfter() method with separator length greater than 1.')]
-  #[CoversFunction('getAfter')]
   public function testGetAfterSeparatorTooLong() : void {
     // Input: 
     // $source: 'Hello, there!'
@@ -292,7 +271,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the getAfter() method with an empty source.')]
-  #[CoversFunction('getAfter')]
   public function testGetAfterSourceEmpty() : void {
     // Input: 
     // $source: ''
@@ -303,7 +281,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the getValueOrDefault() method with empty string input.')]
-  #[CoversFunction('getValueOrDefault')]
   public function testGetValueOrDefaultEmptyInput() : void {
     // Input: 
     // $str: ''
@@ -313,7 +290,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the getValueOrDefault() method with normal string input.')]
-  #[CoversFunction('getValueOrDefault')]
   public function testGetValueOrDefaultNormalInput() : void {
     // Input: 
     // $str: 'Hello, there!'
@@ -323,7 +299,6 @@ class StringHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the getValueOrDefault() method with NULL string input.')]
-  #[CoversFunction('getValueOrDefault')]
   public function testGetValueOrDefaultNullInput() : void {
     // Input: 
     // $str: 'NULL'

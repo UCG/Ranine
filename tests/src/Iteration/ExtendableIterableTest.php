@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace Ranine\Tests\Iteration;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
@@ -14,44 +14,62 @@ use Ranine\Exception\InvalidOperationException;
 use Ranine\Iteration\ExtendableIterable;
 use Ranine\Tests\Traits\IterableAssertionTrait;
 
-#[TestDox('Tests the ExtendableIterable class.')]
 #[CoversClass(ExtendableIterable::class)]
+#[CoversMethod('ExtendableIterable','all')]
+#[CoversMethod('ExtendableIterable','any')]
+#[CoversMethod('ExtendableIterable','append')]
+#[CoversMethod('ExtendableIterable','appendKeyAndValue')]
+#[CoversMethod('ExtendableIterable','appendValue')]
+#[CoversMethod('ExtendableIterable','apply')]
+#[CoversMethod('ExtendableIterable','applyWith')]
+#[CoversMethod('ExtendableIterable','count')]
+#[CoversMethod('ExtendableIterable','expand')]
+#[CoversMethod('ExtendableIterable','filter')]
+#[CoversMethod('ExtendableIterable','first')]
+#[CoversMethod('ExtendableIterable','firstKey')]
+#[CoversMethod('ExtendableIterable','firstKeyAndValue')]
+#[CoversMethod('ExtendableIterable','getKeys')]
+#[CoversMethod('ExtendableIterable','isEmpty')]
+#[CoversMethod('ExtendableIterable','map')]
+#[CoversMethod('ExtendableIterable','mapSequentialKeys')]
+#[CoversMethod('ExtendableIterable','reduce')]
+#[CoversMethod('ExtendableIterable','take')]
+#[CoversMethod('ExtendableIterable','takeWhile')]
+#[CoversMethod('ExtendableIterable','toArray')]
+#[CoversMethod('ExtendableIterable','zip')]
 #[Group('ranine')]
+#[TestDox('Tests the ExtendableIterable class.')]
 class ExtendableIterableTest extends TestCase {
 
   use IterableAssertionTrait;
 
-  #[TestDox('Test the all() method.')]
-  #[CoversFunction('all')]
   #[DataProvider('provideDataForTestAll')]
+  #[TestDox('Test the all() method.')]
   public function testAll(array $inputData, callable $predicate, bool $expectedResult) : void {
     $iter = ExtendableIterable::from($inputData);
     $this->assertSame($expectedResult, $iter->all($predicate));
   }
 
-  #[TestDox('Test the any() method.')]
-  #[CoversFunction('any')]
   #[DataProvider('provideDataForTestAny')]
+  #[TestDox('Test the any() method.')]
   public function testAny(array $inputData, callable $predicate, bool $expectedResult) : void {
     $iter = ExtendableIterable::from($inputData);  
     $this->assertSame($expectedResult, $iter->any($predicate));
   }
 
-  #[TestDox('Test the append() method.')]
-  #[CoversFunction('append')]
   #[DataProvider('provideDataForTestAppend')]
+  #[TestDox('Test the append() method.')]
   public function testAppend(array $iterData,
     iterable $iterToAppend,
     array $expectedValues,
     array $expectedKeys,
     int $expectedCount) : void {
-      
+
     $iter = ExtendableIterable::from($iterData);
     $appendedIter = $iter->append($iterToAppend);
     $this->assertIterableKeysAndValues($appendedIter, $expectedKeys, $expectedValues, $expectedCount);
   }
 
-  #[CoversFunction('appendKeyAndValue')]
   #[DataProvider('provideDataForTestAppendKeyAndValue')]
   public function testAppendKeyAndValue(array $iterData,
     int $keyToAppend,
@@ -65,20 +83,18 @@ class ExtendableIterableTest extends TestCase {
     $this->assertIterableKeysAndValues($appendedKeyAndValue, $expectedKeys, $expectedValues, $expectedCount);
   }
 
-  #[CoversFunction('appendValue')]
   #[DataProvider('provideDataForTestAppendValue')]
   public function testAppendValue(iterable $iterData,
     int $valueToAppend,
     array $expectedKeys,
     array $expectedValues,
     int $expectedCount) : void {
-    
+
     $iter = ExtendableIterable::from($iterData);
     $appendedIter = $iter->appendValue($valueToAppend);
     $this->assertIterableKeysAndValues($appendedIter, $expectedKeys, $expectedValues, $expectedCount);
   }
 
-  #[CoversFunction('apply')]
   #[DataProvider('provideDataForTestApply')]
   public function testApply(iterable $iterData, 
     array $expectedKeys,
@@ -103,7 +119,6 @@ class ExtendableIterableTest extends TestCase {
     $this->assertTrue(TRUE);
   }
 
-  #[CoversFunction('applyWith')]
   #[DataProvider('provideDataForTestApplyWith')]
   public function testApplyWith(array $iterData,
     array $other,
@@ -159,7 +174,6 @@ class ExtendableIterableTest extends TestCase {
     $this->assertSame($totalNumberOfIterations, $i);
   }
 
-  #[CoversFunction('count')]
   #[DataProvider('provideDataForTestCount')]
   public function testCount(iterable $iterData, int $expectedCount) : void {
     $source = ExtendableIterable::from($iterData);
@@ -167,20 +181,18 @@ class ExtendableIterableTest extends TestCase {
     $this->assertSame($expectedCount, $countedSource);
   }
 
-  #[CoversFunction('expand')]
   #[DataProvider('provideDataForTestExpand')]
   public function testExpand(iterable $iterData,
   array $expectedKeys,
   array $expectedValues,
   int $expectedCount) : void {
-    
+
     $iter = ExtendableIterable::from($iterData);
     $expansion = fn($key, $value) => is_iterable($value) ? $value : NULL;
     $expandedIter = $iter->expand($expansion);
     $this->assertIterableKeysAndValues($expandedIter,$expectedKeys,$expectedValues,$expectedCount);
   }
 
-  #[CoversFunction('filter')]
   #[DataProvider('provideDataForTestFilter')]
   public function testFilter(array $input,
   callable   $filter,
@@ -193,35 +205,30 @@ class ExtendableIterableTest extends TestCase {
     $this->assertIterableKeysAndValues($filteredIter, $expectedKeys, $expectedValues, $expectedCount);
   }
 
-  #[CoversFunction('first')]
   public function testFirst() : void {
     $iter = ExtendableIterable::from([1]);
     $first = $iter->first();
     $this->assertSame(1,$first);
   }
 
-  #[CoversFunction('first')]
   public function testFirstEmptyIter() : void {
     $iter = ExtendableIterable::empty();
     $this->expectException(InvalidOperationException::class);
     $iter->first();
   }
 
-  #[CoversFunction('firstKey')]
   public function testFirstKey() : void {
     $iter = ExtendableIterable::from(['b' => NULL]);
     $firstKey = $iter->firstKey();
     $this->assertSame('b', $firstKey);
   }
 
-  #[CoversFunction('firstKey')]
   public function testFirstKeyEmptyIter() : void {
     $iter = ExtendableIterable::empty();
     $this->expectException(InvalidOperationException::class);
     $iter->firstKey();
   }
 
-  #[CoversFunction('firstKeyAndValue')]
   public function testFirstKeyAndValue() : void {
     $key = 0;
     $value = 0;
@@ -231,7 +238,6 @@ class ExtendableIterableTest extends TestCase {
     $this->assertSame(NULL, $value);
   }
 
-  #[CoversFunction('firstKeyAndValue')]
   public function testFirstKeyAndValueEmptyIter() : void {
     $key = 0;
     $value = 0;
@@ -240,7 +246,6 @@ class ExtendableIterableTest extends TestCase {
     $iter->firstKeyAndValue($key, $value);
   }
 
-  #[CoversFunction('getKeys')]
   #[DataProvider('provideDataForTestGetKeys')]
   public function testGetKeys(array $dataForInitialIter, array $expectedKeys, array $expectedValues, int $expectedCount) : void {
     $iter = ExtendableIterable::from($dataForInitialIter);
@@ -248,14 +253,12 @@ class ExtendableIterableTest extends TestCase {
     $this->assertIterableKeysAndValues($keysIter, $expectedKeys, $expectedValues, $expectedCount);
   }
 
-  #[CoversFunction('isEmpty')]
   public function testIsEmpty() : void {
     $emptyIter = ExtendableIterable::from([]);   $nonEmptyIter = ExtendableIterable::from([0 => NULL]);
     $this->assertTrue($emptyIter->isEmpty());
     $this->assertFalse($nonEmptyIter->isEmpty());
   }
 
-  #[CoversFunction('map')]
   #[DataProvider('provideDataForTestMap')]
   public function testMap(iterable $iterData,
   callable $keyMap,
@@ -269,7 +272,6 @@ class ExtendableIterableTest extends TestCase {
     $this->assertIterableKeysAndValues($mappedIter, $expectedKeys, $expectedValues, $expectedCount);
   }
 
-  #[CoversFunction('mapSequentialKeys')]
   #[DataProvider('provideDataForTestMapSequentialKeys')]
   public function testMapSequentialKeys(array $iterData,
   ?callable $valueMap,
@@ -282,7 +284,6 @@ class ExtendableIterableTest extends TestCase {
     $this->assertIterableKeysAndValues($mappedIter, $expectedKeys, $expectedValues, $expectedCount);
   }
 
-  #[CoversFunction('reduce')]
   #[DataProvider('provideDataForTestReduce')]
   public function testReduce(array $iterData,
   callable $reduction,
@@ -294,7 +295,6 @@ class ExtendableIterableTest extends TestCase {
     $this->assertSame($expectedOutput, $finalValue);
   }
 
-  #[CoversFunction('take')]
   #[DataProvider('provideDataForTestTake')]
   public function testTake(array $iterData,
   int $numberOfItemsToTake,
@@ -307,14 +307,12 @@ class ExtendableIterableTest extends TestCase {
     $this->assertIterableKeysAndValues($result, $expectedKeys, $expectedValues, $expectedCount);
   }
 
-  #[CoversFunction('take')]
   public function testTakeInvalidNumber() : void {
     $iter = ExtendableIterable::fromKeyAndValue(2, 3);
     $this->expectException(\InvalidArgumentException::class);
     $iter->take(-1);
   }
 
-  #[CoversFunction('takeWhile')]
   #[DataProvider('provideDataForTestTakeWhile')]
   public function testTakeWhile(iterable $iterData,
   callable $predicate,
@@ -328,7 +326,6 @@ class ExtendableIterableTest extends TestCase {
     $this->assertIterableKeysAndValues($newIter, $expectedKeys, $expectedValues, $expectedCount);
   }
 
-  #[CoversFunction('takeWhile')]
   public function testTakeWhileMaxLessThanZero() : void {
     $iter = ExtendableIterable::from([1]);
     $predicate = fn($k,$v) : bool => TRUE;
@@ -337,7 +334,6 @@ class ExtendableIterableTest extends TestCase {
     $iter->takeWhile($predicate,$max);
   }
 
-  #[CoversFunction('toArray')]
   #[DataProvider('provideDataForTestToArray')]
   public function testToArray(iterable $iterData, bool $preserveKeys, array $expectedFinalArray) : void {
     $iter = ExtendableIterable::from(ExtendableIterable::from($iterData));
@@ -345,7 +341,6 @@ class ExtendableIterableTest extends TestCase {
     $this->assertTrue($arr === $expectedFinalArray);
   }
 
-  #[CoversFunction('zip')]
   #[DataProvider('provideDataForTestZip')]
   public function testZip(iterable $iterData,
     iterable $other,
@@ -401,7 +396,7 @@ class ExtendableIterableTest extends TestCase {
       'single-append' => [[1],[7],[1, 7], [0, 0], 2],
     ];
   }
-  
+
   public static function provideDataForTestAppendKeyAndValue() : array {
     return [
       'single-key-value-append' => [[2,5],1,7,[0,1,1],[2,5,7],3],

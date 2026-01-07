@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace Ranine\Tests;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
@@ -14,6 +14,10 @@ use Ranine\Collection\HashSet;
 use Ranine\Iteration\ExtendableIterable;
 
 #[CoversClass(HashSet::class)]
+#[CoversMethod('HashSet','add')]
+#[CoversMethod('HashSet','has')]
+#[CoversMethod('HashSet','getCount')]
+#[CoversMethod('HashSet','remove')]
 #[Group('ranine')]
 #[TestDox('Tests the HashSet class.')]
 class HashSetTest extends TestCase {
@@ -22,8 +26,6 @@ class HashSetTest extends TestCase {
    * @param array $items
    *   Items to add.
    */
-  #[CoversFunction('add')]
-  #[CoversFunction('has')]
   #[DataProvider('provideTestAddArguments')]
   #[TestDox('Tests the add() and has() methods. 
     Uses the default hashing / comparison.')]
@@ -40,7 +42,6 @@ class HashSetTest extends TestCase {
     $this->assertTrue(ExtendableIterable::from($items)->all(fn($k, $item) => $set->has($item)));
   }
 
-  #[CoversFunction('getCount')]
   #[TestDox('Tests the getCount() method. 
     Uses the default hashing / comparison.')]
   public function testGetCount() : void {
@@ -52,9 +53,7 @@ class HashSetTest extends TestCase {
     $this->assertTrue($set->getCount() === 2);
   }
 
-  #[CoversFunction('remove')]
-  #[CoversFunction('has')]
-    #[TestDox('Tests the remove() and has() method.
+  #[TestDox('Tests the remove() and has() method.
     Uses the default hashing / comparison.')]
   public function testRemove() : void {
     /** @var \Ranine\Collection\HashSet<int> */

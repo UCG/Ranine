@@ -5,20 +5,22 @@ declare(strict_types = 1);
 namespace Ranine\Tests\Helper;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 use Ranine\Helper\CollectionHelpers;
 
-#[TestDox('Tests the CollectionHelpers class.')]
 #[CoversClass(CollectionHelpers::class)]
+#[CoversMethod('CollectionHelpers','condenseAndSortRanges')]
+#[CoversMethod('CollectionHelpers','getSortedRanges')]
+#[CoversMethod('CollectionHelpers','removeDuplicatesFromSortedArray')]
 #[Group('ranine')]
+#[TestDox('Tests the CollectionHelpers class.')]
 class CollectionHelpersTest extends TestCase {
 
   #[TestDox('Tests the condenseAndSortRanges() method.')]
-  #[CoversFunction('condenseAndSortRanges')]
   public function testCondenseAndSortRanges() : void {
     $output1 = CollectionHelpers::condenseAndSortRanges([-1 => 3, 3 => 4, 5 => 5, 7 => 7, 8 => 8, -4 => 1, 18 => 20]);
     $output2 = CollectionHelpers::condenseAndSortRanges([-1 => -1, -2 => -1, 5 => 6, 7 => 7]);
@@ -32,7 +34,6 @@ class CollectionHelpersTest extends TestCase {
 
   #[TestDox("Tests the condenseAndSortRanges() method to make sure exception is 
     thrown when a key is greater than it's value.")]
-  #[CoversFunction('condenseAndSortRanges')]
   #[DataProvider('provideDataWhereKeyIsGreaterThanValue')]
   public function testCondenseAndSortRangesKeysGreaterThanValues(array $badArray) : void {
     $this->expectException(\InvalidArgumentException::class);
@@ -40,10 +41,9 @@ class CollectionHelpersTest extends TestCase {
     foreach ($result as $v);
   }
 
+  #[DataProvider('provideDataWhereKeyAndOrValueIsNonIntegral')]
   #[TestDox("Tests the condenseAndSortRanges() method to make sure exception is 
     thrown when a key or value in $/ranges is non-integral.")]
-  #[CoversFunction('condenseAndSortRanges')]
-  #[DataProvider('provideDataWhereKeyAndOrValueIsNonIntegral')]
   public function testCondenseAndSortRangesNonIntegralKeyOrValue(array $badArray) : void {
     $this->expectException(\InvalidArgumentException::class);
     $result = CollectionHelpers::condenseAndSortRanges($badArray);
@@ -51,7 +51,6 @@ class CollectionHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests the getSortedRanges() method.')]
-  #[CoversFunction('getSortedRanges')]
   public function testGetSortedRanges() : void {
     $output1 = CollectionHelpers::getSortedRanges([-1, 0, 2, 3, 4, 5, 7, 8, 10, 12, 14, 15, 16, 17]);
     $output2 = CollectionHelpers::getSortedRanges([-1, 0, 2, 3, 4, 5, 7, 8, 10, 12, 14, 15, 17]);
@@ -68,15 +67,13 @@ class CollectionHelpersTest extends TestCase {
 
   #[TestDox("Tests the getSortedRanges() method to make sure exception is 
     thrown when a value in $/integers was not an integer.")]
-  #[CoversFunction('getSortedRanges')]
   public function testGetSortedRangesValueNotInteger() : void {
     $this->expectException(\InvalidArgumentException::class);
     CollectionHelpers::getSortedRanges([-1, 0, 2, 3, 'a']);
   }
 
-  #[TestDox("Tests the removeDuplicatesFromSortedArray() method.")]
-  #[CoversFunction('removeDuplicatesFromSortedArray')]
   #[DataProvider('provideDataForRemoveDuplicatesTest')]
+  #[TestDox("Tests the removeDuplicatesFromSortedArray() method.")]
   public function testRemoveDuplicatesFromSortedArray(array $input, array $expectedValues, array $expectedKeys) : void {
     CollectionHelpers::removeDuplicatesFromSortedArray($input);
 

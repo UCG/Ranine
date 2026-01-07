@@ -5,20 +5,20 @@ declare(strict_types = 1);
 namespace Ranine\Tests\Helper;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 use Ranine\Helper\IterationHelpers;
 use Ranine\Iteration\RecursiveReferenceArrayIterator;
 
-#[TestDox('Tests the IterationHelpers class.')]
 #[CoversClass(IterationHelpers::class)]
+#[CoversMethod('IterationHelpers','walkRecursiveIterator')]
 #[Group('ranine')]
+#[TestDox('Tests the IterationHelpers class.')]
 class IterationHelpersTest extends TestCase {
 
   #[TestDox('Tests the walkRecursiveIterator() method.')]
-  #[CoversFunction('walkRecursiveIterator')]
   public function testWalkRecursiveIteator() : void {
     $arr = [
       1 => [2, 3, 4 => [5, 6, 7], 8 => [9, 10]],
@@ -83,7 +83,6 @@ class IterationHelpersTest extends TestCase {
   }
 
   #[TestDox('Tests context modification (by reference) for walkRecursiveIterator().')]
-  #[CoversFunction('walkRecursiveIterator')]
   public function testWalkRecursiveIteratorContextModification() : void {
     $arr = [4 => [2, 3], 6 => 3];
     /** @var \Ranine\Iteration\RecursiveReferenceArrayIterator<int, int[]|int> */
