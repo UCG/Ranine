@@ -5,60 +5,32 @@ declare(strict_types = 1);
 namespace Ranine\Tests\Iteration;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 use Ranine\Exception\InvalidOperationException;
 use Ranine\Iteration\ExtendableIterable;
 use Ranine\Tests\Traits\IterableAssertionTrait;
 
 #[CoversClass(ExtendableIterable::class)]
-#[CoversMethod('ExtendableIterable','all')]
-#[CoversMethod('ExtendableIterable','any')]
-#[CoversMethod('ExtendableIterable','append')]
-#[CoversMethod('ExtendableIterable','appendKeyAndValue')]
-#[CoversMethod('ExtendableIterable','appendValue')]
-#[CoversMethod('ExtendableIterable','apply')]
-#[CoversMethod('ExtendableIterable','applyWith')]
-#[CoversMethod('ExtendableIterable','count')]
-#[CoversMethod('ExtendableIterable','expand')]
-#[CoversMethod('ExtendableIterable','filter')]
-#[CoversMethod('ExtendableIterable','first')]
-#[CoversMethod('ExtendableIterable','firstKey')]
-#[CoversMethod('ExtendableIterable','firstKeyAndValue')]
-#[CoversMethod('ExtendableIterable','getKeys')]
-#[CoversMethod('ExtendableIterable','isEmpty')]
-#[CoversMethod('ExtendableIterable','map')]
-#[CoversMethod('ExtendableIterable','mapSequentialKeys')]
-#[CoversMethod('ExtendableIterable','reduce')]
-#[CoversMethod('ExtendableIterable','take')]
-#[CoversMethod('ExtendableIterable','takeWhile')]
-#[CoversMethod('ExtendableIterable','toArray')]
-#[CoversMethod('ExtendableIterable','zip')]
 #[Group('ranine')]
-#[TestDox('Tests the ExtendableIterable class.')]
 class ExtendableIterableTest extends TestCase {
 
   use IterableAssertionTrait;
 
   #[DataProvider('provideDataForTestAll')]
-  #[TestDox('Test the all() method.')]
   public function testAll(array $inputData, callable $predicate, bool $expectedResult) : void {
     $iter = ExtendableIterable::from($inputData);
     $this->assertSame($expectedResult, $iter->all($predicate));
   }
 
   #[DataProvider('provideDataForTestAny')]
-  #[TestDox('Test the any() method.')]
   public function testAny(array $inputData, callable $predicate, bool $expectedResult) : void {
     $iter = ExtendableIterable::from($inputData);  
     $this->assertSame($expectedResult, $iter->any($predicate));
   }
 
   #[DataProvider('provideDataForTestAppend')]
-  #[TestDox('Test the append() method.')]
   public function testAppend(array $iterData,
     iterable $iterToAppend,
     array $expectedValues,

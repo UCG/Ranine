@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace Ranine\Tests;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
@@ -14,12 +13,7 @@ use Ranine\Collection\HashSet;
 use Ranine\Iteration\ExtendableIterable;
 
 #[CoversClass(HashSet::class)]
-#[CoversMethod('HashSet','add')]
-#[CoversMethod('HashSet','has')]
-#[CoversMethod('HashSet','getCount')]
-#[CoversMethod('HashSet','remove')]
 #[Group('ranine')]
-#[TestDox('Tests the HashSet class.')]
 class HashSetTest extends TestCase {
 
   /**
@@ -27,9 +21,10 @@ class HashSetTest extends TestCase {
    *   Items to add.
    */
   #[DataProvider('provideTestAddArguments')]
-  #[TestDox('Tests the add() and has() methods. 
-    Uses the default hashing / comparison.')]
+  #[TestDox('Tests the add() and has() methods.')]
   public function testAdd(array $items) : void {
+    // Uses the default hashing / comparison.
+
     $set = new HashSet();
     $oneIterationCompleted = FALSE;
     foreach ($items as $item) {
@@ -42,9 +37,9 @@ class HashSetTest extends TestCase {
     $this->assertTrue(ExtendableIterable::from($items)->all(fn($k, $item) => $set->has($item)));
   }
 
-  #[TestDox('Tests the getCount() method. 
-    Uses the default hashing / comparison.')]
   public function testGetCount() : void {
+    // Uses the default hashing / comparison.
+
     /** @var \Ranine\Collection\HashSet<int> */
     $set = new HashSet();
     $this->assertTrue($set->getCount() === 0);
@@ -53,9 +48,10 @@ class HashSetTest extends TestCase {
     $this->assertTrue($set->getCount() === 2);
   }
 
-  #[TestDox('Tests the remove() and has() method.
-    Uses the default hashing / comparison.')]
+  #[TestDox('Tests the remove() and has() method.')]
   public function testRemove() : void {
+    // Uses the default hashing / comparison. 
+
     /** @var \Ranine\Collection\HashSet<int> */
     $set = new HashSet();
     $this->assertFalse($set->remove(0));
@@ -67,8 +63,6 @@ class HashSetTest extends TestCase {
   }
 
   /**
-   * Provides arguments for testAdd().
-   *
    * @return mixed[][][]
    *   Arguments.
    */

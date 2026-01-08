@@ -5,22 +5,14 @@ declare(strict_types = 1);
 namespace Ranine\Tests\Helper;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 use Ranine\Exception\ParseException;
 use Ranine\Helper\ParseHelpers;
 use Ranine\Tests\Traits\IterableAssertionTrait;
 
 #[CoversClass(ParseHelpers::class)]
-#[CoversMethod('ParseHelpers','parseInt')]
-#[CoversMethod('ParseHelpers','parseIntFromString')]
-#[CoversMethod('ParseHelpers','parseIntRange')]
-#[CoversMethod('ParseHelpers','parseIntRangeEndpoints')]
-#[CoversMethod('ParseHelpers','tryParseInt')]
-#[CoversMethod('ParseHelpers','tryParseIntFromString')]
-#[CoversMethod('ParseHelpers','tryParseIntRange')]
-#[CoversMethod('ParseHelpers','tryParseIntRangeEndpoints')]
 class ParseHelpersTest extends TestCase {
 
   use IterableAssertionTrait;
@@ -116,6 +108,7 @@ class ParseHelpersTest extends TestCase {
   }
 
   #[DataProvider('provideDataForParseIntRangeAndTryParseIntRangeTests')]
+  #[TestDox('Ignore NULL $output warning, tryParseIntRange will update it if successful.')]
   public function testTryParseIntRange(string $range, string $divider, array $expectedValues, int $expectedCount) : void {
     $output = NULL;
     $succeeded = ParseHelpers::tryParseIntRange($range, $output, $divider);

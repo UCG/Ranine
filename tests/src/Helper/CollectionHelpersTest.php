@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace Ranine\Tests\Helper;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
@@ -13,14 +12,9 @@ use PHPUnit\Framework\TestCase;
 use Ranine\Helper\CollectionHelpers;
 
 #[CoversClass(CollectionHelpers::class)]
-#[CoversMethod('CollectionHelpers','condenseAndSortRanges')]
-#[CoversMethod('CollectionHelpers','getSortedRanges')]
-#[CoversMethod('CollectionHelpers','removeDuplicatesFromSortedArray')]
 #[Group('ranine')]
-#[TestDox('Tests the CollectionHelpers class.')]
 class CollectionHelpersTest extends TestCase {
 
-  #[TestDox('Tests the condenseAndSortRanges() method.')]
   public function testCondenseAndSortRanges() : void {
     $output1 = CollectionHelpers::condenseAndSortRanges([-1 => 3, 3 => 4, 5 => 5, 7 => 7, 8 => 8, -4 => 1, 18 => 20]);
     $output2 = CollectionHelpers::condenseAndSortRanges([-1 => -1, -2 => -1, 5 => 6, 7 => 7]);
@@ -32,9 +26,9 @@ class CollectionHelpersTest extends TestCase {
     foreach ($output4 as $v) { $this->assertTrue(FALSE); }
   }
 
+  #[DataProvider('provideDataWhereKeyIsGreaterThanValue')]
   #[TestDox("Tests the condenseAndSortRanges() method to make sure exception is 
     thrown when a key is greater than it's value.")]
-  #[DataProvider('provideDataWhereKeyIsGreaterThanValue')]
   public function testCondenseAndSortRangesKeysGreaterThanValues(array $badArray) : void {
     $this->expectException(\InvalidArgumentException::class);
     $result = CollectionHelpers::condenseAndSortRanges($badArray);
@@ -50,7 +44,6 @@ class CollectionHelpersTest extends TestCase {
     foreach ($result as $v);
   }
 
-  #[TestDox('Tests the getSortedRanges() method.')]
   public function testGetSortedRanges() : void {
     $output1 = CollectionHelpers::getSortedRanges([-1, 0, 2, 3, 4, 5, 7, 8, 10, 12, 14, 15, 16, 17]);
     $output2 = CollectionHelpers::getSortedRanges([-1, 0, 2, 3, 4, 5, 7, 8, 10, 12, 14, 15, 17]);
@@ -73,7 +66,6 @@ class CollectionHelpersTest extends TestCase {
   }
 
   #[DataProvider('provideDataForRemoveDuplicatesTest')]
-  #[TestDox("Tests the removeDuplicatesFromSortedArray() method.")]
   public function testRemoveDuplicatesFromSortedArray(array $input, array $expectedValues, array $expectedKeys) : void {
     CollectionHelpers::removeDuplicatesFromSortedArray($input);
 

@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace Ranine\Tests;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
@@ -13,15 +12,6 @@ use Ranine\BinaryStream;
 use Ranine\StringPart;
 
 #[CoversClass(BinaryStream::class)]
-#[CoversMethod('BinaryStream','readUInt8')]
-#[CoversMethod('BinaryStream','readUreadUInt16BEInt8')]
-#[CoversMethod('BinaryStream','readUInt16LE')]
-#[CoversMethod('BinaryStream','readUInt32BE')]
-#[CoversMethod('BinaryStream','readUInt32LE')]
-#[CoversMethod('BinaryStream','readUInt64BE')]
-#[CoversMethod('BinaryStream','readUInt64LE')]
-#[CoversMethod('BinaryStream','readBytes')]
-#[CoversMethod('BinaryStream','readUntil')]
 #[Group('ranine')]
 #[TestDox('Tests the BinaryStream class.')]
 class BinaryStreamTest extends TestCase {

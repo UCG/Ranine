@@ -5,22 +5,13 @@ declare(strict_types = 1);
 namespace Ranine\Tests\Helper;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 use Ranine\Helper\StringHelpers;
 
 #[CoversClass(StringHelpers::class)]
-#[CoversMethod('StringHelpers','assemble')]
-#[CoversMethod('StringHelpers','emptyToNull')]
-#[CoversMethod('StringHelpers','isNonEmptyString')]
-#[CoversMethod('StringHelpers','isNullOrEmpty')]
-#[CoversMethod('StringHelpers','escape')]
-#[CoversMethod('StringHelpers','getAfter')]
-#[CoversMethod('StringHelpers','getValueOrDefault')]
 #[Group('ranine')]
-#[TestDox('Tests the StringHelpers class.')]
 class StringHelpersTest extends TestCase {
 
   #[TestDox('Tests the assemble() method with escape characters in $items strings.')]

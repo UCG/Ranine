@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace Ranine\Tests;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
@@ -13,24 +12,9 @@ use PHPUnit\Framework\TestCase;
 use Ranine\StringPart;
 
 #[CoversClass(StringPart::class)]
-#[CoversMethod('StringPart','append')]
-#[CoversMethod('StringPart','clean')]
-#[CoversMethod('StringPart','clear')]
-#[CoversMethod('StringPart','create')]
-#[CoversMethod('StringPart','equals')]
-#[CoversMethod('StringPart','equalsStringPart')]
-#[CoversMethod('StringPart','getBackingString')]
-#[CoversMethod('StringPart','getEndPosition')]
-#[CoversMethod('StringPart','getLength')]
-#[CoversMethod('StringPart','getStartPosition')]
-#[CoversMethod('StringPart','isEmpty')]
-#[CoversMethod('StringPart','recut')]
-#[CoversMethod('StringPart','withNewEndpoints')]
 #[Group('ranine')]
-#[TestDox('Tests the StringPart class')]
 class StringPartTest extends TestCase {
 
-  #[TestDox('Tests the append() method.')]
   public function testAppend() : void {
     $firstSentence = 'In a sort of ghastly simplicity we remove the organ and demand the function. ';
     $secondSentence = 'We make men without chests and expect of them virtue and enterprise.';
@@ -50,7 +34,6 @@ class StringPartTest extends TestCase {
     $this->assertTrue(((string) $part) === $comparison);
   }
 
-  #[TestDox('Tests the clean() method.')]
   public function testClean() : void {
     $sentence = 'But the Court has cheated both sides, robbing the winners of an honest victory, and the losers of the peace that comes from a fair defeat.';
     // ~ A. Scalia, J., dissenting in United States v. Windsor
@@ -77,7 +60,6 @@ class StringPartTest extends TestCase {
     StringPart::create($backingString, $startPosition, $endPosition);
   }
 
-  #[TestDox('Tests the equals() method.')]
   public function testEquals() : void {
     $firstPart = 'It occurred to him that those scarcely perceptible impulses of his to protest what people of high rank considered good,';
     $secondPart = 'vague impulses which he had always suppressed, might have been precisely what mattered,';
@@ -88,7 +70,6 @@ class StringPartTest extends TestCase {
     $this->assertTrue($part->equals($secondPart));
   }
 
-  #[TestDox('Tests the equalsStringPart() method.')]
   public function testEqualsStringPart() : void {
     $firstSentence = 'There are a dozen views about everything until you know the answer.';
     $secondSentence = 'Then there\'s never more than one.';
@@ -134,7 +115,6 @@ class StringPartTest extends TestCase {
     $this->assertFalse($part->isEmpty());
   }
 
-  #[TestDox('Tests the recut() method.')]
   public function testRecut() : void {
     $firstSentence = 'We laugh at honour and are shocked to find traitors in our midst. ';
     $secondSentence = 'We castrate and bid the geldings be fruitful.';
@@ -146,7 +126,6 @@ class StringPartTest extends TestCase {
     $this->assertTrue(((string) $part) === $firstSentence);
   }
 
-  #[TestDox('Tests the withNewEndpoints() method.')]
   public function testWithNewEndpoints() : void {
     $firstSentence = 'The whole point of seeing through something is to see something through it. ';
     $secondSentence = 'To "see through" all things is the same as not to see.';

@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace Ranine\Tests\Validation;
 
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\Attributes\Group;
@@ -19,9 +18,7 @@ use Ranine\Exception\MissingElementArraySchemaException;
 use Ranine\Exception\InvalidTypeArraySchemaException;
 
 #[CoversClass(ArraySchema::class)]
-#[CoversMethod('ArraySchema','validate')]
 #[Group('ranine')]
-#[TestDox('Tests the ArraySchema class.')]
 class ArraySchemaTest extends TestCase {
 
   private const BAD_SCHEMA_MESSAGE_1_1_1 = 'Value must be the integer "two."';
@@ -30,7 +27,6 @@ class ArraySchemaTest extends TestCase {
   private const BAD_SCHEMA_MESSAGE_1_3 = 'Value must be "a".';
   private const BAD_SCHEMA_MESSAGE_2 = 'Value must be a boolean.';
 
-  #[TestDox('Array schema under test.')]
   private ArraySchema $schema;
 
   #[TestDox('Tests the validate() method with an array with a missing element.')]
@@ -146,11 +142,10 @@ class ArraySchemaTest extends TestCase {
   }
 
   /**
-   * Provides valid arrays for testValidateValidSchema().
-   * 
    * @return mixed[][][]
    *   Arrays.
    */
+  #[TestDox('Provides valid arrays for testValidateValidSchema().')]
   public static function provideValidArrays() : array {
     return [
       [[
