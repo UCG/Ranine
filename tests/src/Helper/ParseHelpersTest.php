@@ -108,8 +108,8 @@ class ParseHelpersTest extends TestCase {
   }
 
   #[DataProvider('provideDataForParseIntRangeAndTryParseIntRangeTests')]
-  #[TestDox('Ignore NULL $output warning, tryParseIntRange will update it if successful.')]
   public function testTryParseIntRange(string $range, string $divider, array $expectedValues, int $expectedCount) : void {
+    // Ignore NULL $output warning, tryParseIntRange will update it if successful.
     $output = NULL;
     $succeeded = ParseHelpers::tryParseIntRange($range, $output, $divider);
 
