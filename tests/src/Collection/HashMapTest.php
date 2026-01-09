@@ -52,7 +52,7 @@ class HashMapTest extends TestCase {
     $this->assertTrue($map->get(4) === 5);
   }
 
-  #[TestDox('Tests the remove() and has() method.')]
+  #[TestDox('Tests the remove() and has() methods.')]
   public function testRemove() : void {
     // Uses the default hashing / comparison.
 

@@ -13,7 +13,6 @@ use Ranine\StringPart;
 
 #[CoversClass(BinaryStream::class)]
 #[Group('ranine')]
-#[TestDox('Tests the BinaryStream class.')]
 class BinaryStreamTest extends TestCase {
 
   #[TestDox('Tests various integer reading methods.')]
@@ -35,7 +34,6 @@ class BinaryStreamTest extends TestCase {
     $this->assertTrue($stream->readUint64BE() === 13);
   }
 
-  #[TestDox('Tests the readBytes() method.')]
   public function testReadBytes() : void {
     $firstLine = 'O Sir! the good die first,';
     $secondLine = 'And they whose hearts are dry as summer dust';
@@ -53,7 +51,6 @@ class BinaryStreamTest extends TestCase {
     $this->assertTrue(((string) $firstTwoLines) === ($firstLine. "\n" . $secondLine));
   }
 
-  #[TestDox('Tests the readUntil() method.')]
   public function testReadUntil() : void {
     $firstPart = 'It\'s all God\'s will';
     $secondPart = 'you can die in your sleep,';

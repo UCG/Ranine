@@ -48,7 +48,7 @@ class HashSetTest extends TestCase {
     $this->assertTrue($set->getCount() === 2);
   }
 
-  #[TestDox('Tests the remove() and has() method.')]
+  #[TestDox('Tests the remove() and has() methods.')]
   public function testRemove() : void {
     // Uses the default hashing / comparison. 
 

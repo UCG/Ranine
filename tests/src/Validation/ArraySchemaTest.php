@@ -27,6 +27,9 @@ class ArraySchemaTest extends TestCase {
   private const BAD_SCHEMA_MESSAGE_1_3 = 'Value must be "a".';
   private const BAD_SCHEMA_MESSAGE_2 = 'Value must be a boolean.';
 
+  /**
+  * Array schema under test.
+  */
   private ArraySchema $schema;
 
   #[TestDox('Tests the validate() method with an array with a missing element.')]
