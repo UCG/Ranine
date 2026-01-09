@@ -4,29 +4,18 @@ declare(strict_types = 1);
 
 namespace Ranine\Tests;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 use Ranine\BinaryStream;
 use Ranine\StringPart;
 
-/**
- * Tests the BinaryStream class.
- *
- * @coversDefaultClass \Ranine\BinaryStream
- * @group ranine
- */
+#[CoversClass(BinaryStream::class)]
+#[Group('ranine')]
 class BinaryStreamTest extends TestCase {
 
-  /**
-   * Tests various integer reading methods.
-   *
-   * @covers ::readUInt8
-   * @covers ::readUInt16BE
-   * @covers ::readUInt16LE
-   * @covers ::readUInt32BE
-   * @covers ::readUInt32LE
-   * @covers ::readUInt64BE
-   * @covers ::readUInt64LE
-   */
+  #[TestDox('Tests various integer reading methods.')]
   public function testIntegerReading() : void {
     $source = (function () {
       $str = pack('CVNnvPJ', 1, 1, 2, 3, 5, 8, 13);
@@ -45,11 +34,6 @@ class BinaryStreamTest extends TestCase {
     $this->assertTrue($stream->readUint64BE() === 13);
   }
 
-  /**
-   * Tests the readBytes() method.
-   *
-   * @covers ::readBytes
-   */
   public function testReadBytes() : void {
     $firstLine = 'O Sir! the good die first,';
     $secondLine = 'And they whose hearts are dry as summer dust';
@@ -67,11 +51,6 @@ class BinaryStreamTest extends TestCase {
     $this->assertTrue(((string) $firstTwoLines) === ($firstLine. "\n" . $secondLine));
   }
 
-  /**
-   * Tests the readUntil() method.
-   *
-   * @covers ::readUntil
-   */
   public function testReadUntil() : void {
     $firstPart = 'It\'s all God\'s will';
     $secondPart = 'you can die in your sleep,';
