@@ -155,9 +155,9 @@ class ExtendableIterableTest extends TestCase {
 
   #[DataProvider('provideDataForTestExpand')]
   public function testExpand(iterable $iterData,
-  array $expectedKeys,
-  array $expectedValues,
-  int $expectedCount) : void {
+    array $expectedKeys,
+    array $expectedValues,
+    int $expectedCount) : void {
 
     $iter = ExtendableIterable::from($iterData);
     $expansion = fn($key, $value) => is_iterable($value) ? $value : NULL;
@@ -167,10 +167,10 @@ class ExtendableIterableTest extends TestCase {
 
   #[DataProvider('provideDataForTestFilter')]
   public function testFilter(array $input,
-  callable   $filter,
-  array $expectedKeys,
-  array $expectedValues,
-  int $expectedCount) : void {
+    callable   $filter,
+    array $expectedKeys,
+    array $expectedValues,
+    int $expectedCount) : void {
 
     $iter = ExtendableIterable::from($input);
     $filteredIter = $iter->filter($filter);
@@ -233,11 +233,11 @@ class ExtendableIterableTest extends TestCase {
 
   #[DataProvider('provideDataForTestMap')]
   public function testMap(iterable $iterData,
-  callable $keyMap,
-  callable $valueMap,
-  array $expectedKeys,
-  array $expectedValues,
-  int $expectedCount) : void {
+    callable $keyMap,
+    callable $valueMap,
+    array $expectedKeys,
+    array $expectedValues,
+    int $expectedCount) : void {
 
     $iter = ExtendableIterable::from($iterData);
     $mappedIter = $iter->map($valueMap, $keyMap);
@@ -246,10 +246,10 @@ class ExtendableIterableTest extends TestCase {
 
   #[DataProvider('provideDataForTestMapSequentialKeys')]
   public function testMapSequentialKeys(array $iterData,
-  ?callable $valueMap,
-  array $expectedKeys,
-  array $expectedValues,
-  int $expectedCount) : void {
+    ?callable $valueMap,
+    array $expectedKeys,
+    array $expectedValues,
+    int $expectedCount) : void {
 
     $iter = ExtendableIterable::from($iterData);
     $mappedIter = $iter->mapSequentialKeys($valueMap);
@@ -258,9 +258,9 @@ class ExtendableIterableTest extends TestCase {
 
   #[DataProvider('provideDataForTestReduce')]
   public function testReduce(array $iterData,
-  callable $reduction,
-  mixed $initialValueOfAggregate,
-  mixed $expectedOutput) : void {
+    callable $reduction,
+    mixed $initialValueOfAggregate,
+    mixed $expectedOutput) : void {
 
     $iter = ExtendableIterable::from($iterData);
     $finalValue = $iter->reduce($reduction, $initialValueOfAggregate);
@@ -269,10 +269,10 @@ class ExtendableIterableTest extends TestCase {
 
   #[DataProvider('provideDataForTestTake')]
   public function testTake(array $iterData,
-  int $numberOfItemsToTake,
-  array $expectedKeys,
-  array $expectedValues,
-  int $expectedCount) : void {
+    int $numberOfItemsToTake,
+    array $expectedKeys,
+    array $expectedValues,
+    int $expectedCount) : void {
 
     $iter = ExtendableIterable::from($iterData);
     $result = $iter->take($numberOfItemsToTake);
@@ -287,10 +287,10 @@ class ExtendableIterableTest extends TestCase {
 
   #[DataProvider('provideDataForTestTakeWhile')]
   public function testTakeWhile(iterable $iterData,
-  callable $predicate,
-  ?int $max,
-  array $expectedKeys,
-  array $expectedValues,
+    callable $predicate,
+    ?int $max,
+    array $expectedKeys,
+    array $expectedValues,
     int $expectedCount) : void {
 
     $iter = ExtendableIterable::from($iterData);
