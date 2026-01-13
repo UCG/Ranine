@@ -4,23 +4,17 @@ declare(strict_types = 1);
 
 namespace Ranine\Tests\Helper;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 use Ranine\Helper\IterationHelpers;
 use Ranine\Iteration\RecursiveReferenceArrayIterator;
 
-/**
- * Tests the IterationHelpers class.
- *
- * @coversDefaultClass \Ranine\Helper\IterationHelpers
- * @group ranine
- */
+#[CoversClass(IterationHelpers::class)]
+#[Group('ranine')]
 class IterationHelpersTest extends TestCase {
 
-  /**
-   * Tests the walkRecursiveIterator() method.
-   *
-   * @covers ::walkRecursiveIterator
-   */
   public function testWalkRecursiveIteator() : void {
     $arr = [
       1 => [2, 3, 4 => [5, 6, 7], 8 => [9, 10]],
@@ -84,11 +78,7 @@ class IterationHelpersTest extends TestCase {
     $this->assertTrue($currentSum === $sumOfValues);
   }
 
-  /**
-   * Tests context modification (by reference) for walkRecursiveIterator().
-   *
-   * @covers ::walkRecursiveIterator
-   */
+  #[TestDox('Tests context modification (by reference) for walkRecursiveIterator().')]
   public function testWalkRecursiveIteratorContextModification() : void {
     $arr = [4 => [2, 3], 6 => 3];
     /** @var \Ranine\Iteration\RecursiveReferenceArrayIterator<int, int[]|int> */

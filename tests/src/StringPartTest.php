@@ -4,22 +4,17 @@ declare(strict_types = 1);
 
 namespace Ranine\Tests;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 use Ranine\StringPart;
 
-/**
- * Tests the StringPart class.
- *
- * @coversDefaultClass \Ranine\StringPart
- * @group ranine
- */
+#[CoversClass(StringPart::class)]
+#[Group('ranine')]
 class StringPartTest extends TestCase {
 
-  /**
-   * Tests the append() method.
-   *
-   * @covers ::append
-   */
   public function testAppend() : void {
     $firstSentence = 'In a sort of ghastly simplicity we remove the organ and demand the function. ';
     $secondSentence = 'We make men without chests and expect of them virtue and enterprise.';
@@ -39,11 +34,6 @@ class StringPartTest extends TestCase {
     $this->assertTrue(((string) $part) === $comparison);
   }
 
-  /**
-   * Tests the clean() method.
-   *
-   * @covers ::clean
-   */
   public function testClean() : void {
     $sentence = 'But the Court has cheated both sides, robbing the winners of an honest victory, and the losers of the peace that comes from a fair defeat.';
     // ~ A. Scalia, J., dissenting in United States v. Windsor
@@ -52,39 +42,24 @@ class StringPartTest extends TestCase {
     $part->clean();
     $this->assertTrue($part->getBackingString() === $sentence);
   }
-  
-  /**
-   * @covers ::clear
-   */
+
   public function testClear() : void {
     $part = StringPart::create('Delete this text!', 0, 16)->clear();
     $expected = '';
     $this->assertTrue($part->equals($expected));
   }
 
-  /**
-   * @covers ::create
-   *
-   * @dataProvider provideDataForTestCreate
-   */
+  #[DataProvider('provideDataForTestCreate')]
   public function testCreate(string $backingString, int $startPosition, int $endPosition, string $expectedString) : void {
     $this->assertSame($expectedString, (string)StringPart::create($backingString, $startPosition, $endPosition));
   }
-  
-  /**
-   * @covers ::create
-   * @dataProvider provideDataForTestCreateInvalid
-   */
+
+  #[DataProvider('provideDataForTestCreateInvalid')]
   public function testCreateInvalid(string $backingString, int $startPosition, int $endPosition) : void {
     $this->expectException('\InvalidArgumentException');
     StringPart::create($backingString, $startPosition, $endPosition);
   }
-  
-  /**
-   * Tests the equals() method.
-   *
-   * @covers ::equals
-   */
+
   public function testEquals() : void {
     $firstPart = 'It occurred to him that those scarcely perceptible impulses of his to protest what people of high rank considered good,';
     $secondPart = 'vague impulses which he had always suppressed, might have been precisely what mattered,';
@@ -95,11 +70,6 @@ class StringPartTest extends TestCase {
     $this->assertTrue($part->equals($secondPart));
   }
 
-  /**
-   * Tests the equalsStringPart() method.
-   *
-   * @covers ::equalsStringPart
-   */
   public function testEqualsStringPart() : void {
     $firstSentence = 'There are a dozen views about everything until you know the answer.';
     $secondSentence = 'Then there\'s never more than one.';
@@ -112,47 +82,32 @@ class StringPartTest extends TestCase {
     $this->assertTrue($part1->equalsStringPart($part3));
     $this->assertTrue($part3->equalsStringPart($part1));
   }
-  
-  /**
-   * @covers ::getBackingString
-   */
+
   public function testGetBackingString() : void {
     $part = StringPart::create('Somethin bit me!', 0, 7);
     $this->assertSame('Somethin bit me!', $part->getBackingString());
     // ~ Forest Gump
   }
-  
-  /**
-   * @covers ::getEndPosition
-   */
+
   public function testGetEndPosition() : void {
     $part = StringPart::create('Somethin bit me!', 5, 10);
     $this->assertSame(10, $part->getEndPosition());
     // ~ Forest Gump
   }
 
-  /**
-   * @covers ::getLength
-   * @dataProvider provideDataForTestGetLength
-   */
+  #[DataProvider('provideDataForTestGetLength')]
   public function testGetLength(int $startPosition, int $endPosition, int $expectedLength) : void {
     $part = StringPart::create('I have the ears of a fox and the eyes a hawk.', $startPosition, $endPosition);
     $this->assertSame($expectedLength, $part->getLength());
     // ~ J. R. Tolkien, Gimli, son of Glo'in, The Lord of the Rings: The Fellowship of the Ring
   }
 
-  /**
-   * @covers ::getStartPosition
-   * @dataProvider provideDataForTestGetStartPosition
-   */
+  #[DataProvider('provideDataForTestGetStartPosition')]
   public function testGetStartPosition(int $expectedStartPosition, int $startPosition, int $endPosition) : void {
     $part = StringPart::create('From your starting position, play pawn to e4.', $startPosition, $endPosition);
     $this->assertSame($expectedStartPosition, $part->getStartPosition());
   }
 
-  /**
-   * @covers ::isEmpty
-   */
   public function testIsEmpty() : void {
     $part = StringPart::create(' ', -1,-1);
     $this->assertTrue($part->isEmpty());
@@ -160,11 +115,6 @@ class StringPartTest extends TestCase {
     $this->assertFalse($part->isEmpty());
   }
 
-  /**
-   * Tests the recut() method.
-   *
-   * @covers ::recut
-   */
   public function testRecut() : void {
     $firstSentence = 'We laugh at honour and are shocked to find traitors in our midst. ';
     $secondSentence = 'We castrate and bid the geldings be fruitful.';
@@ -176,11 +126,6 @@ class StringPartTest extends TestCase {
     $this->assertTrue(((string) $part) === $firstSentence);
   }
 
-  /**
-   * Tests the withNewEndpoints() method.
-   *
-   * @covers ::withNewEndpoints
-   */
   public function testWithNewEndpoints() : void {
     $firstSentence = 'The whole point of seeing through something is to see something through it. ';
     $secondSentence = 'To "see through" all things is the same as not to see.';
@@ -204,7 +149,7 @@ class StringPartTest extends TestCase {
       ],
     ];
   }
-  
+
   public static function provideDataForTestCreateInvalid() : array {
     return [
       'endPos-not--1-when-startPos-is--1' => ['', -1, 0],
