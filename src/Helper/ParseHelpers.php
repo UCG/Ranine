@@ -91,6 +91,7 @@ final class ParseHelpers {
     if (!self::tryParseIntRange($range, $result, $divider)) {
       throw new ParseException('Could not parse integer range.');
     }
+    assert($result !== NULL);
     return $result;
   }
 

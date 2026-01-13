@@ -40,6 +40,8 @@ class RecursiveReferenceArrayIterator implements \RecursiveIterator {
 
   /**
    * {@inheritdoc}
+   *
+   * @return null|self<TKey, TValue>
    */
   public function getChildren() : ?self {
     $this->throwIfNotValid();

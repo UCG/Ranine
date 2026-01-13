@@ -54,8 +54,6 @@ class ArraySchema {
    *
    * @throws \Ranine\Exception\InvalidArraySchemaException
    *   Thrown if $data has an invalid schema.
-   *
-   * @phpstan-pure
    */
   public function validate(array $data) : void {
     // Ensure the top-level array doesn't clearly have too many items (every

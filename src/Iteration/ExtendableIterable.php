@@ -625,6 +625,8 @@ class ExtendableIterable implements \IteratorAggregate {
 
   /**
    * Creates an returns a new empty extendable iterable.
+   *
+   * @return self<TKey, TValue>
    */
   public static function empty() : self {
     return new self([]);

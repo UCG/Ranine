@@ -43,7 +43,7 @@ final class ThrowHelpers {
    *
    * @throws \InvalidArgumentException
    *
-   * phpstan-assert null|float|positive-int $value
+   * @phpstan-assert null|float|positive-int $value
    */
   public static function throwIfLessThanOrEqualToZero(int|float|null $value, string $variableName) : void {
     if ($value !== NULL && $value <= 0) {
@@ -60,7 +60,7 @@ final class ThrowHelpers {
    *
    * @throws \InvalidArgumentException
    *
-   * phpstan-assert null|float|int<0, max> $value
+   * @phpstan-assert null|float|int<0, max> $value
    */
   public static function throwIfLessThanZero(int|float|null $value, string $variableName) : void {
     if ($value !== NULL && $value < 0) {

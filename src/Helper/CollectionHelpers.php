@@ -54,7 +54,6 @@ final class CollectionHelpers {
       $currentOutputStartValue = 0;
       $currentOutputEndValue = 0;
       foreach ($ranges as $start => $end) {
-        /** @phpstan-ignore-next-line */
         if (!is_int($start) || !is_int($end)) {
           throw new \InvalidArgumentException('A key or value in $ranges is non-integral.');
         }

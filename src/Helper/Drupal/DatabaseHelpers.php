@@ -91,7 +91,6 @@ final class DatabaseHelpers {
         }
         else {
           // Transaction execution failed. Rollback.
-          /** @phpstan-ignore-next-line */
           if (isset($transaction)) {
             $transaction->rollBack();
           }
@@ -101,7 +100,6 @@ final class DatabaseHelpers {
         // Rollback transaction (should happen automatically for a detected
         // deadlock error code, but we do it here no matter what just to be
         // safe).
-        /** @phpstan-ignore-next-line */
         if (isset($transaction)) {
           $transaction->rollBack();
         }
@@ -120,7 +118,6 @@ final class DatabaseHelpers {
       }
       catch (\Throwable $e) {
         // Rollback and rethrow.
-        /** @phpstan-ignore-next-line */
         if (isset($transaction)) {
           $transaction->rollBack();
         }
@@ -146,7 +143,7 @@ final class DatabaseHelpers {
   public static function getMySqlErrorCode(DatabaseExceptionWrapper $exception) : ?string {
     // Grab the inner PDO exception.
     $pdoException = $exception->getPrevious();
-    assert(isset($pdoException) && is_object($pdoException) && $pdoException instanceof \PDOException);
+    assert(isset($pdoException) && $pdoException instanceof \PDOException);
     return $pdoException->errorInfo ? (string) $pdoException->errorInfo[1] : NULL;
   }
 

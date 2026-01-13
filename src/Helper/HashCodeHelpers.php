@@ -60,7 +60,7 @@ final class HashCodeHelpers {
         if (is_string($key)) {
           $keyHash = self::computeStringHashCode($key);
         }
-        elseif (is_int($key)) {
+        else {
           $keyHash = self::computeIntegerHashCode($key);
         }
         $hash ^= $keyHash ^ $keyValueSeparator;

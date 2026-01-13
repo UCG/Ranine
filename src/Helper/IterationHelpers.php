@@ -146,8 +146,6 @@ final class IterationHelpers {
 
       // Move 3. Work our way back up the tree, if necessary.
       while (!$currentIterator->valid() && $parentIterator !== NULL) {
-        /** @var \RecursiveIterator $childIterator */
-
         // Since we're done one level, call the level finish function.
         $levelFinish($currentContext);
 

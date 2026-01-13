@@ -31,7 +31,6 @@ class HashMapTest extends TestCase {
     }
     foreach ($pairsGeneration() as $key => $value) {
       $this->assertTrue($map->hasKey($key));
-      /** @phpstan-ignore-next-line */
       $this->assertTrue($map->get($key) === $value);
     }
   }

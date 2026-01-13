@@ -95,7 +95,6 @@ final class HttpHelpers {
    *   failed).
    * @param string $password
    *   (output) Password (undefined if header parsing failed).
-   * @phpstan-param non-empty-string $username
    *
    * @return bool
    *   Returns TRUE if the username and password were successfully parsed;

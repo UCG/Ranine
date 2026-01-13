@@ -39,7 +39,7 @@ class CsvParser {
   }
 
   public function readRow() : bool {
-    $row = static::getAndCheckCsvRow($this->file);
+    $row = self::getAndCheckCsvRow($this->file);
     if ($row === NULL) return FALSE;
     else {
       if (count($row) !== $this->numFields) {
@@ -131,7 +131,7 @@ class CsvParser {
    *   Thrown if the CSV data is malformed.
    */
   private static function fromResourceInternal($res, array $fieldGatherers) : self {
-    $headers = static::getAndCheckCsvRow($res);
+    $headers = self::getAndCheckCsvRow($res);
     if ($headers === NULL) {
       throw new BadCsvException('Empty input CSV data.');
     }
